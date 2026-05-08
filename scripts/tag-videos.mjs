@@ -18,6 +18,7 @@ const MODELS = [
   "workers-ai-llama-3.3-70b",
   "openrouter-llama-70b-free",
 ];
+const MAX_BATCH_ATTEMPTS = Math.max(2, MODELS.length * 2);
 
 const SYSTEM_PROMPT = `You are a video tagging assistant. Given a list of YouTube videos (title + description), return a JSON array of tag arrays.
 
@@ -96,6 +97,7 @@ async function processQueue(model, batches, results, stats) {
   while (true) {
     const batch = batches.pop();
     if (!batch) break;
+    batch.attempts = (batch.attempts ?? 0) + 1;
 
     const tags = await callModel(model, batch.videos);
     if (tags) {
@@ -107,9 +109,13 @@ async function processQueue(model, batches, results, stats) {
       }
       stats.success += batch.videos.length;
     } else {
-      // Put back for another model to try
-      batches.unshift(batch);
-      stats.retries++;
+      stats.retries += 1;
+      if (batch.attempts >= MAX_BATCH_ATTEMPTS) {
+        stats.failed += batch.videos.length;
+      } else {
+        // Put back for another model to try.
+        batches.unshift(batch);
+      }
     }
 
     const total = stats.success + stats.failed;
@@ -139,6 +145,7 @@ async function main() {
   console.log(`Videos needing tags: ${needsTagging.length}`);
   console.log(`Models: ${MODELS.length} (${MODELS.join(", ")})`);
   console.log(`Batch size: ${BATCH_SIZE}, Concurrency: ${MODELS.length * CONCURRENCY_PER_MODEL} workers`);
+  console.log(`Max attempts per batch: ${MAX_BATCH_ATTEMPTS}`);
 
   if (needsTagging.length === 0) {
     console.log("Nothing to tag!");
