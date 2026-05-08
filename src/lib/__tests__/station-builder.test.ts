@@ -3,6 +3,7 @@ import {
   buildCatalogPreview,
   createStationDraft,
   createStationPrExport,
+  createStationsJsonPatch,
   normalizeYouTubeHandle,
   parseSourceLines,
   slugifyStationId,
@@ -17,7 +18,7 @@ describe("station builder", () => {
   });
 
   it("parses named source lines with default duration filters", () => {
-    expect(parseSourceLines("Veritasium | @veritasium\nKurzgesagt | youtube.com/@kurzgesagt")).toEqual([
+    expect(parseSourceLines("Veritasium | @veritasium\nKurzgesagt | youtube.com/@kurzgesagt\nDupe | @veritasium")).toEqual([
       { name: "Veritasium", handle: "@veritasium", minDuration: 60, maxDuration: 1800 },
       { name: "Kurzgesagt", handle: "@kurzgesagt", minDuration: 60, maxDuration: 1800 },
     ]);
@@ -43,7 +44,8 @@ describe("station builder", () => {
       stations: {
         science: {
           videos: [
-            { id: "a", title: "Science A", duration: 120, date: "", tags: [], source: "Veritasium" },
+            { id: "a", title: "Science A", duration: 120, date: "", tags: ["physics"], source: "Veritasium" },
+            { id: "long", title: "Science Long", duration: 4000, date: "", tags: ["physics"], source: "Veritasium" },
             { id: "b", title: "Science B", duration: 180, date: "", tags: [], source: "Kurzgesagt" },
           ],
           categoryVideoIds: {},
@@ -68,11 +70,26 @@ describe("station builder", () => {
 
     expect(preview.totalVideos).toBe(1);
     expect(preview.sourcePreviews[0].matchedStations).toEqual(["Science"]);
+    expect(preview.sourcePreviews[0].rejectedVideoCount).toBe(1);
+    expect(preview.sourcePreviews[0].commonTags).toEqual(["physics"]);
     expect(preview.sourcePreviews[0].sampleVideos[0].title).toBe("Science A");
     expect(preview.sourcePreviews[1].videoCount).toBe(0);
   });
 
-  it("exports a PR-ready payload with catalog preview and JSON snippet", () => {
+  it("exports a deterministic stations.json patch", () => {
+    const draft = createStationDraft({
+      name: "Deep Science",
+      description: "Physics and experiments",
+      sourcesText: "Veritasium | @veritasium",
+    });
+    const patch = createStationsJsonPatch(draft);
+
+    expect(patch).toContain("*** Update File: stations.json");
+    expect(patch).toContain('"id": "deep-science"');
+    expect(patch).toContain("+]");
+  });
+
+  it("exports a PR-ready payload with catalog preview and patch instructions", () => {
     const draft = createStationDraft({
       name: "Deep Science",
       description: "Physics and experiments",
@@ -80,11 +97,20 @@ describe("station builder", () => {
     });
     const text = createStationPrExport(draft, {
       totalVideos: 42,
-      sourcePreviews: [{ source: draft.sources[0], videoCount: 42, sampleVideos: [], matchedStations: [] }],
+      sourcePreviews: [{
+        source: draft.sources[0],
+        videoCount: 42,
+        rejectedVideoCount: 2,
+        sampleVideos: [],
+        matchedStations: [],
+        commonTags: ["physics"],
+      }],
     });
 
     expect(text).toContain("Title: Add Deep Science station");
     expect(text).toContain("42 matching videos");
+    expect(text).toContain("2 rejected by duration filters");
+    expect(text).toContain("common tags: physics");
     expect(text).toContain('"id": "deep-science"');
   });
 });

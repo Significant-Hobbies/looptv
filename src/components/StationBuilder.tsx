@@ -161,10 +161,22 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                           {source.videoCount.toLocaleString()}
                         </span>
                       </div>
+                      <p className="mt-2 text-xs text-white/35">
+                        {source.rejectedVideoCount.toLocaleString()} rejected by duration filters
+                      </p>
                       {source.matchedStations.length > 0 && (
                         <p className="mt-2 text-xs text-white/35">
                           Already appears in {source.matchedStations.join(", ")}
                         </p>
+                      )}
+                      {source.commonTags.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {source.commonTags.map((tag) => (
+                            <span key={tag} className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/35">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                       {source.sampleVideos.length > 0 ? (
                         <ul className="mt-3 space-y-1.5">
@@ -187,7 +199,7 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
               <section className="grid gap-4 xl:grid-cols-2">
                 <div>
                   <div className="mb-2 flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-semibold text-white">stations.json</h3>
+                    <h3 className="text-sm font-semibold text-white">stations.json entry</h3>
                     <button
                       onClick={() => copyText("json", jsonSnippet)}
                       className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/15"

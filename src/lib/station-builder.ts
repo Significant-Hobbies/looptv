@@ -10,8 +10,10 @@ export interface StationBuilderDraft {
 export interface SourcePreview {
   source: YouTubeSource;
   videoCount: number;
+  rejectedVideoCount: number;
   sampleVideos: Video[];
   matchedStations: string[];
+  commonTags: string[];
 }
 
 export interface CatalogPreview {
@@ -50,6 +52,8 @@ export function parseSourceLines(
   const minDuration = defaults.minDuration ?? DEFAULT_MIN_DURATION;
   const maxDuration = defaults.maxDuration ?? DEFAULT_MAX_DURATION;
 
+  const seenHandles = new Set<string>();
+
   return input
     .split(/\r?\n|,/)
     .map((line) => line.trim())
@@ -67,7 +71,11 @@ export function parseSourceLines(
         maxDuration,
       };
     })
-    .filter((source) => source.handle.length > 1);
+    .filter((source) => {
+      if (source.handle.length <= 1 || seenHandles.has(source.handle.toLowerCase())) return false;
+      seenHandles.add(source.handle.toLowerCase());
+      return true;
+    });
 }
 
 export function createStationDraft(input: {
@@ -104,8 +112,10 @@ export function buildCatalogPreview(
       sourcePreviews: draft.sources.map((source) => ({
         source,
         videoCount: 0,
+        rejectedVideoCount: 0,
         sampleVideos: [],
         matchedStations: [],
+        commonTags: [],
       })),
     };
   }
@@ -130,13 +140,16 @@ export function buildCatalogPreview(
       }
     }
 
-    const videos = allVideos.filter((video) => video.source && matchedNames.has(video.source));
+    const candidates = allVideos.filter((video) => video.source && matchedNames.has(video.source));
+    const videos = candidates.filter((video) => passesDurationFilter(video, source));
 
     return {
       source,
       videoCount: videos.length,
+      rejectedVideoCount: candidates.length - videos.length,
       sampleVideos: videos.slice(0, 3),
       matchedStations: [...matchedStations].sort(),
+      commonTags: collectCommonTags(videos),
     };
   });
 
@@ -150,9 +163,33 @@ export function createStationConfigSnippet(draft: StationBuilderDraft): string {
   return JSON.stringify(draft, null, 2);
 }
 
+export function createStationsJsonPatch(draft: StationBuilderDraft): string {
+  const entry = createStationConfigSnippet(draft)
+    .split("\n")
+    .map((line) => `  ${line}`)
+    .join("\n");
+
+  return [
+    "*** Begin Patch",
+    "*** Update File: stations.json",
+    "@@",
+    "-]",
+    "+,",
+    ...entry.split("\n").map((line) => `+${line}`),
+    "+]",
+    "*** End Patch",
+  ].join("\n");
+}
+
 export function createStationPrExport(draft: StationBuilderDraft, preview: CatalogPreview): string {
   const sourceSummary = preview.sourcePreviews
-    .map((source) => `- ${source.source.name} (${source.source.handle}): ${source.videoCount.toLocaleString()} catalog videos`)
+    .map((source) => {
+      const rejected = source.rejectedVideoCount > 0
+        ? `, ${source.rejectedVideoCount.toLocaleString()} rejected by duration filters`
+        : "";
+      const tags = source.commonTags.length > 0 ? `, common tags: ${source.commonTags.join(", ")}` : "";
+      return `- ${source.source.name} (${source.source.handle}): ${source.videoCount.toLocaleString()} catalog videos${rejected}${tags}`;
+    })
     .join("\n");
 
   return [
@@ -166,11 +203,34 @@ export function createStationPrExport(draft: StationBuilderDraft, preview: Catal
     "Catalog preview:",
     sourceSummary || "- No sources yet.",
     "",
-    "stations.json entry:",
-    "```json",
-    createStationConfigSnippet(draft),
+    "Deterministic stations.json patch:",
+    "```diff",
+    createStationsJsonPatch(draft),
     "```",
   ].join("\n");
+}
+
+function passesDurationFilter(video: Video, source: YouTubeSource): boolean {
+  if (source.minDuration !== undefined && video.duration < source.minDuration) return false;
+  if (source.maxDuration !== undefined && video.duration > source.maxDuration) return false;
+  return true;
+}
+
+function collectCommonTags(videos: Video[]): string[] {
+  const counts = new Map<string, number>();
+
+  for (const video of videos) {
+    for (const tag of video.tags) {
+      const normalized = tag.trim();
+      if (!normalized) continue;
+      counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+    }
+  }
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 5)
+    .map(([tag]) => tag);
 }
 
 function titleCase(value: string): string {
