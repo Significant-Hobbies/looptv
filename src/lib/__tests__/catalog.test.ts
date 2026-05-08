@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { formatDuration, pickRandom, getVideosForStation } from "../catalog";
+import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, scoreVideo, serializeSmartMixProfile } from "../smartmix";
 import type { Video, Catalog } from "../types";
 
 // ---------- formatDuration ----------
@@ -23,6 +24,31 @@ describe("formatDuration", () => {
 
   it("formats 3600 seconds as 1:00:00", () => {
     expect(formatDuration(3600)).toBe("1:00:00");
+  });
+});
+
+describe("Smart Mix", () => {
+  it("scores videos from preferred sources and tags higher", () => {
+    const profile = createSmartMixProfile({ sourceWeights: { Alpha: 2 }, tagWeights: { fun: 3 } });
+    const preferred = scoreVideo({ id: "a", title: "A", duration: 300, date: "", tags: ["fun"], source: "Alpha", viewCount: 1000 }, profile);
+    const other = scoreVideo({ id: "b", title: "B", duration: 300, date: "", tags: ["serious"], source: "Beta", viewCount: 1000 }, profile);
+    expect(preferred.score).toBeGreaterThan(other.score);
+    expect(preferred.reason).toContain("Alpha source match");
+  });
+
+  it("avoids disliked and recently played videos", () => {
+    const catalog = makeCatalog();
+    const profile = createSmartMixProfile({ dislikes: ["a", "b"] });
+    const pick = pickSmartMixVideo(catalog, profile, { recentIds: new Set(["c"]) });
+    expect(pick.video).toBeNull();
+  });
+
+  it("updates preference weights and round-trips exported profiles", () => {
+    const video = { id: "a", title: "A", duration: 300, date: "", tags: ["fun"], source: "Alpha" };
+    const profile = applyPreference(createSmartMixProfile(), video, "favorite");
+    expect(profile.favorites).toContain("a");
+    expect(profile.sourceWeights.Alpha).toBe(1);
+    expect(parseSmartMixProfile(serializeSmartMixProfile(profile))).toEqual(profile);
   });
 });
 

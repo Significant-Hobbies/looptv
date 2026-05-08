@@ -3,11 +3,14 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { Catalog, Video } from "@/lib/types";
 import { loadCatalog, getVideosForStation, pickRandom, formatDuration } from "@/lib/catalog";
-import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater } from "@/lib/watched";
+import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
+import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
 import Link from "next/link";
 import Player, { type PlayerHandle } from "./Player";
 import Search from "./Search";
 import stations from "../../channels.config";
+
+const SMART_MIX_ID = "smart-mix";
 
 export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
@@ -26,6 +29,16 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [copied, setCopied] = useState(false);
   const [watchLaterIds, setWatchLaterIds] = useState<Set<string>>(() => new Set(getWatchLater()));
+  const [smartMixProfile, setSmartMixProfile] = useState<SmartMixProfile>(() => {
+    const raw = getSmartMixProfileRaw();
+    if (!raw) return createSmartMixProfile();
+    try {
+      return parseSmartMixProfile(raw);
+    } catch {
+      return createSmartMixProfile();
+    }
+  });
+  const [smartMixReason, setSmartMixReason] = useState("");
   const queueRef = useRef<Video[]>([]);
   const [queueCount, setQueueCount] = useState(0);
   const skippedRef = useRef(new Set<string>());
@@ -34,7 +47,10 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const playerRef = useRef<PlayerHandle>(null);
 
   const isPlayAll = activeStation === "all";
-  const config = isPlayAll
+  const isSmartMix = activeStation === SMART_MIX_ID;
+  const config = isSmartMix
+    ? { id: SMART_MIX_ID, name: "Smart Mix", description: "Personalized from favorites, dislikes, sources, tags, and local watch signals", sources: [] as { name: string; handle: string }[] }
+    : isPlayAll
     ? { id: "all", name: "All Stations", description: "Shuffle across all stations", sources: [] as { name: string; handle: string }[] }
     : stations.find((s) => s.id === activeStation) ?? stations[0];
 
@@ -77,7 +93,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         return;
       }
 
-      const videos = getVideosForStation(catalog, activeStation, cat || activeCategory);
+      const videos = isSmartMix
+        ? Object.values(catalog.stations).flatMap((station) => station.videos)
+        : getVideosForStation(catalog, activeStation, cat || activeCategory);
       // Filter out watched if enabled, plus skipped (embed errors)
       const available = videos.filter(
         (v) => !skippedRef.current.has(v.id) && (!hideWatched || !watchedIds.has(v.id)) && (!v.source || !blockedSources.has(v.source)) && (!activeSources || !v.source || activeSources.has(v.source))
@@ -90,19 +108,29 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         skippedRef.current.clear();
       }
 
+      const recentIds = new Set(historyRef.current.slice(-12).map((video) => video.id));
+      const smartPick = isSmartMix
+        ? pickSmartMixVideo(catalog, smartMixProfile, {
+            watchedIds: hideWatched ? watchedIds : undefined,
+            blockedSources,
+            excludeId: currentVideo?.id,
+            recentIds,
+          })
+        : null;
       const pool = available.length > 0 ? available : videos;
-      const next = pickRandom(pool, currentVideo?.id);
+      const next = smartPick ? smartPick.video : pickRandom(pool, currentVideo?.id);
       if (next) {
         maybeMarkWatched(currentVideo);
         if (currentVideo) { historyRef.current.push(currentVideo); setHasHistory(true); }
         setCurrentVideo(next);
+        setSmartMixReason(smartPick?.reason ?? "");
         setStatus("");
         setPaused(false);
       } else {
         setStatus("No unwatched videos in this category");
       }
     },
-    [catalog, activeStation, activeCategory, currentVideo, hideWatched, watchedIds, blockedSources, activeSources, maybeMarkWatched]
+    [catalog, activeStation, activeCategory, currentVideo, hideWatched, watchedIds, blockedSources, activeSources, maybeMarkWatched, isSmartMix, smartMixProfile]
   );
 
   const playPrev = useCallback(() => {
@@ -201,11 +229,19 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     [currentVideo, playNext]
   );
 
-  const allVideos = isPlayAll
+  const allVideos = isPlayAll || isSmartMix
     ? Object.values(catalog?.stations ?? {}).flatMap((s) => s.videos)
     : catalog?.stations?.[activeStation]?.videos ?? [];
   const catalogLoaded = catalog !== null;
   const unwatchedCount = allVideos.filter((v) => !watchedIds.has(v.id)).length;
+
+  const updateSmartPreference = useCallback((preference: "favorite" | "dislike") => {
+    if (!currentVideo) return;
+    const next = applyPreference(smartMixProfile, currentVideo, preference);
+    setSmartMixProfile(next);
+    setSmartMixProfileRaw(serializeSmartMixProfile(next));
+    if (preference === "dislike") playNext();
+  }, [currentVideo, playNext, smartMixProfile]);
 
   // ── Landing: channel picker with stats ──
   if (mode === "landing") {
@@ -236,6 +272,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               Shuffle
+            </button>
+            <button
+              onClick={() => { setActiveStation(SMART_MIX_ID); setMode("playing"); }}
+              className="bg-white text-black hover:bg-white/90 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4h2m-1 0v16m-7-5h14M5 9h14" /></svg>
+              Smart Mix
             </button>
           </div>
           {stats.totalWatched > 0 && (
@@ -428,11 +471,77 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                   {queueCount > 0 && <span className="text-blue-400">{queueCount} queued</span>}
                   {status && <span className="text-yellow-500">{status}</span>}
                 </p>
+                {isSmartMix && (
+                  <p className="text-white/30 text-xs mt-1 truncate">
+                    {smartMixReason || "Learning from favorites, dislikes, tags, sources, skips, and watch history."}
+                  </p>
+                )}
               </div>
             )}
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
+            {currentVideo && (
+              <>
+                <button
+                  onClick={() => updateSmartPreference("favorite")}
+                  className={`p-2 rounded-lg transition-colors ${smartMixProfile.favorites.includes(currentVideo.id) ? "text-yellow-300" : "text-white/40 hover:text-yellow-300 hover:bg-white/10"}`}
+                  title="Favorite for Smart Mix"
+                >
+                  <svg className="w-5 h-5" fill={smartMixProfile.favorites.includes(currentVideo.id) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.48 3.499l2.006 4.064 4.486.652-3.246 3.164.766 4.468-4.012-2.109-4.012 2.109.766-4.468-3.246-3.164 4.486-.652 2.006-4.064z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => updateSmartPreference("dislike")}
+                  className={`p-2 rounded-lg transition-colors ${smartMixProfile.dislikes.includes(currentVideo.id) ? "text-red-400" : "text-white/40 hover:text-red-400 hover:bg-white/10"}`}
+                  title="Dislike and skip in Smart Mix"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l2.682-5.364A2 2 0 017.918 4H15v10l-4 7-1-1v-6zM15 4h4v10h-4V4z" />
+                  </svg>
+                </button>
+              </>
+            )}
+            {isSmartMix && (
+              <>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(serializeSmartMixProfile(smartMixProfile));
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                  title="Export Smart Mix profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v12m0-12l4 4m-4-4L8 7m-4 10h16v4H4v-4z" /></svg>
+                </button>
+                <button
+                  onClick={() => {
+                    const raw = window.prompt("Paste Smart Mix profile JSON");
+                    if (!raw) return;
+                    const next = parseSmartMixProfile(raw);
+                    setSmartMixProfile(next);
+                    setSmartMixProfileRaw(serializeSmartMixProfile(next));
+                  }}
+                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                  title="Import Smart Mix profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21V9m0 12l4-4m-4 4l-4-4m-4-10h16V3H4v4z" /></svg>
+                </button>
+                <button
+                  onClick={() => {
+                    resetSmartMixProfile();
+                    setSmartMixProfile(createSmartMixProfile());
+                    setSmartMixReason("");
+                  }}
+                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                  title="Reset Smart Mix profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0019 5m0 0h-5m5 0v5" /></svg>
+                </button>
+              </>
+            )}
             {/* Hide watched toggle */}
             <button
               onClick={() => setHideWatched((h) => !h)}
