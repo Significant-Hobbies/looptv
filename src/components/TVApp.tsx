@@ -63,7 +63,18 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   useEffect(() => {
     loadCatalog()
       .then((c) => { setCatalog(c); setStatus(""); })
-      .catch(() => setStatus("No catalog found. Run: pnpm run build:catalog"));
+      .catch((err) => {
+        console.error("TVApp: catalog load failed after retries", err);
+        const isDev =
+          typeof window !== "undefined" &&
+          (window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1");
+        setStatus(
+          isDev
+            ? "No catalog found. Run: pnpm run build:catalog"
+            : "Catalog couldn't load. Check your connection and refresh.",
+        );
+      });
   }, []);
 
   // Mark video as watched only if user watched >= 50%
