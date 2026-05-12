@@ -6,12 +6,15 @@ import {
   getBlockedSources,
   getSmartMixProfileRaw,
   getStats,
+  getUserPrefs,
   getWatchedIds,
   getWatchLater,
   markWatched,
   removeWatchLater,
   resetSmartMixProfile,
+  resetUserPrefs,
   setSmartMixProfileRaw,
+  setUserPrefs,
   unblockSource,
 } from "../watched";
 
@@ -192,6 +195,47 @@ describe("smart mix profile raw I/O", () => {
     setSmartMixProfileRaw("{}");
     resetSmartMixProfile();
     expect(getSmartMixProfileRaw()).toBeNull();
+  });
+});
+
+describe("user prefs", () => {
+  it("returns defaults when unset", () => {
+    const prefs = getUserPrefs();
+    expect(prefs).toEqual({
+      defaultStation: null,
+      hideWatched: true,
+      autoplayOnLoad: false,
+      startMuted: false,
+    });
+  });
+
+  it("patches a single key without disturbing the rest", () => {
+    const updated = setUserPrefs({ defaultStation: "comedy" });
+    expect(updated.defaultStation).toBe("comedy");
+    expect(updated.hideWatched).toBe(true);
+    expect(getUserPrefs().defaultStation).toBe("comedy");
+  });
+
+  it("survives an arbitrary unknown field in stored prefs", () => {
+    localStorage.setItem(
+      "looptv_prefs",
+      JSON.stringify({ defaultStation: "snl", legacyField: 1 }),
+    );
+    const prefs = getUserPrefs();
+    expect(prefs.defaultStation).toBe("snl");
+    expect(prefs.hideWatched).toBe(true);
+  });
+
+  it("reset wipes prefs back to defaults", () => {
+    setUserPrefs({ defaultStation: "snl", autoplayOnLoad: true });
+    resetUserPrefs();
+    expect(getUserPrefs().defaultStation).toBeNull();
+    expect(getUserPrefs().autoplayOnLoad).toBe(false);
+  });
+
+  it("recovers from malformed JSON in storage", () => {
+    localStorage.setItem("looptv_prefs", "}{");
+    expect(getUserPrefs().defaultStation).toBeNull();
   });
 });
 
