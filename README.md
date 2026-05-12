@@ -90,6 +90,31 @@ Next.js frontend       <- Picks random videos, plays via YouTube IFrame API
 | 1-9 | Jump to station by number |
 | Esc | Close search |
 
+## Playback edge cases
+
+- **Embed errors 101 / 150.** When a channel disables embedding for a
+  specific video (geo-block, copyright claim, owner setting), the YouTube
+  IFrame Player fires `onError` with code 101 or 150. `Player.tsx` treats
+  both as auto-skip: the video is added to a session skip set and the next
+  random pick fires immediately. There's no user-visible error and no
+  toast — by design, so the "TV channel" feel never breaks.
+- **No /catalog.json.** Catalog fetches retry twice with backoff before
+  giving up; if they still fail, a connection hint shows in production and
+  the dev build instruction shows on localhost.
+
+## Local stats
+
+`watched.ts` keeps everything client-side in `localStorage`:
+
+- `looptv_watched` — set of video IDs seen ≥ 50% through.
+- `looptv_stats` — counts by station + source, total seconds watched.
+- `looptv_blocked_sources` — sources you opted out of.
+- `looptv_watch_later` — bookmarked video IDs.
+- `looptv_smart_mix_profile` — Smart Mix preference weights.
+- `looptv_prefs` — default station, autoplay/mute on load, hide-watched toggle.
+
+Clearing site data wipes all of it; nothing leaves the browser.
+
 ## GitHub Actions
 
 The catalog updates weekly via GitHub Actions (`.github/workflows/update-catalog.yml`). It fetches new videos, runs NER only on new additions, and commits the updated catalog.
