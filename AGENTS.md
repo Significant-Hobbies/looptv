@@ -20,7 +20,7 @@ TV-like random YouTube player with 13 stations, 78 channels, and ~38K videos —
 - DB: None — static `public/catalog.json` served at runtime; watched history in localStorage
 - Auth: None
 - Testing: Vitest (unit)
-- Deploy: Cloudflare Pages (static export, `output: 'export'`) — `looptv.pages.dev`; legacy Worker at `looptv.sarthakagrawal927.workers.dev` left intact
+- Deploy: Cloudflare Pages (static export, `output: 'export'`) — `looptv.pages.dev`. The legacy Worker at `looptv.sarthakagrawal927.workers.dev` is orphaned (no longer in the deploy path); remove with `wrangler delete --name looptv` once the Pages deploy is verified.
 - Package manager: pnpm
 
 ## Repo structure
