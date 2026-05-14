@@ -5,6 +5,7 @@ import type { Catalog, Video } from "@/lib/types";
 import { loadCatalog, getVideosForStation, pickRandom, formatDuration } from "@/lib/catalog";
 import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
+import { ytErrorReason } from "@/lib/yt-errors";
 import Link from "next/link";
 import Player, { type PlayerHandle } from "./Player";
 import Search from "./Search";
@@ -234,9 +235,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   }, [mode, playNext, playPrev, handleCategoryChange, categories, searchOpen, startPlaying]);
 
   const handleError = useCallback(
-    () => {
+    (code: number) => {
       if (currentVideo) skippedRef.current.add(currentVideo.id);
-      setStatus("Skipping...");
+      setStatus(`Skipping (${ytErrorReason(code)})...`);
       setTimeout(() => playNext(), 500);
     },
     [currentVideo, playNext]
