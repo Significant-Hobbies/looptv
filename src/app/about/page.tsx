@@ -44,7 +44,7 @@ export default function AboutPage() {
           player and the catalog is just a committed JSON file.
         </p>
         <p>
-          Watched history lives in your browser's localStorage and never leaves
+          Watched history lives in your browser&apos;s localStorage and never leaves
           your device.
         </p>
       </section>
@@ -84,7 +84,7 @@ export default function AboutPage() {
           <code className="text-amber-400">stations.json</code>, run{" "}
           <code className="text-amber-400">pnpm run build:catalog</code>{" "}
           (requires <code className="text-amber-400">yt-dlp</code>), and deploy.
-          That's it.
+          That&apos;s it.
         </p>
       </section>
     </main>
