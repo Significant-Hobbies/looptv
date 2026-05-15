@@ -1,5 +1,8 @@
 import type { MetadataRoute } from "next";
 
+// looptv uses `output: 'export'`, so every route must be statically renderable.
+export const dynamic = "force-static";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "LoopTV",
