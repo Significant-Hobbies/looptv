@@ -18,6 +18,8 @@ export default function StatsPage() {
   const [uniqueWatched, setUniqueWatched] = useState(0);
 
   useEffect(() => {
+    // localStorage is client-only — reading on mount is the standard pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStats(getStats());
     setUniqueWatched(getWatchedIds().size);
   }, []);
