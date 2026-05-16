@@ -47,7 +47,7 @@ for (const station of stationsConfig) {
         const raw = JSON.parse(line);
         const dur = raw.duration || 0;
         if (dur < minDur || dur > maxDur) continue;
-        if ((raw.view_count || 0) < 10000) continue;
+        if (raw.view_count !== undefined && raw.view_count !== null && raw.view_count < 10000) continue;
         videos.push(raw);
       } catch {}
     }
@@ -70,6 +70,7 @@ function calcPercentile(count) {
 
 const catalog = { lastUpdated: "", stations: {} };
 let totalNew = 0;
+const emptyStations = [];
 
 for (const station of stationsConfig) {
   const allVideos = [];
@@ -114,6 +115,9 @@ for (const station of stationsConfig) {
   }
 
   catalog.stations[station.id] = { videos: allVideos, categoryVideoIds: {} };
+  if (allVideos.length === 0) {
+    emptyStations.push(station.id);
+  }
 
   const sourceNames = station.sources.map((s) => s.name).join(" + ");
   const newInStation = allVideos.filter((v) => v.description).length;
@@ -127,3 +131,10 @@ fs.writeFileSync(OUTPUT, JSON.stringify(catalog));
 const sizeKB = Math.round(fs.statSync(OUTPUT).size / 1024);
 console.log(`\nTotal new videos needing NER: ${totalNew}`);
 console.log(`Output: ${OUTPUT} (${sizeKB}KB)`);
+
+if (emptyStations.length > 0) {
+  console.error(
+    `Catalog build produced empty stations: ${emptyStations.join(", ")}. Refusing to ship an empty TV catalog.`
+  );
+  process.exit(1);
+}
