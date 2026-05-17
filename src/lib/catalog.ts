@@ -7,13 +7,36 @@ let summaryInflight: Promise<CatalogSummary> | null = null;
 
 const RETRY_DELAYS_MS = [400, 1200];
 
+function catalogVideoCount(catalog: Catalog): number {
+  return Object.values(catalog.stations ?? {}).reduce(
+    (total, station) => total + (Array.isArray(station.videos) ? station.videos.length : 0),
+    0,
+  );
+}
+
+function assertUsableCatalog(catalog: Catalog): Catalog {
+  if (!catalog?.stations || catalogVideoCount(catalog) === 0) {
+    throw new Error("Catalog loaded but contains no videos");
+  }
+  return catalog;
+}
+
+function assertUsableSummary(summary: CatalogSummary): CatalogSummary {
+  if (!summary?.stations || (summary.totalVideos ?? 0) === 0) {
+    throw new Error("Catalog summary loaded but contains no videos");
+  }
+  return summary;
+}
+
 async function fetchCatalogWithRetry(): Promise<Catalog> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
-      const res = await fetch("/catalog.json", { cache: "force-cache" });
+      const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
+      const url = shouldBypassCache ? `/catalog.json?v=${Date.now()}` : "/catalog.json";
+      const res = await fetch(url, { cache: shouldBypassCache ? "no-store" : "force-cache" });
       if (!res.ok) throw new Error(`Failed to load catalog: ${res.status}`);
-      return (await res.json()) as Catalog;
+      return assertUsableCatalog((await res.json()) as Catalog);
     } catch (err) {
       lastErr = err;
       if (attempt < RETRY_DELAYS_MS.length) {
@@ -43,9 +66,15 @@ export async function loadCatalogSummary(): Promise<CatalogSummary> {
   if (summaryCache) return summaryCache;
   if (summaryInflight) return summaryInflight;
   summaryInflight = fetch("/catalog-summary.json", { cache: "force-cache" })
-    .then((res) => {
+    .then(async (res) => {
       if (!res.ok) throw new Error(`Failed to load catalog summary: ${res.status}`);
-      return res.json() as Promise<CatalogSummary>;
+      try {
+        return assertUsableSummary((await res.json()) as CatalogSummary);
+      } catch {
+        const fresh = await fetch(`/catalog-summary.json?v=${Date.now()}`, { cache: "no-store" });
+        if (!fresh.ok) throw new Error(`Failed to refresh catalog summary: ${fresh.status}`);
+        return assertUsableSummary((await fresh.json()) as CatalogSummary);
+      }
     })
     .then((summary) => {
       summaryCache = summary;

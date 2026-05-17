@@ -11,12 +11,14 @@ import Player, { type PlayerHandle } from "./Player";
 import Search from "./Search";
 import StationBuilder from "./StationBuilder";
 import stations from "../../channels.config";
+import bundledCatalogSummary from "../../public/catalog-summary.json";
 
 const SMART_MIX_ID = "smart-mix";
+const INITIAL_CATALOG_SUMMARY = bundledCatalogSummary as CatalogSummary;
 
 export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
-  const [catalogSummary, setCatalogSummary] = useState<CatalogSummary | null>(null);
+  const [catalogSummary, setCatalogSummary] = useState<CatalogSummary | null>(INITIAL_CATALOG_SUMMARY);
   const [activeStation, setActiveStation] = useState(initialChannel || stations[0].id);
   const [activeCategory, setActiveCategory] = useState("all");
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
