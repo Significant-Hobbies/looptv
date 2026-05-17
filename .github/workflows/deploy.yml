@@ -4,9 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/deploy.yml'
-      - 'app/**'
-      - 'components/**'
-      - 'lib/**'
+      - 'src/**'
       - 'public/**'
       - 'scripts/**'
       - 'channels.config.ts'
@@ -24,9 +22,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/deploy.yml'
-      - 'app/**'
-      - 'components/**'
-      - 'lib/**'
+      - 'src/**'
       - 'public/**'
       - 'scripts/**'
       - 'channels.config.ts'
