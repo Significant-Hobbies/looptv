@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { Catalog, CatalogSummary, Video } from "@/lib/types";
 import { loadCatalog, loadCatalogSummary, getVideosForStation, pickRandom, formatDuration } from "@/lib/catalog";
-import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
+import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
 import { ytErrorReason } from "@/lib/yt-errors";
 import Link from "next/link";
@@ -33,6 +33,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [copied, setCopied] = useState(false);
   const [watchLaterIds, setWatchLaterIds] = useState<Set<string>>(() => new Set(getWatchLater()));
+  const [savedForPlaybackIds, setSavedForPlaybackIds] = useState<Set<string>>(() => new Set(getSavedForPlayback()));
   const [smartMixProfile, setSmartMixProfile] = useState<SmartMixProfile>(() => {
     const raw = getSmartMixProfileRaw();
     if (!raw) return createSmartMixProfile();
@@ -90,6 +91,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     const progress = playerRef.current?.getWatchProgress() ?? 0;
     if (forceWatched || progress >= 0.5) {
       markWatched(video.id, video.duration, activeStation, video.source || "");
+      removeSavedForPlayback(video.id);
+      setSavedForPlaybackIds((prev) => {
+        if (!prev.has(video.id)) return prev;
+        const next = new Set(prev);
+        next.delete(video.id);
+        return next;
+      });
       setWatchedIds((prev) => {
         if (prev.has(video.id)) return prev;
         return new Set([...prev, video.id]);
@@ -521,6 +529,27 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           <div className="flex items-center gap-1 shrink-0">
             {currentVideo && (
               <>
+                <button
+                  onClick={() => {
+                    if (savedForPlaybackIds.has(currentVideo.id)) {
+                      removeSavedForPlayback(currentVideo.id);
+                      setSavedForPlaybackIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(currentVideo.id);
+                        return next;
+                      });
+                    } else {
+                      addSavedForPlayback(currentVideo.id);
+                      setSavedForPlaybackIds((prev) => new Set([...prev, currentVideo.id]));
+                    }
+                  }}
+                  className={`p-2 rounded-lg transition-colors ${savedForPlaybackIds.has(currentVideo.id) ? "text-blue-300" : "text-white/40 hover:text-blue-300 hover:bg-white/10"}`}
+                  title={savedForPlaybackIds.has(currentVideo.id) ? "Remove browser save" : "Save in browser until watched"}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v10m0 0l4-4m-4 4L8 9m-4 9h16" />
+                  </svg>
+                </button>
                 <button
                   onClick={() => updateSmartPreference("favorite")}
                   className={`p-2 rounded-lg transition-colors ${smartMixProfile.favorites.includes(currentVideo.id) ? "text-yellow-300" : "text-white/40 hover:text-yellow-300 hover:bg-white/10"}`}

@@ -2,6 +2,7 @@ const WATCHED_KEY = "looptv_watched";
 const STATS_KEY = "looptv_stats";
 const BLOCKED_KEY = "looptv_blocked_sources";
 const WATCH_LATER_KEY = "looptv_watch_later";
+const SAVED_FOR_PLAYBACK_KEY = "looptv_saved_for_playback";
 const SMART_MIX_KEY = "looptv_smart_mix_profile";
 
 export interface WatchStats {
@@ -119,6 +120,31 @@ export function removeWatchLater(videoId: string): void {
   if (typeof window === "undefined") return;
   const list = getWatchLater().filter((id) => id !== videoId);
   localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(list));
+}
+
+export function getSavedForPlayback(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(SAVED_FOR_PLAYBACK_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addSavedForPlayback(videoId: string): void {
+  if (typeof window === "undefined") return;
+  const list = getSavedForPlayback();
+  if (!list.includes(videoId)) {
+    list.push(videoId);
+    localStorage.setItem(SAVED_FOR_PLAYBACK_KEY, JSON.stringify(list));
+  }
+}
+
+export function removeSavedForPlayback(videoId: string): void {
+  if (typeof window === "undefined") return;
+  const list = getSavedForPlayback().filter((id) => id !== videoId);
+  localStorage.setItem(SAVED_FOR_PLAYBACK_KEY, JSON.stringify(list));
 }
 
 export function getSmartMixProfileRaw(): string | null {

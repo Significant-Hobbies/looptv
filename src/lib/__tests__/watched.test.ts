@@ -1,15 +1,18 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   addWatchLater,
+  addSavedForPlayback,
   blockSource,
   clearWatched,
   getBlockedSources,
+  getSavedForPlayback,
   getSmartMixProfileRaw,
   getStats,
   getUserPrefs,
   getWatchedIds,
   getWatchLater,
   markWatched,
+  removeSavedForPlayback,
   removeWatchLater,
   resetSmartMixProfile,
   resetUserPrefs,
@@ -181,6 +184,25 @@ describe("watch later", () => {
   });
 });
 
+describe("saved for playback", () => {
+  it("starts empty", () => {
+    expect(getSavedForPlayback()).toEqual([]);
+  });
+
+  it("adds an id without duplicating it", () => {
+    addSavedForPlayback("v1");
+    addSavedForPlayback("v1");
+    expect(getSavedForPlayback()).toEqual(["v1"]);
+  });
+
+  it("removes a specific id without disturbing others", () => {
+    addSavedForPlayback("v1");
+    addSavedForPlayback("v2");
+    removeSavedForPlayback("v1");
+    expect(getSavedForPlayback()).toEqual(["v2"]);
+  });
+});
+
 describe("smart mix profile raw I/O", () => {
   it("returns null when unset", () => {
     expect(getSmartMixProfileRaw()).toBeNull();
@@ -253,5 +275,10 @@ describe("malformed localStorage tolerance", () => {
   it("getWatchLater recovers from invalid JSON", () => {
     localStorage.setItem("looptv_watch_later", "}{");
     expect(getWatchLater()).toEqual([]);
+  });
+
+  it("getSavedForPlayback recovers from invalid JSON", () => {
+    localStorage.setItem("looptv_saved_for_playback", "}{");
+    expect(getSavedForPlayback()).toEqual([]);
   });
 });
