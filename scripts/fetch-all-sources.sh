@@ -7,6 +7,7 @@ set -euo pipefail
 
 DATA_DIR="data/sources"
 COUNTS_FILE="$DATA_DIR/counts.txt"
+MIN_CACHE_ROWS_TO_TRUST="${MIN_CACHE_ROWS_TO_TRUST:-5}"
 mkdir -p "$DATA_DIR"
 
 # All YouTube handles from user subscriptions
@@ -51,13 +52,17 @@ for handle in "${HANDLES[@]}"; do
 
   if [ -f "$FILE" ] && [ -s "$FILE" ]; then
     COUNT=$(wc -l < "$FILE" | tr -d ' ')
-    echo "$handle|$COUNT" >> "$COUNTS_FILE"
-    SKIPPED=$((SKIPPED + 1))
-    printf "[%d/%d] @%-30s CACHED (%s videos)\n" "$DONE" "$TOTAL" "$handle" "$COUNT"
-    continue
+    if [ "$COUNT" -ge "$MIN_CACHE_ROWS_TO_TRUST" ]; then
+      echo "$handle|$COUNT" >> "$COUNTS_FILE"
+      SKIPPED=$((SKIPPED + 1))
+      printf "[%d/%d] @%-30s CACHED (%s videos)\n" "$DONE" "$TOTAL" "$handle" "$COUNT"
+      continue
+    fi
+    printf "[%d/%d] @%-30s cached only %s videos, refetching..." "$DONE" "$TOTAL" "$handle" "$COUNT"
+  else
+    printf "[%d/%d] @%-30s fetching..." "$DONE" "$TOTAL" "$handle"
   fi
 
-  printf "[%d/%d] @%-30s fetching..." "$DONE" "$TOTAL" "$handle"
   yt-dlp --flat-playlist --dump-json --no-warnings \
     "https://www.youtube.com/@$handle/videos" > "$FILE" 2>/dev/null || true
 

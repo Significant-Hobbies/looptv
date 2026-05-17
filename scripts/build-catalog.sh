@@ -14,6 +14,7 @@ DATA_DIR="data/sources"
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
 FRESH="${1:-}"
+MIN_CACHE_ROWS_TO_TRUST="${MIN_CACHE_ROWS_TO_TRUST:-5}"
 
 mkdir -p "$DATA_DIR"
 
@@ -34,8 +35,22 @@ for handle in $HANDLES; do
 
   if [ "$FRESH" != "--fresh" ] && [ -f "$CACHED" ] && [ -s "$CACHED" ]; then
     COUNT=$(wc -l < "$CACHED" | tr -d ' ')
-    printf "  @%-30s CACHED (%s videos)\n" "$SAFE" "$COUNT"
-    cp "$CACHED" "$TEMP_DIR/${SAFE}.jsonl"
+    if [ "$COUNT" -lt "$MIN_CACHE_ROWS_TO_TRUST" ]; then
+      printf "  @%-30s cached only %s videos, refetching..." "$SAFE" "$COUNT"
+      yt-dlp --flat-playlist --dump-json --no-warnings \
+        "https://www.youtube.com/$handle/videos" > "$TEMP_DIR/${SAFE}.jsonl" 2>/dev/null || true
+      FRESH_COUNT=$(wc -l < "$TEMP_DIR/${SAFE}.jsonl" | tr -d ' ')
+      if [ "$FRESH_COUNT" -gt "$COUNT" ]; then
+        printf " %s videos\n" "$FRESH_COUNT"
+        cp "$TEMP_DIR/${SAFE}.jsonl" "$CACHED"
+      else
+        printf " keeping cached %s videos\n" "$COUNT"
+        cp "$CACHED" "$TEMP_DIR/${SAFE}.jsonl"
+      fi
+    else
+      printf "  @%-30s CACHED (%s videos)\n" "$SAFE" "$COUNT"
+      cp "$CACHED" "$TEMP_DIR/${SAFE}.jsonl"
+    fi
   else
     printf "  @%-30s fetching..." "$SAFE"
     yt-dlp --flat-playlist --dump-json --no-warnings \
