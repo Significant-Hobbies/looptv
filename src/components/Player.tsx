@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from "react";
+import { useEffect, useRef, useCallback, useImperativeHandle, useState, forwardRef } from "react";
 
 declare global {
   interface Window {
@@ -29,7 +29,21 @@ interface PlayerProps {
 
 let apiLoaded = false;
 let apiReady = false;
+let apiFailed = false;
 const readyCallbacks: (() => void)[] = [];
+const failCallbacks: (() => void)[] = [];
+// YouTube's iframe_api normally fires onYouTubeIframeAPIReady within a few
+// seconds. If the script is blocked (offline, network filter, ad-block) the
+// callback never fires — guard with a timeout so the UI can degrade.
+const API_LOAD_TIMEOUT_MS = 12000;
+
+function failApi() {
+  if (apiFailed || apiReady) return;
+  apiFailed = true;
+  failCallbacks.forEach((cb) => cb());
+  failCallbacks.length = 0;
+  readyCallbacks.length = 0;
+}
 
 function loadYTApi() {
   if (apiLoaded) return;
@@ -37,22 +51,33 @@ function loadYTApi() {
 
   const tag = document.createElement("script");
   tag.src = "https://www.youtube.com/iframe_api";
+  tag.onerror = failApi;
   document.head.appendChild(tag);
 
   window.onYouTubeIframeAPIReady = () => {
     apiReady = true;
     readyCallbacks.forEach((cb) => cb());
     readyCallbacks.length = 0;
+    failCallbacks.length = 0;
   };
+
+  setTimeout(() => {
+    if (!apiReady) failApi();
+  }, API_LOAD_TIMEOUT_MS);
 }
 
-function onApiReady(cb: () => void) {
+function onApiReady(cb: () => void, onFail?: () => void) {
   if (apiReady) {
     cb();
-  } else {
-    readyCallbacks.push(cb);
-    loadYTApi();
+    return;
   }
+  if (apiFailed) {
+    onFail?.();
+    return;
+  }
+  readyCallbacks.push(cb);
+  if (onFail) failCallbacks.push(onFail);
+  loadYTApi();
 }
 
 const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
@@ -62,6 +87,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YT.Player | null>(null);
   const currentVideoRef = useRef(videoId);
+  const [apiUnavailable, setApiUnavailable] = useState(false);
 
   const onEndedRef = useRef(onEnded);
   const onErrorRef = useRef(onError);
@@ -161,7 +187,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
   }, []);
 
   useEffect(() => {
-    onApiReady(createPlayer);
+    onApiReady(createPlayer, () => setApiUnavailable(true));
     return () => {
       playerRef.current?.destroy();
       playerRef.current = null;
@@ -174,6 +200,28 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
       playerRef.current.loadVideoById(videoId);
     }
   }, [videoId]);
+
+  if (apiUnavailable) {
+    return (
+      <div className="player-container absolute inset-0 bg-black flex items-center justify-center p-8">
+        <div className="text-center max-w-sm">
+          <p className="text-white text-base font-medium mb-2">
+            Couldn&apos;t load the video player
+          </p>
+          <p className="text-white/50 text-sm mb-5">
+            The YouTube player couldn&apos;t be reached. Check your connection —
+            a network filter or ad-blocker can also block it.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white text-sm transition-colors"
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="player-container absolute inset-0 bg-black">

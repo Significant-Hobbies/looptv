@@ -8,6 +8,7 @@ import {
   createStationDraft,
   createStationPrExport,
 } from "@/lib/station-builder";
+import { trackCoreAction } from "@/lib/analytics";
 
 interface StationBuilderProps {
   catalog: Catalog | null;
@@ -41,6 +42,8 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
     await navigator.clipboard.writeText(text);
     setCopied(kind);
     setTimeout(() => setCopied(null), 1800);
+    // Exporting a station config is the completed "build a station" action.
+    trackCoreAction("station_built");
   };
 
   return (

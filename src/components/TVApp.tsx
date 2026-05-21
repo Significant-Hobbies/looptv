@@ -6,6 +6,7 @@ import { loadCatalog, loadCatalogSummary, getVideosForStation, pickRandom, forma
 import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
 import { ytErrorReason } from "@/lib/yt-errors";
+import { trackActivated, trackCoreAction } from "@/lib/analytics";
 import Link from "next/link";
 import Player, { type PlayerHandle } from "./Player";
 import Search from "./Search";
@@ -211,6 +212,16 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     if (mode === "playing" && catalog && !currentVideo) playNext();
   }, [mode, catalog, currentVideo, playNext]);
 
+  // Owner analytics: playing a video is the core product action. The first
+  // play also marks the viewer as `activated`. trackActivated() de-dupes
+  // internally, so it is safe to call on every play.
+  useEffect(() => {
+    if (mode === "playing" && currentVideo) {
+      trackActivated();
+      trackCoreAction("video_played");
+    }
+  }, [mode, currentVideo]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -284,10 +295,10 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         <div className="text-center mb-10">
           <h1 className="text-white text-5xl font-bold tracking-tight mb-2">LoopTV</h1>
           <p className="text-white/40 text-base">Pick a channel. Random clips play nonstop.</p>
-          <div className="flex items-center justify-center gap-3 mt-5">
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
             <button
               onClick={() => { setActiveStation("all"); setMode("playing"); }}
-              className="bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-500 text-white text-sm font-semibold px-5 py-3 min-h-11 rounded-xl transition-colors flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               Play All
@@ -298,21 +309,21 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                 setActiveStation(rand.id);
                 setMode("playing");
               }}
-              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-3 min-h-11 rounded-xl transition-colors flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               Shuffle
             </button>
             <button
               onClick={() => { setActiveStation(SMART_MIX_ID); setMode("playing"); }}
-              className="bg-white text-black hover:bg-white/90 text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+              className="bg-white text-black hover:bg-white/90 text-sm font-semibold px-5 py-3 min-h-11 rounded-xl transition-colors flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4h2m-1 0v16m-7-5h14M5 9h14" /></svg>
               Smart Mix
             </button>
             <button
               onClick={() => setStationBuilderOpen(true)}
-              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2"
+              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-3 min-h-11 rounded-xl transition-colors flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v14m7-7H5" />
@@ -464,7 +475,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   // ── Player view ──
   return (
     <div className="fixed inset-0 bg-black flex flex-col">
-      <div className="relative" style={{ height: "calc(100vh - 88px)" }}>
+      <div className="relative flex-1 min-h-0">
         {currentVideo && (
           <Player
             ref={playerRef}
@@ -479,10 +490,11 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       </div>
 
       <div className="bg-zinc-950 border-t border-white/10 shrink-0">
-        <div className="flex items-center gap-3 px-4 py-2">
+        {/* Wrap on mobile so the ~14 controls never overflow the 390px viewport. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:flex-nowrap sm:px-4">
           <button
             onClick={() => { maybeMarkWatched(currentVideo); setMode("lobby"); setCurrentVideo(null); }}
-            className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0"
             title="Back to channel"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -490,7 +502,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             </svg>
           </button>
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 basis-[60%] sm:basis-auto">
             {currentVideo && (
               <div>
                 <p className="text-white text-sm font-medium truncate">{currentVideo.title}</p>
@@ -528,7 +540,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             )}
           </div>
 
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-1 shrink-0">
             {currentVideo && (
               <>
                 <button
@@ -647,17 +659,17 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </button>
             <div className="w-px h-5 bg-white/10 mx-1" />
-            <button onClick={playPrev} className={`p-2 rounded-lg transition-colors ${hasHistory ? "text-white/60 hover:text-white hover:bg-white/10" : "text-white/20 cursor-not-allowed"}`} title="Previous (P)">
+            <button onClick={playPrev} className={`p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg transition-colors ${hasHistory ? "text-white/60 hover:text-white hover:bg-white/10" : "text-white/20 cursor-not-allowed"}`} title="Previous (P)">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" /></svg>
             </button>
-            <button onClick={() => { playerRef.current?.togglePlay(); setPaused((p) => !p); }} className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors" title="Play/Pause (Space)">
+            <button onClick={() => { playerRef.current?.togglePlay(); setPaused((p) => !p); }} className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white hover:bg-white/10 transition-colors" title="Play/Pause (Space)">
               {paused ? (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               ) : (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
               )}
             </button>
-            <button onClick={() => playNext()} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Next (N)">
+            <button onClick={() => playNext()} className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Next (N)">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" /></svg>
             </button>
             <div className="w-px h-5 bg-white/10 mx-1" />
