@@ -5,13 +5,16 @@ import {
   blockSource,
   clearWatched,
   getBlockedSources,
+  getEmbedHealth,
   getSavedForPlayback,
   getSmartMixProfileRaw,
+  getSourceEmbedBlockRate,
   getStats,
   getUserPrefs,
   getWatchedIds,
   getWatchLater,
   markWatched,
+  recordEmbedAttempt,
   removeSavedForPlayback,
   removeWatchLater,
   resetSmartMixProfile,
@@ -258,6 +261,67 @@ describe("user prefs", () => {
   it("recovers from malformed JSON in storage", () => {
     localStorage.setItem("looptv_prefs", "}{");
     expect(getUserPrefs().defaultStation).toBeNull();
+  });
+});
+
+describe("embed health tracking", () => {
+  it("returns empty object when nothing is stored", () => {
+    expect(getEmbedHealth()).toEqual({});
+  });
+
+  it("records a successful embed attempt", () => {
+    recordEmbedAttempt("Kurzgesagt", false);
+    const health = getEmbedHealth();
+    expect(health["Kurzgesagt"].checked).toBe(1);
+    expect(health["Kurzgesagt"].blocked).toBe(0);
+  });
+
+  it("records a blocked embed attempt", () => {
+    recordEmbedAttempt("BrokenChannel", true);
+    const health = getEmbedHealth();
+    expect(health["BrokenChannel"].checked).toBe(1);
+    expect(health["BrokenChannel"].blocked).toBe(1);
+  });
+
+  it("accumulates multiple attempts for the same source", () => {
+    recordEmbedAttempt("MySource", false);
+    recordEmbedAttempt("MySource", false);
+    recordEmbedAttempt("MySource", true);
+    const health = getEmbedHealth();
+    expect(health["MySource"].checked).toBe(3);
+    expect(health["MySource"].blocked).toBe(1);
+  });
+
+  it("tracks multiple sources independently", () => {
+    recordEmbedAttempt("Alpha", false);
+    recordEmbedAttempt("Beta", true);
+    const health = getEmbedHealth();
+    expect(health["Alpha"].blocked).toBe(0);
+    expect(health["Beta"].blocked).toBe(1);
+  });
+
+  it("getSourceEmbedBlockRate returns 0 when no data exists", () => {
+    expect(getSourceEmbedBlockRate("unknown")).toBe(0);
+  });
+
+  it("getSourceEmbedBlockRate calculates block rate correctly", () => {
+    recordEmbedAttempt("Partial", true);
+    recordEmbedAttempt("Partial", true);
+    recordEmbedAttempt("Partial", false);
+    recordEmbedAttempt("Partial", false);
+    expect(getSourceEmbedBlockRate("Partial")).toBeCloseTo(0.5);
+  });
+
+  it("sets sampledAt on each attempt", () => {
+    recordEmbedAttempt("Timed", false);
+    const health = getEmbedHealth();
+    expect(health["Timed"].sampledAt).not.toBe("");
+    expect(new Date(health["Timed"].sampledAt).getTime()).toBeLessThanOrEqual(Date.now());
+  });
+
+  it("is a no-op for empty source string", () => {
+    recordEmbedAttempt("", false);
+    expect(getEmbedHealth()).toEqual({});
   });
 });
 

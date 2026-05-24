@@ -162,6 +162,44 @@ export function resetSmartMixProfile(): void {
   localStorage.removeItem(SMART_MIX_KEY);
 }
 
+const EMBED_HEALTH_KEY = "looptv_embed_health";
+
+export interface EmbedHealthRecord {
+  blocked: number;
+  checked: number;
+  sampledAt: string;
+}
+
+export function getEmbedHealth(): Record<string, EmbedHealthRecord> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = localStorage.getItem(EMBED_HEALTH_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function recordEmbedAttempt(source: string, blocked: boolean): void {
+  if (typeof window === "undefined" || !source) return;
+  const health = getEmbedHealth();
+  const entry = health[source] ?? { blocked: 0, checked: 0, sampledAt: "" };
+  entry.checked++;
+  if (blocked) entry.blocked++;
+  entry.sampledAt = new Date().toISOString();
+  health[source] = entry;
+  try {
+    localStorage.setItem(EMBED_HEALTH_KEY, JSON.stringify(health));
+  } catch {}
+}
+
+export function getSourceEmbedBlockRate(source: string): number {
+  const health = getEmbedHealth();
+  const entry = health[source];
+  if (!entry || entry.checked === 0) return 0;
+  return entry.blocked / entry.checked;
+}
+
 const PREFS_KEY = "looptv_prefs";
 
 export interface UserPrefs {

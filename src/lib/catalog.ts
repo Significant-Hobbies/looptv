@@ -1,4 +1,4 @@
-import type { Catalog, CatalogSummary, Video } from "./types";
+import type { Catalog, CatalogSummary, SourceMeta, Video } from "./types";
 
 let catalogCache: Catalog | null = null;
 let inflight: Promise<Catalog> | null = null;
@@ -147,6 +147,36 @@ export function getCatalogFreshness(
     label: `Catalog updated ${ageLabel}`,
     ageDays,
     updatedAt,
+  };
+}
+
+export const STALE_SOURCE_DAYS = 14;
+
+export type SourceFreshness = {
+  state: "fresh" | "stale" | "unknown";
+  label: string;
+  ageDays: number | null;
+};
+
+export function getSourceFreshness(
+  meta: SourceMeta | undefined | null,
+  now: Date = new Date(),
+): SourceFreshness {
+  const fetchedAt = meta?.lastSuccessfulFetch || meta?.fetchedAt;
+  if (!fetchedAt) {
+    return { state: "unknown", label: "Never fetched", ageDays: null };
+  }
+  const date = new Date(fetchedAt);
+  if (Number.isNaN(date.getTime())) {
+    return { state: "unknown", label: "Fetch time unknown", ageDays: null };
+  }
+  const ageDays = Math.max(0, Math.floor((now.getTime() - date.getTime()) / MS_PER_DAY));
+  const ageLabel =
+    ageDays === 0 ? "today" : ageDays === 1 ? "1 day ago" : `${ageDays} days ago`;
+  return {
+    state: ageDays > STALE_SOURCE_DAYS ? "stale" : "fresh",
+    label: `Fetched ${ageLabel}`,
+    ageDays,
   };
 }
 

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { Catalog, CatalogSummary, Video } from "@/lib/types";
-import { loadCatalog, loadCatalogSummary, getVideosForStation, pickRandom, formatDuration, getCatalogFreshness } from "@/lib/catalog";
-import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile } from "@/lib/watched";
+import { loadCatalog, loadCatalogSummary, getVideosForStation, pickRandom, formatDuration, getCatalogFreshness, getSourceFreshness } from "@/lib/catalog";
+import { getWatchedIds, markWatched, getStats, getBlockedSources, blockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile, getEmbedHealth, type EmbedHealthRecord } from "@/lib/watched";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
 import { ytErrorReason } from "@/lib/yt-errors";
 import { trackActivated, trackCoreAction } from "@/lib/analytics";
@@ -48,6 +48,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   });
   const [smartMixReason, setSmartMixReason] = useState("");
   const [playbackIssue, setPlaybackIssue] = useState<{ reason: string; skipped: number } | null>(null);
+  const [embedHealth, setEmbedHealth] = useState<Record<string, EmbedHealthRecord>>(() => getEmbedHealth());
   const queueRef = useRef<Video[]>([]);
   const [queueCount, setQueueCount] = useState(0);
   const skippedRef = useRef(new Set<string>());
@@ -527,9 +528,21 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             <div className="flex flex-wrap justify-center gap-1.5 mb-3 max-w-xl">
               {config.sources.map((s) => {
                 const isActive = !activeSources || activeSources.has(s.name);
+                const handle = s.handle.replace("@", "");
+                const meta = catalog?.sourceMeta?.[handle];
+                const freshness = getSourceFreshness(meta);
+                const isStale = freshness.state === "stale";
+                const health = embedHealth[s.name];
+                const blockRate = health && health.checked >= 5 ? health.blocked / health.checked : 0;
+                const isUnhealthy = blockRate > 0.3;
+                const title = [
+                  freshness.state !== "unknown" ? freshness.label : null,
+                  isUnhealthy ? `${Math.round(blockRate * 100)}% embed blocks` : null,
+                ].filter(Boolean).join(" · ") || undefined;
                 return (
                   <button
                     key={s.handle}
+                    title={title}
                     onClick={() => {
                       setActiveSources((prev) => {
                         const allNames = new Set(config.sources.map((src) => src.name));
@@ -549,13 +562,19 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                         return next.size === allNames.size ? null : next;
                       });
                     }}
-                    className={`px-2.5 py-1 rounded-full text-xs transition-colors ${
+                    className={`px-2.5 py-1 rounded-full text-xs transition-colors flex items-center gap-1 ${
                       isActive
                         ? "bg-white/15 text-white/70"
                         : "bg-white/5 text-white/20 line-through"
                     }`}
                   >
                     {s.name}
+                    {isStale && (
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400/80 shrink-0" aria-label="stale" />
+                    )}
+                    {isUnhealthy && (
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-400/80 shrink-0" aria-label="embed issues" />
+                    )}
                   </button>
                 );
               })}
@@ -625,6 +644,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           <Player
             ref={playerRef}
             videoId={currentVideo.id}
+            source={currentVideo.source}
             onEnded={playNext}
             onError={handleError}
             onReady={() => { setStatus(""); setPlaybackIssue(null); }}
@@ -672,7 +692,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         {/* Wrap on mobile so the ~14 controls never overflow the 390px viewport. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:flex-nowrap sm:px-4">
           <button
-            onClick={() => { maybeMarkWatched(currentVideo); setMode("lobby"); setCurrentVideo(null); }}
+            onClick={() => { maybeMarkWatched(currentVideo); setMode("lobby"); setCurrentVideo(null); setEmbedHealth(getEmbedHealth()); }}
             className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0"
             title="Back to channel"
           >

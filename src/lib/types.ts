@@ -28,8 +28,22 @@ export interface StationCatalog {
   categoryVideoIds: Record<string, string[]>; // auto-derived from tags
 }
 
+export interface SourceEmbedHealth {
+  sampledAt: string;
+  blocked: number;
+  checked: number;
+}
+
+export interface SourceMeta {
+  fetchedAt: string;
+  lastSuccessfulFetch: string; // empty string if source has never yielded videos
+  videoCount: number;
+  embedHealth?: SourceEmbedHealth;
+}
+
 export interface Catalog {
   lastUpdated: string;
+  sourceMeta?: Record<string, SourceMeta>; // keyed by YouTube handle (without @)
   stations: Record<string, StationCatalog>;
 }
 

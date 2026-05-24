@@ -31,13 +31,15 @@ for (const station of Object.values(existing.stations || {})) {
 }
 
 // First pass: parse and cache qualifying videos per source (avoids reading files twice)
-const sourceCache = new Map(); // handle → { src, videos[] }
+const sourceCache = new Map(); // handle → videos[]
+const sourceMeta = {}; // handle → { fetchedAt, lastSuccessfulFetch, videoCount }
 for (const station of stationsConfig) {
   for (const src of station.sources) {
     const handle = src.handle.replace("@", "");
     if (sourceCache.has(handle)) continue;
     const filePath = path.join(TEMP_DIR, `${handle}.jsonl`);
     if (!fs.existsSync(filePath)) continue;
+    const fetchedAt = fs.statSync(filePath).mtime.toISOString();
     const minDur = src.minDuration ?? 60;
     const maxDur = src.maxDuration ?? 3600;
     const lines = fs.readFileSync(filePath, "utf-8").trim().split("\n");
@@ -52,6 +54,13 @@ for (const station of stationsConfig) {
       } catch {}
     }
     sourceCache.set(handle, videos);
+    // Preserve lastSuccessfulFetch from previous catalog if this run yields no videos
+    const prevMeta = existing.sourceMeta?.[handle];
+    sourceMeta[handle] = {
+      fetchedAt,
+      lastSuccessfulFetch: videos.length > 0 ? fetchedAt : (prevMeta?.lastSuccessfulFetch ?? ""),
+      videoCount: videos.length,
+    };
   }
 }
 
@@ -68,7 +77,7 @@ function calcPercentile(count) {
   return Math.round(50 - 40 * t); // 50% (smallest) → 10% (largest)
 }
 
-const catalog = { lastUpdated: "", stations: {} };
+const catalog = { lastUpdated: "", sourceMeta: {}, stations: {} };
 let totalNew = 0;
 const emptyStations = [];
 
@@ -127,6 +136,7 @@ for (const station of stationsConfig) {
 }
 
 catalog.lastUpdated = new Date().toISOString();
+catalog.sourceMeta = sourceMeta;
 fs.writeFileSync(OUTPUT, JSON.stringify(catalog));
 const summaryOutput = path.join(path.dirname(OUTPUT), "catalog-summary.json");
 const catalogSummary = {

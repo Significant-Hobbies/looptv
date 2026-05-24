@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { formatDuration, getCatalogFreshness, pickRandom, getVideosForStation } from "../catalog";
+import { formatDuration, getCatalogFreshness, getSourceFreshness, STALE_SOURCE_DAYS, pickRandom, getVideosForStation } from "../catalog";
+import type { SourceMeta } from "../types";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, scoreVideo, serializeSmartMixProfile } from "../smartmix";
 import type { Video, Catalog } from "../types";
 
@@ -139,6 +140,68 @@ function makeCatalog(): Catalog {
     },
   };
 }
+
+// ---------- getSourceFreshness ----------
+
+describe("getSourceFreshness", () => {
+  const now = new Date("2026-05-24T12:00:00.000Z");
+  const fresh: SourceMeta = {
+    fetchedAt: "2026-05-20T12:00:00.000Z",
+    lastSuccessfulFetch: "2026-05-20T12:00:00.000Z",
+    videoCount: 50,
+  };
+  const stale: SourceMeta = {
+    fetchedAt: "2026-04-01T12:00:00.000Z",
+    lastSuccessfulFetch: "2026-04-01T12:00:00.000Z",
+    videoCount: 50,
+  };
+  const neverFetched: SourceMeta = {
+    fetchedAt: "2026-05-20T12:00:00.000Z",
+    lastSuccessfulFetch: "",
+    videoCount: 0,
+  };
+
+  it("reports fresh when last successful fetch is within the stale threshold", () => {
+    const result = getSourceFreshness(fresh, now);
+    expect(result.state).toBe("fresh");
+    expect(result.ageDays).toBe(4);
+    expect(result.label).toContain("4 days ago");
+  });
+
+  it("reports stale when last successful fetch exceeds the threshold", () => {
+    const result = getSourceFreshness(stale, now);
+    expect(result.state).toBe("stale");
+    expect(result.ageDays).toBeGreaterThan(STALE_SOURCE_DAYS);
+  });
+
+  it("falls back to fetchedAt when lastSuccessfulFetch is empty", () => {
+    const result = getSourceFreshness(neverFetched, now);
+    // fetchedAt is recent so should be fresh
+    expect(result.state).toBe("fresh");
+  });
+
+  it("reports unknown when meta is null", () => {
+    const result = getSourceFreshness(null, now);
+    expect(result.state).toBe("unknown");
+    expect(result.ageDays).toBeNull();
+  });
+
+  it("reports unknown when meta is undefined", () => {
+    const result = getSourceFreshness(undefined, now);
+    expect(result.state).toBe("unknown");
+  });
+
+  it("reports fetched today for a very recent timestamp", () => {
+    const todayMeta: SourceMeta = {
+      fetchedAt: now.toISOString(),
+      lastSuccessfulFetch: now.toISOString(),
+      videoCount: 10,
+    };
+    const result = getSourceFreshness(todayMeta, now);
+    expect(result.state).toBe("fresh");
+    expect(result.label).toContain("today");
+  });
+});
 
 describe("getVideosForStation", () => {
   it('returns all videos when categoryId is "all"', () => {
