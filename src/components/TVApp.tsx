@@ -287,6 +287,34 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       ? `Channel catalog may be stale - ${catalogFreshness.label}`
       : catalogFreshness.label;
 
+  // "Up next on Play All" preview: three random videos that prove the
+  // catalog is loaded and what playback will actually look like. Picked in
+  // an effect (not render) so the random draw stays out of React's pure
+  // render path.
+  const [previewQueue, setPreviewQueue] = useState<Video[]>([]);
+  useEffect(() => {
+    if (!catalog) return;
+    const pool = Object.values(catalog.stations).flatMap((s) => s.videos);
+    if (pool.length === 0) return;
+    const picks: Video[] = [];
+    const seen = new Set<string>();
+    const max = Math.min(3, pool.length);
+    let guard = 0;
+    while (picks.length < max && guard < 50) {
+      guard += 1;
+      const v = pool[Math.floor(Math.random() * pool.length)];
+      if (seen.has(v.id)) continue;
+      seen.add(v.id);
+      picks.push(v);
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPreviewQueue(picks);
+  }, [catalog]);
+  const totalCatalogVideos =
+    (catalog && Object.values(catalog.stations).reduce((n, s) => n + s.videos.length, 0)) ||
+    catalogSummary?.totalVideos ||
+    0;
+
   const updateSmartPreference = useCallback((preference: "favorite" | "dislike") => {
     if (!currentVideo) return;
     const next = applyPreference(smartMixProfile, currentVideo, preference);
@@ -306,9 +334,42 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         <div className="text-center mb-10">
           <h1 className="text-white text-5xl font-bold tracking-tight mb-2">LoopTV</h1>
           <p className="text-white/40 text-base">Pick a channel. Random clips play nonstop.</p>
-          <p className={`text-xs mt-2 ${catalogFreshness.state === "stale" ? "text-yellow-400" : "text-white/25"}`}>
-            {catalogFreshnessLabel}
-          </p>
+          <div
+            className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs"
+            data-testid="reliability-strip"
+          >
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 ${
+                catalogFreshness.state === "stale"
+                  ? "bg-yellow-400/10 text-yellow-300 border border-yellow-400/30"
+                  : catalogFreshness.state === "loading"
+                  ? "bg-white/5 text-white/40 border border-white/10"
+                  : "bg-emerald-400/10 text-emerald-300 border border-emerald-400/25"
+              }`}
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  catalogFreshness.state === "stale"
+                    ? "bg-yellow-300"
+                    : catalogFreshness.state === "loading"
+                    ? "bg-white/30"
+                    : "bg-emerald-300"
+                }`}
+              />
+              {catalogFreshnessLabel}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 text-white/55 border border-white/10 px-2.5 py-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Auto-skips unplayable clips
+            </span>
+            {totalCatalogVideos > 0 && (
+              <span className="inline-flex items-center rounded-full bg-white/5 text-white/55 border border-white/10 px-2.5 py-1">
+                {totalCatalogVideos.toLocaleString()} videos ready
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
             <button
               onClick={() => { setActiveStation("all"); setMode("playing"); }}
@@ -352,6 +413,70 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             </p>
           )}
         </div>
+
+        <div className="w-full max-w-4xl mb-8" data-testid="up-next">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <p className="text-white/40 text-xs uppercase tracking-wider">
+              Up next on Play All
+            </p>
+            <p className="text-white/25 text-xs">
+              {catalogLoaded ? "Random shuffle · skips embeds that won't load" : "Loading queue..."}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {(catalogLoaded ? previewQueue : Array.from({ length: 3 })).map((entry, idx) => {
+              const video = catalogLoaded ? (entry as Video) : null;
+              return (
+                <button
+                  key={video?.id ?? `skeleton-${idx}`}
+                  onClick={() => {
+                    if (!video) return;
+                    setActiveStation("all");
+                    setCurrentVideo(video);
+                    setMode("playing");
+                  }}
+                  disabled={!video}
+                  className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 text-left transition-colors enabled:hover:bg-white/10 enabled:hover:border-white/20 disabled:cursor-default"
+                >
+                  <div className="relative aspect-video w-full bg-zinc-900">
+                    {video && (
+                      // YouTube thumb served straight from i.ytimg.com; static export means
+                      // next/image's optimizer is disabled anyway, so a plain <img> is fine.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={`https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+                      />
+                    )}
+                    {video && (
+                      <span className="absolute bottom-1.5 right-1.5 rounded bg-black/80 px-1.5 py-0.5 text-[10px] font-mono text-white/85">
+                        {formatDuration(video.duration)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    {video ? (
+                      <>
+                        <p className="text-white text-sm font-medium line-clamp-2">{video.title}</p>
+                        <p className="text-white/40 text-xs mt-1 truncate">
+                          {video.source || "LoopTV"}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="h-3.5 w-4/5 rounded bg-white/10" />
+                        <div className="h-3 w-1/3 mt-2 rounded bg-white/5" />
+                      </>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
           {stations.map((st) => {
             const count =
@@ -369,9 +494,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                 <p className="text-white/30 text-xs mt-2">
                   {count ? `${count.toLocaleString()} videos` : catalogLoaded ? "No videos" : "Loading..."}
                 </p>
-                <p className={`text-xs mt-1 ${catalogFreshness.state === "stale" ? "text-yellow-400/80" : "text-white/20"}`}>
-                  {catalogFreshness.state === "loading" ? "Checking freshness..." : catalogFreshnessLabel}
-                </p>
+                {catalogFreshness.state === "stale" && (
+                  <p className="text-xs mt-1 text-yellow-400/80">{catalogFreshnessLabel}</p>
+                )}
               </Link>
             );
           })}
