@@ -59,6 +59,7 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '7d048325699a5acddb44d3be31cf6ba9' }}
           command: pages deploy out --project-name=looptv --branch=main --commit-dirty=true
       - name: Smoke production
         run: curl --fail --silent --show-error --location --output /dev/null --retry 3 --retry-delay 5 https://looptv.pages.dev
@@ -87,6 +88,7 @@ jobs:
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '7d048325699a5acddb44d3be31cf6ba9' }}
           command: pages deploy out --project-name=looptv --branch=pr-${{ github.event.number }} --commit-dirty=true
       - name: Comment preview URL
         uses: actions/github-script@v7
