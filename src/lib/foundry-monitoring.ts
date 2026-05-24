@@ -3,8 +3,8 @@
 import { initPostHog, track } from "@saas-maker/posthog-client";
 
 const PROJECT_SLUG = "looptv";
-const POSTHOG_KEY = "phc_qgiAarw4Co4pw9fz3Fxj4UJaHmqzFetqs4JrXhGc35Nd";
-const POSTHOG_HOST = "https://us.i.posthog.com";
+const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim();
+const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || "https://us.i.posthog.com";
 
 function route() {
   if (typeof window === "undefined") return undefined;
@@ -55,6 +55,7 @@ export function capturePageCrash(error: unknown, source: "window_error" | "unhan
 
 export function installBrowserMonitoring() {
   if (typeof window === "undefined") return () => {};
+  if (!POSTHOG_KEY) return () => {};
   initPostHog({ apiKey: POSTHOG_KEY, host: POSTHOG_HOST });
 
   const onError = (event: ErrorEvent) => capturePageCrash(event.error ?? event.message, "window_error");
