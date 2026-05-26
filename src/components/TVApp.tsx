@@ -46,6 +46,8 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [smartMixReason, setSmartMixReason] = useState("");
   const [playbackIssue, setPlaybackIssue] = useState<{ reason: string; skipped: number } | null>(null);
   const [embedHealth, setEmbedHealth] = useState<Record<string, EmbedHealthRecord>>(() => ({}));
+  const [catalogError, setCatalogError] = useState(false);
+  const [catalogRetrying, setCatalogRetrying] = useState(false);
   const queueRef = useRef<Video[]>([]);
   const [queueCount, setQueueCount] = useState(0);
   const skippedRef = useRef(new Set<string>());
@@ -97,14 +99,18 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     };
   }, []);
 
-  useEffect(() => {
+  const fetchCatalog = useCallback(() => {
+    queueMicrotask(() => {
+      setCatalogError(false);
+      setCatalogRetrying(true);
+    });
     loadCatalogSummary()
       .then(setCatalogSummary)
       .catch(() => {
         // The full catalog still powers playback; summary only improves first paint.
       });
     loadCatalog()
-      .then((c) => { setCatalog(c); setStatus(""); })
+      .then((c) => { setCatalog(c); setStatus(""); setCatalogError(false); })
       .catch((err) => {
         console.error("TVApp: catalog load failed after retries", err);
         const isDev =
@@ -114,10 +120,18 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         setStatus(
           isDev
             ? "No catalog found. Run: pnpm run build:catalog"
-            : "Catalog couldn't load. Check your connection and refresh.",
+            : "Catalog couldn't load. Showing sample channels — tap retry when you're back online.",
         );
+        setCatalogError(true);
+      })
+      .finally(() => {
+        setCatalogRetrying(false);
       });
   }, []);
+
+  useEffect(() => {
+    fetchCatalog();
+  }, [fetchCatalog]);
 
   // Mark video as watched only if user watched >= 50%
   const maybeMarkWatched = useCallback((video: Video | null, forceWatched = false) => {
@@ -560,6 +574,30 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             })}
           </div>
         </div>
+
+        {catalogError && (
+          <div
+            data-testid="catalog-offline-banner"
+            className="w-full max-w-4xl mb-6 rounded-xl border border-yellow-400/30 bg-yellow-400/10 px-5 py-4 text-sm text-yellow-100"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-semibold text-yellow-100">Catalog unavailable — showing sample channels</p>
+                <p className="mt-1 text-yellow-100/70">
+                  We couldn&apos;t reach <code className="rounded bg-black/30 px-1 py-0.5 text-xs">catalog.json</code>.
+                  Browse the {stations.length} channels below, then retry once your connection is back.
+                </p>
+              </div>
+              <button
+                onClick={fetchCatalog}
+                disabled={catalogRetrying}
+                className="self-start rounded-lg bg-yellow-300/20 px-4 py-2 font-medium text-yellow-100 transition-colors hover:bg-yellow-300/30 disabled:cursor-wait disabled:opacity-60 sm:self-auto"
+              >
+                {catalogRetrying ? "Retrying..." : "Retry"}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
           {stations.map((st) => {

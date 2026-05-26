@@ -109,8 +109,11 @@ Next.js frontend       <- Picks random videos, plays via YouTube IFrame API
   random pick fires immediately. There's no user-visible error and no
   toast — by design, so the "TV channel" feel never breaks.
 - **No /catalog.json.** Catalog fetches retry twice with backoff before
-  giving up; if they still fail, a connection hint shows in production and
-  the dev build instruction shows on localhost.
+  giving up. If they still fail, the landing page renders an offline
+  fallback banner above the channel grid (sample channels stay visible
+  because `stations.json` is bundled) with a Retry button that re-runs the
+  fetch without a page reload. Dev builds show the build-catalog hint
+  instead.
 
 ## Local stats
 
@@ -148,3 +151,18 @@ wrangler pages deploy out --project-name=looptv
 ## License
 
 MIT
+
+<!-- ACTIVE-AI-TASK-LOG:START -->
+## Active AI Task Log
+
+This section is maintained by the SaaS Maker Active-AI product/design loop so future agents do not reopen duplicate UI tasks.
+
+- Business lane: P2 Watch / maintenance
+- Rule: do not create another broad "improve the UI" task unless the acceptance criteria differ materially from the tasks listed here.
+- Source of truth for task status: SaaS Maker task board. README entries are durable context only.
+
+| Task | Status | Priority | Last known note |
+| --- | --- | --- | --- |
+| `4a5a6c8c` [fleet-smoke] looptv/web React hydration error | done | medium | 2026-05-25 18:55:41 |
+| `fcdbf330` looptv: add clear offline catalog fallback | done | low | 2026-05-26 — landing-page banner with sample channels + Retry when `/catalog.json` fetch fails |
+<!-- ACTIVE-AI-TASK-LOG:END -->
