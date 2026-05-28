@@ -12,7 +12,7 @@ TV-like app that plays random YouTube videos from curated channels, nonstop. Pic
 |---------|---------|
 | Hosting | Cloudflare Pages (`looptv`, `looptv.pages.dev`) — static Next.js export, deployed via `wrangler pages deploy` |
 | Database | None — static `public/catalog.json` served at runtime; watched history in browser `localStorage` |
-| Analytics | PostHog via `@saas-maker/posthog-client` |
+| Analytics | PostHog via `local posthog-js wrapper` |
 | AI / tagging | HuggingFace Transformers NER (`dslim/bert-base-NER`), run locally / in CI — no hosted AI service |
 | CI/CD | GitHub Actions (`.github/workflows/deploy.yml`) — auto-deploy to Pages on push to `main`; `update-catalog.yml` weekly catalog rebuild |
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { PostHogProvider } from '@saas-maker/posthog-client';
+import posthog from "posthog-js";
+import { PostHogProvider } from "posthog-js/react";
 import { useEffect } from 'react';
 
 import { trackReturned, trackSignup } from '@/lib/analytics';
@@ -24,5 +25,5 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  return <PostHogProvider>{children}</PostHogProvider>;
+  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
 }
