@@ -89,7 +89,7 @@ export default function LandingPage() {
           {totalVideos.toLocaleString()} videos in today&apos;s catalog. No
           account, no API keys, no algorithm deciding what&apos;s next.
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/random"
             className="inline-flex min-h-11 items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500"
@@ -98,7 +98,7 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/channels"
-            className="inline-flex min-h-11 items-center rounded-xl bg-white/10 px-6 py-3 text-sm text-white transition-colors hover:bg-white/15"
+            className="text-sm text-zinc-400 hover:text-zinc-200 underline underline-offset-4"
           >
             Browse stations
           </Link>
@@ -192,13 +192,13 @@ export default function LandingPage() {
           href="/random"
           className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500"
         >
-          Open LoopTV
+          Pick a station
         </Link>
       </section>
 
       {/* ── Footer ── */}
       <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-zinc-500">
-        <p>MIT-licensed · catalog rebuilt weekly via GitHub Actions</p>
+        <p>The algorithm doesn&apos;t decide. You pick the station.</p>
         <nav className="flex gap-5">
           <Link href="/about" className="hover:text-zinc-300">
             About

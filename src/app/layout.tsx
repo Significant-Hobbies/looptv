@@ -16,11 +16,11 @@ export const metadata: Metadata = {
     default: "LoopTV",
     template: "%s | LoopTV",
   },
-  description: "Random clips from your favorite channels, nonstop",
+  description: "Pick a station. Random clips from curated YouTube channels play nonstop. No account, no algorithm.",
   metadataBase: new URL(siteUrl),
   openGraph: {
     title: "LoopTV",
-    description: "Random clips from your favorite channels, nonstop",
+    description: "Pick a station. Random clips from curated YouTube channels play nonstop. No account, no algorithm.",
     url: siteUrl,
     siteName: "LoopTV",
     type: "website",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "LoopTV",
-    description: "Random clips from your favorite channels, nonstop",
+    description: "Pick a station. Random clips from curated YouTube channels play nonstop. No account, no algorithm.",
   },
   robots: {
     index: true,
