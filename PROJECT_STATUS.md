@@ -18,10 +18,10 @@ LoopTV is a TV-like web app for watching random YouTube videos from curated chan
 
 ## Planned Next
 
-1. Improve station quality by pruning dead, low-signal, or repetitive channels.
-2. Add lightweight playback diagnostics for skipped videos and catalog freshness.
-3. Make catalog generation easier to audit so station changes show expected video-count deltas.
-4. Refine the TV controls for lean-back use on large screens and mobile.
+1. Improve station quality by pruning dead, low-signal, or repetitive channels. PRD: `docs/prds/source-health-and-auto-pruning.md`.
+2. Add lightweight playback diagnostics for skipped videos and catalog freshness. PRD: `docs/prds/playback-diagnostics-and-freshness.md`.
+3. Refine the TV controls for lean-back use on large screens and mobile. PRD: `docs/prds/lean-back-controls-redesign.md`.
+4. Catalog generation auditability remains a follow-up: expected video-count deltas and station diffs still need a dedicated spec.
 
 ## Deferred / Parked
 
