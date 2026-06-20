@@ -49,3 +49,7 @@ data/
 # fallow cache
 .fallow/
 cache.bin
+
+# playwright
+test-results/
+playwright-report/
