@@ -1,0 +1,29 @@
+import { describe, expect, it } from "vitest";
+import {
+  computeEnrichBudget,
+  filterFlatByDuration,
+  findSourceByHandle,
+} from "../fetch-channel.mjs";
+
+describe("fetch-channel", () => {
+  it("filters flat entries by per-source duration", () => {
+    const flat = [
+      { id: "a", duration: 30 },
+      { id: "b", duration: 300 },
+      { id: "c", duration: 5000 },
+    ];
+    expect(filterFlatByDuration(flat, 60, 1800).map((v) => v.id)).toEqual(["b"]);
+  });
+
+  it("enriches all rows for small channels", () => {
+    expect(computeEnrichBudget(80, {})).toBe(80);
+  });
+
+  it("caps enrich budget for mega channels", () => {
+    const snl = findSourceByHandle("@SaturdayNightLive");
+    const budget = computeEnrichBudget(9000, snl);
+    expect(budget).toBeGreaterThanOrEqual(250);
+    expect(budget).toBeLessThan(9000);
+    expect(budget).toBeLessThanOrEqual(500);
+  });
+});

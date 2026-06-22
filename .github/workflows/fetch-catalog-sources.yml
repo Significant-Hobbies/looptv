@@ -40,7 +40,7 @@ jobs:
         env:
           SHARD_INDEX: ${{ matrix.shard }}
           SHARD_TOTAL: 4
-          FETCH_CONCURRENCY: "6"
+          FETCH_CONCURRENCY: "8"
           CACHE_MAX_AGE_DAYS: "13"
         run: bash scripts/fetch-sources.sh
 
