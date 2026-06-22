@@ -23,6 +23,14 @@ echo ""
 echo "=== Building catalog ==="
 bash scripts/build-catalog.sh --process-only
 
+if [ -z "${FAGW_API_KEY:-}" ] && command -v infisical >/dev/null 2>&1; then
+  INFISICAL_ROOT="${INFISICAL_ROOT:-$ROOT/../knowledge-base/cloudflare/worker}"
+  if [ -f "$INFISICAL_ROOT/.infisical.json" ]; then
+    FAGW_API_KEY="$(cd "$INFISICAL_ROOT" && infisical secrets get Free_ai --plain 2>/dev/null || true)"
+    export FAGW_API_KEY
+  fi
+fi
+
 if [ -n "${FAGW_API_KEY:-}" ]; then
   echo ""
   echo "=== Tagging via free-AI gateway ==="
@@ -31,8 +39,8 @@ if [ -n "${FAGW_API_KEY:-}" ]; then
   node scripts/tag-videos.mjs
 else
   echo ""
-  echo "Skipping AI tag (FAGW_API_KEY not set)."
-  echo "After fetch: FAGW_API_KEY=... node scripts/tag-videos.mjs"
+  echo "Skipping AI tag (FAGW_API_KEY not set; Infisical Free_ai unavailable)."
+  echo "After fetch: infisical secrets get Free_ai --plain | xargs -I{} env FAGW_API_KEY={} node scripts/tag-videos.mjs"
 fi
 
 node -e "
