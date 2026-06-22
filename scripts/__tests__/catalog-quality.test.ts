@@ -1,0 +1,69 @@
+import { describe, expect, it } from "vitest";
+import {
+  MAX_VIDEOS_PER_SOURCE,
+  MIN_VIEW_COUNT,
+  applySourceQualityFilter,
+  calcPercentile,
+  qualifiesRawVideo,
+  resolveTopPercentile,
+  validateCatalog,
+  validateCatalogVideo,
+} from "../catalog-quality.mjs";
+
+describe("catalog quality", () => {
+  it("requires a global minimum view count", () => {
+    expect(MIN_VIEW_COUNT).toBe(10_000);
+    expect(MAX_VIDEOS_PER_SOURCE).toBe(200);
+  });
+
+  it("uses tighter percentiles for larger sources", () => {
+    expect(calcPercentile(20)).toBe(50);
+    expect(calcPercentile(100)).toBe(35);
+    expect(calcPercentile(500)).toBe(15);
+    expect(calcPercentile(2_000)).toBe(8);
+    expect(calcPercentile(8_000)).toBe(5);
+    expect(calcPercentile(12_000)).toBe(3);
+  });
+
+  it("does not shift when unrelated channels are added to the fleet", () => {
+    const mediumChannel = calcPercentile(400);
+    expect(mediumChannel).toBe(25);
+    expect(calcPercentile(400)).toBe(mediumChannel);
+  });
+
+  it("honors explicit topPercentile overrides from stations.json", () => {
+    expect(resolveTopPercentile({ topPercentile: 3 }, 12_000)).toBe(3);
+    expect(resolveTopPercentile({}, 12_000)).toBe(3);
+  });
+
+  it("rejects raw videos without view counts", () => {
+    expect(qualifiesRawVideo({ duration: 300 }, 60, 3600)).toBe(false);
+    expect(qualifiesRawVideo({ duration: 300, view_count: 9_999 }, 60, 3600)).toBe(false);
+    expect(qualifiesRawVideo({ duration: 300, view_count: 10_000 }, 60, 3600)).toBe(true);
+  });
+
+  it("caps each source after percentile filtering", () => {
+    const sourceVideos = Array.from({ length: 5_000 }, (_, i) => ({
+      id: `v${i}`,
+      duration: 300,
+      view_count: 10_000_000 - i,
+    }));
+    const { filtered } = applySourceQualityFilter(sourceVideos, {});
+    expect(filtered.length).toBe(MAX_VIDEOS_PER_SOURCE);
+    expect(filtered[0].view_count).toBeGreaterThan(filtered.at(-1)?.view_count ?? 0);
+  });
+
+  it("refuses to ship catalog entries below the view threshold", () => {
+    expect(() => validateCatalogVideo({ id: "x", viewCount: 0 })).toThrow();
+    expect(() =>
+      validateCatalog({
+        stations: {
+          science: {
+            videos: [{ id: "ok", viewCount: 10_000 }],
+            categoryVideoIds: {},
+          },
+        },
+      }),
+    ).not.toThrow();
+  });
+});

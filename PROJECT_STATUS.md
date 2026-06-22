@@ -1,30 +1,137 @@
-# Project Status
+# looptv — PROJECT STATUS
 
-Last updated: 2026-06-04
+Last updated: 2026-06-20
 
-## Current Scope
+## Why/What
 
-LoopTV is a TV-like web app for watching random YouTube videos from curated channels. It is intentionally API-key-free: the app ships a generated static catalog and deploys as a Cloudflare Pages static export.
+**Thesis:** TV-like web app for random YouTube playback from curated channels — lean-back, zero API keys. Maintainers edit `stations.json`; bi-weekly CI refreshes `catalog.json` with yt-dlp + AI gateway tagging.
 
-## Done
+**In scope:** Static Next.js export on Cloudflare Pages, YouTube IFrame Player, client-side watch history, playback diagnostics, source health auto-quarantine, lean-back controls redesign.
 
-- Thirteen stations are defined in `stations.json`.
-- The committed catalog contains roughly 38K videos across 78 curated channels.
-- The static Next.js export serves the player without a database, auth system, or YouTube API key.
-- YouTube embed errors such as 101 and 150 auto-skip to keep playback moving.
-- `/catalog.json` offline fallback behavior and a visible fallback banner are implemented.
-- A weekly GitHub Action refreshes the catalog with `yt-dlp` and local/CI enrichment tooling.
-- Cloudflare Pages deployment is documented for `looptv.pages.dev`.
+**Out / parked:** User accounts, server-side catalog, YouTube Data API (hard constraint: zero API keys), playlists/likes/subscriptions as cloud features.
 
-## Planned Next
+## Dependencies
 
-1. Improve station quality by pruning dead, low-signal, or repetitive channels. PRD: `docs/prds/source-health-and-auto-pruning.md`.
-2. Add lightweight playback diagnostics for skipped videos and catalog freshness. PRD: `docs/prds/playback-diagnostics-and-freshness.md`.
-3. Refine the TV controls for lean-back use on large screens and mobile. PRD: `docs/prds/lean-back-controls-redesign.md`.
-4. Catalog generation auditability remains a follow-up: expected video-count deltas and station diffs still need a dedicated spec.
+### External
 
-## Deferred / Parked
+- **Hosting:** Cloudflare Pages `looptv.pages.dev`.
+- **Playback:** YouTube IFrame Player API (free) — no YouTube Data API keys.
+- **Catalog build:** yt-dlp + `scripts/process-catalog.mjs` + `scripts/extract-tags.py` (dslim/bert-base-NER).
+- **Analytics:** PostHog via local wrapper (optional; no PII beyond analytics config).
+- **State:** Browser `localStorage` only — no DB, no auth.
 
-- User accounts, playlists, likes, and subscriptions are deferred.
-- YouTube Data API usage is deferred; the current constraint is zero API keys.
-- Server-side catalog storage is parked while the static catalog remains reliable.
+### Internal fleet
+
+- **@saas-maker/feedback:** in-app feedback widget integration.
+
+### Stack & commands
+
+| Concern | Technology |
+| --- | --- |
+| Frontend | Next.js 16 static export + Tailwind v4 |
+| Hosting | Cloudflare Pages `looptv.pages.dev` |
+| Catalog | `public/catalog.json` (static); config `stations.json` |
+| Playback | YouTube IFrame Player API (free) |
+| Catalog build | yt-dlp + process-catalog + extract-tags (HuggingFace NER) |
+| State | Browser `localStorage` only |
+
+```bash
+pnpm install
+pnpm dev
+pnpm build | pnpm cf:build
+pnpm deploy                  # build + wrangler pages deploy out --project-name=looptv
+pnpm test                    # vitest
+pnpm lint | pnpm typecheck | pnpm check   # biome
+bash scripts/build-catalog.sh            # requires yt-dlp
+python3 scripts/extract-tags.py          # requires requirements-ner.txt
+bash scripts/fetch-all-sources.sh
+```
+
+```
+stations.json → build-catalog.sh (yt-dlp metadata)
+             → process-catalog.mjs (merge, preserve NER tags)
+             → extract-tags.py (HuggingFace NER: people, places, categories)
+             → catalog.json (committed, served statically)
+             → Next.js player (random pick, IFrame API, localStorage prefs)
+```
+
+**Stats (current):** 17 stations, 149 channels (~38K videos until next catalog rebuild); global 10K views minimum filter; per-source min/max duration in `stations.json`.
+
+**CI:** `.github/workflows/fetch-catalog-sources.yml` (4 parallel fetch shards, bi-weekly) → `.github/workflows/build-catalog.yml` (merge, process, tag, commit); `.github/workflows/deploy.yml` on push to main.
+
+## Timeline
+
+- **2026-05-25:** React hydration error fix (fleet-smoke task done).
+- **PRD cycle:** Playback diagnostics, source health auto-pruning, lean-back controls redesign — all shipped.
+- **Weekly CI:** catalog rebuild may auto-commit on the 1st and 15th; maintainer review expected for station diffs.
+
+## Products
+
+| Product | Surface | Role |
+| --- | --- | --- |
+| LoopTV player | Station grid + random picker | Lean-back YouTube playback from curated catalog |
+| Catalog pipeline | `stations.json` → `catalog.json` | Maintainer-edited stations + automated metadata/NER refresh |
+| Client stats | `localStorage` keys | Per-browser watch history, Smart Mix, quarantine state |
+
+## Features (shipped)
+
+### Core player
+
+- Station grid landing; random video picker per station.
+- YouTube IFrame API embed; auto-skip on embed errors 101/150 (geo/copyright/owner disable).
+- Keyboard shortcuts: Space play/pause, N/P or arrows next/prev, M mute, F fullscreen, W hide-watched, `/` search, 1–9 station jump, Esc close search.
+- Smart Mix preference weights in localStorage.
+
+### Catalog & offline
+
+- `/catalog.json` fetch with retry + backoff; offline fallback banner on landing with Retry (no full reload).
+- Sample channels visible from bundled `stations.json` when catalog unavailable.
+- Dev hint for build-catalog when fetch fails in development.
+
+### Playback diagnostics
+
+- Compact banner when degraded: catalog age, source age, skip streaks, embed issue counts.
+- Retry refreshes catalog without full page reload.
+
+### Source health & auto-pruning
+
+- Channel Health panel: fresh/stale/unhealthy/quarantined/blocked counts; issue filters; re-enable quarantined sources.
+- Auto-quarantine on sustained embed failures; decisions persist in localStorage.
+
+### Lean-back controls redesign
+
+- Primary control rail: play/pause, next/previous, search, watch later, station switch.
+- Secondary actions in More drawer; mobile-safe tap targets; keyboard shortcuts preserved.
+
+### Client-side stats (`watched.ts`)
+
+- `looptv_watched` — ≥50% viewed IDs.
+- `looptv_stats` — per-station/source counts, total seconds.
+- `looptv_blocked_sources`, `looptv_watch_later`, `looptv_smart_mix_profile`, `looptv_prefs`.
+- Clearing site data wipes all; nothing leaves browser.
+
+### Quality & maintenance
+
+- Fork-friendly: edit `stations.json` and deploy.
+- **Top-content policy:** global 10K-view minimum (requires full yt-dlp metadata — no `--flat-playlist`); per-source duration filters; top-N% by views per channel plus 200-video cap (`scripts/catalog-quality.mjs`); catalog build refuses output below threshold; playback picks from top-12 view band (same as Smart Mix).
+
+## Todo / Planned / Deferred / Blocked
+
+### Planned
+
+1. Catalog generation auditability — expected video-count deltas and station diffs spec (document thresholds for weekly CI commits).
+2. Optional catalog diff summary in GitHub Action commit message for maintainer review.
+
+### Deferred
+
+- User accounts, cloud playlists, likes, subscriptions.
+- YouTube Data API — zero API keys remains a hard constraint.
+- Server-side catalog or watch sync while static catalog stays reliable.
+- Recommendation engine beyond Smart Mix local weights.
+
+### Blocked
+
+- Catalog freshness depends on weekly GitHub Action — stale catalog shows diagnostics banner but no push notification.
+- NER tagging requires Python + HuggingFace in CI; local rebuild needs `requirements-ner.txt`.
+- Blocked/quarantined state is per-browser — not portable across devices.
+- Production: `looptv.pages.dev` via Cloudflare Pages static export.

@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Catalog, StationConfig } from "@/lib/types";
 import type { EmbedHealthRecord } from "@/lib/watched";
 import { getSourceFreshness } from "@/lib/catalog";
+import {
+  countSourcesByHealth,
+  getEmbedBlockRate,
+  resolveSourceHealthState,
+  type SourceHealthState,
+} from "@/lib/source-health";
 
 interface Props {
   visible: boolean;
@@ -12,8 +18,18 @@ interface Props {
   catalog: Catalog | null;
   embedHealth: Record<string, EmbedHealthRecord>;
   blockedSources: Set<string>;
+  quarantinedSources: Set<string>;
   onToggleBlock: (source: string) => void;
+  onUnquarantine: (source: string) => void;
 }
+
+const STATE_LABELS: Record<SourceHealthState, string> = {
+  fresh: "Fresh",
+  stale: "Stale",
+  unhealthy: "Embed issues",
+  quarantined: "Quarantined",
+  blocked: "Blocked",
+};
 
 export default function ChannelHealth({
   visible,
@@ -22,63 +38,69 @@ export default function ChannelHealth({
   catalog,
   embedHealth,
   blockedSources,
+  quarantinedSources,
   onToggleBlock,
+  onUnquarantine,
 }: Props) {
   const [issuesOnly, setIssuesOnly] = useState(false);
 
-  if (!visible) return null;
-
-  const allSources = stations.flatMap((st) =>
-    st.sources.map((s) => ({ station: st, source: s }))
+  const allSources = useMemo(
+    () => stations.flatMap((st) => st.sources.map((source) => ({ station: st, source }))),
+    [stations],
   );
 
-  const staleSources = allSources.filter(({ source }) => {
-    const handle = source.handle.replace("@", "");
-    return getSourceFreshness(catalog?.sourceMeta?.[handle]).state === "stale";
-  });
-  const unhealthySources = allSources.filter(({ source }) => {
-    const h = embedHealth[source.name];
-    return h && h.checked >= 5 && h.blocked / h.checked > 0.3;
-  });
-  const blockedCount = allSources.filter(({ source }) =>
-    blockedSources.has(source.name)
-  ).length;
+  const counts = useMemo(
+    () =>
+      countSourcesByHealth(
+        allSources.map(({ source }) => source),
+        catalog?.sourceMeta,
+        embedHealth,
+        blockedSources,
+        quarantinedSources,
+      ),
+    [allSources, catalog?.sourceMeta, embedHealth, blockedSources, quarantinedSources],
+  );
 
   const hasIssues =
-    staleSources.length > 0 ||
-    unhealthySources.length > 0 ||
-    blockedCount > 0;
+    counts.stale > 0 ||
+    counts.unhealthy > 0 ||
+    counts.quarantined > 0 ||
+    counts.blocked > 0;
+
+  const visibleIssueCount = useMemo(() => {
+    if (!catalog || !issuesOnly) return null;
+    return allSources.filter(({ source }) => {
+      const handle = source.handle.replace("@", "");
+      const state = resolveSourceHealthState({
+        sourceName: source.name,
+        meta: catalog.sourceMeta?.[handle],
+        embedHealth: embedHealth[source.name],
+        blockedSources,
+        quarantinedSources,
+      });
+      return state !== "fresh";
+    }).length;
+  }, [allSources, catalog, embedHealth, blockedSources, quarantinedSources, issuesOnly]);
+
+  if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col bg-zinc-950 overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <div>
           <h2 className="text-white text-sm font-semibold">Channel Health</h2>
           {catalog ? (
-            <p className="text-white/40 text-xs mt-0.5">
-              {staleSources.length > 0 && (
-                <span className="text-yellow-400/80">
-                  {staleSources.length} stale
-                </span>
+            <p className="text-white/40 text-xs mt-0.5 flex flex-wrap gap-x-2 gap-y-0.5">
+              <span className="text-emerald-400/80">{counts.fresh} fresh</span>
+              {counts.stale > 0 && <span className="text-yellow-400/80">{counts.stale} stale</span>}
+              {counts.unhealthy > 0 && (
+                <span className="text-orange-400/80">{counts.unhealthy} embed issues</span>
               )}
-              {staleSources.length > 0 &&
-                (unhealthySources.length > 0 || blockedCount > 0) &&
-                " · "}
-              {unhealthySources.length > 0 && (
-                <span className="text-orange-400/80">
-                  {unhealthySources.length} embed issues
-                </span>
+              {counts.quarantined > 0 && (
+                <span className="text-amber-400/80">{counts.quarantined} quarantined</span>
               )}
-              {unhealthySources.length > 0 && blockedCount > 0 && " · "}
-              {blockedCount > 0 && (
-                <span className="text-white/40">
-                  {blockedCount} blocked
-                </span>
-              )}
-              {!hasIssues && (
-                <span className="text-emerald-400/80">All sources healthy</span>
-              )}
+              {counts.blocked > 0 && <span className="text-white/40">{counts.blocked} blocked</span>}
+              {!hasIssues && <span className="text-emerald-400/80">All sources healthy</span>}
             </p>
           ) : (
             <p className="text-white/30 text-xs mt-0.5">Loading catalog...</p>
@@ -87,6 +109,7 @@ export default function ChannelHealth({
         <div className="flex items-center gap-2">
           {hasIssues && (
             <button
+              type="button"
               onClick={() => setIssuesOnly((v) => !v)}
               className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
                 issuesOnly
@@ -98,53 +121,39 @@ export default function ChannelHealth({
             </button>
           )}
           <button
+            type="button"
             onClick={onClose}
             className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
             title="Close (Esc)"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Body */}
       <div className="flex-1 overflow-y-auto">
         {!catalog ? (
           <div className="flex items-center justify-center h-32">
-            <p className="text-white/30 text-sm">
-              Loading catalog data…
-            </p>
+            <p className="text-white/30 text-sm">Loading catalog data…</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
             {stations.map((st) => {
-              const stationVideos =
-                catalog.stations[st.id]?.videos.length ?? 0;
+              const stationVideos = catalog.stations[st.id]?.videos.length ?? 0;
 
               const visibleSources = issuesOnly
                 ? st.sources.filter((s) => {
                     const handle = s.handle.replace("@", "");
-                    const isStale =
-                      getSourceFreshness(catalog.sourceMeta?.[handle])
-                        .state === "stale";
-                    const h = embedHealth[s.name];
-                    const isUnhealthy =
-                      h && h.checked >= 5 && h.blocked / h.checked > 0.3;
-                    return (
-                      isStale || isUnhealthy || blockedSources.has(s.name)
-                    );
+                    const state = resolveSourceHealthState({
+                      sourceName: s.name,
+                      meta: catalog.sourceMeta?.[handle],
+                      embedHealth: embedHealth[s.name],
+                      blockedSources,
+                      quarantinedSources,
+                    });
+                    return state !== "fresh";
                   })
                 : st.sources;
 
@@ -159,9 +168,7 @@ export default function ChannelHealth({
                     <p className="text-white/25 text-xs">
                       {stationVideos > 0
                         ? `${stationVideos.toLocaleString()} videos`
-                        : catalog
-                        ? "No videos"
-                        : ""}
+                        : "No videos"}
                     </p>
                   </div>
                   <div className="space-y-1">
@@ -169,45 +176,49 @@ export default function ChannelHealth({
                       const handle = source.handle.replace("@", "");
                       const meta = catalog.sourceMeta?.[handle];
                       const freshness = getSourceFreshness(meta);
-                      const h = embedHealth[source.name];
-                      const blockRate =
-                        h && h.checked >= 5
-                          ? h.blocked / h.checked
-                          : null;
-                      const isUnhealthy =
-                        blockRate !== null && blockRate > 0.3;
-                      const isStale = freshness.state === "stale";
-                      const isBlocked = blockedSources.has(source.name);
+                      const healthRecord = embedHealth[source.name];
+                      const blockRate = getEmbedBlockRate(healthRecord);
+                      const state = resolveSourceHealthState({
+                        sourceName: source.name,
+                        meta,
+                        embedHealth: healthRecord,
+                        blockedSources,
+                        quarantinedSources,
+                      });
                       const videoCount = meta?.videoCount ?? 0;
 
-                      let dotColor = "bg-emerald-400";
-                      if (isBlocked) dotColor = "bg-white/20";
-                      else if (isUnhealthy) dotColor = "bg-orange-400";
-                      else if (isStale) dotColor = "bg-yellow-400";
+                      const dotColor =
+                        state === "blocked"
+                          ? "bg-white/20"
+                          : state === "quarantined"
+                            ? "bg-amber-400"
+                            : state === "unhealthy"
+                              ? "bg-orange-400"
+                              : state === "stale"
+                                ? "bg-yellow-400"
+                                : "bg-emerald-400";
 
                       return (
                         <div
                           key={source.handle}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                            isBlocked
+                            state === "blocked"
                               ? "bg-white/3 opacity-50"
-                              : isUnhealthy
-                              ? "bg-orange-500/5"
-                              : isStale
-                              ? "bg-yellow-500/5"
-                              : "bg-white/5"
+                              : state === "quarantined"
+                                ? "bg-amber-500/5"
+                                : state === "unhealthy"
+                                  ? "bg-orange-500/5"
+                                  : state === "stale"
+                                    ? "bg-yellow-500/5"
+                                    : "bg-white/5"
                           }`}
                         >
-                          {/* Status dot */}
-                          <span
-                            className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`}
-                          />
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
 
-                          {/* Name + meta */}
                           <div className="min-w-0 flex-1">
                             <p
                               className={`text-sm truncate ${
-                                isBlocked
+                                state === "blocked"
                                   ? "line-through text-white/30"
                                   : "text-white/80"
                               }`}
@@ -218,67 +229,56 @@ export default function ChannelHealth({
                               {videoCount > 0
                                 ? `${videoCount.toLocaleString()} videos`
                                 : "No videos fetched"}
-                              {freshness.state !== "unknown" &&
-                                ` · ${freshness.label}`}
+                              {freshness.state !== "unknown" && ` · ${freshness.label}`}
+                              {state !== "fresh" && ` · ${STATE_LABELS[state]}`}
                             </p>
                           </div>
 
-                          {/* Embed health badge */}
                           {blockRate !== null && (
                             <span
                               className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${
                                 blockRate > 0.5
                                   ? "bg-red-500/20 text-red-300"
                                   : blockRate > 0.3
-                                  ? "bg-orange-500/20 text-orange-300"
-                                  : "bg-white/5 text-white/30"
+                                    ? "bg-orange-500/20 text-orange-300"
+                                    : "bg-white/5 text-white/30"
                               }`}
                             >
                               {Math.round(blockRate * 100)}% blocked
                             </span>
                           )}
 
-                          {/* Block / unblock toggle */}
+                          {state === "quarantined" && (
+                            <button
+                              type="button"
+                              onClick={() => onUnquarantine(source.name)}
+                              className="shrink-0 rounded-lg bg-emerald-500/15 px-2.5 py-1.5 text-xs text-emerald-300 transition-colors hover:bg-emerald-500/25"
+                            >
+                              Re-enable
+                            </button>
+                          )}
+
                           <button
+                            type="button"
                             onClick={() => onToggleBlock(source.name)}
                             className={`p-1.5 rounded transition-colors shrink-0 ${
-                              isBlocked
+                              state === "blocked"
                                 ? "text-emerald-400 hover:bg-emerald-400/10"
                                 : "text-white/25 hover:text-red-400 hover:bg-red-400/10"
                             }`}
                             title={
-                              isBlocked
+                              state === "blocked"
                                 ? `Unblock ${source.name}`
                                 : `Block ${source.name}`
                             }
                           >
-                            {isBlocked ? (
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
+                            {state === "blocked" ? (
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                             ) : (
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                                />
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                               </svg>
                             )}
                           </button>
@@ -290,8 +290,7 @@ export default function ChannelHealth({
               );
             })}
 
-            {/* Empty state when issues-only filter is active */}
-            {issuesOnly && (
+            {issuesOnly && visibleIssueCount === 0 && (
               <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 mb-3" />
                 <p className="text-white/50 text-sm">No issues found</p>
@@ -304,17 +303,12 @@ export default function ChannelHealth({
         )}
       </div>
 
-      {/* Footer */}
       <div className="border-t border-white/10 px-4 py-3 shrink-0">
         <p className="text-white/25 text-xs leading-relaxed">
-          To add a channel: edit{" "}
-          <code className="bg-white/10 px-1 rounded">stations.json</code>, then
-          run{" "}
-          <code className="bg-white/10 px-1 rounded">
-            pnpm run build:catalog
-          </code>
-          . Stale and embed-blocked sources update automatically on next catalog
-          build.
+          Sources with sustained embed failures are auto-quarantined in this browser.
+          Re-enable them here, or block a source permanently. To add a channel: edit{" "}
+          <code className="bg-white/10 px-1 rounded">stations.json</code>, then run{" "}
+          <code className="bg-white/10 px-1 rounded">pnpm run build:catalog</code>.
         </p>
       </div>
     </div>

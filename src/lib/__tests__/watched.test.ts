@@ -5,6 +5,9 @@ import {
   blockSource,
   clearWatched,
   getBlockedSources,
+  getQuarantinedSources,
+  quarantineSource,
+  unquarantineSource,
   getEmbedHealth,
   getSavedForPlayback,
   getSmartMixProfileRaw,
@@ -337,6 +340,23 @@ describe("embed health tracking", () => {
   it("is a no-op for empty source string", () => {
     recordEmbedAttempt("", false);
     expect(getEmbedHealth()).toEqual({});
+  });
+});
+
+describe("source quarantine", () => {
+  it("persists quarantined sources in localStorage", () => {
+    quarantineSource("Bad Channel");
+    expect(getQuarantinedSources().has("Bad Channel")).toBe(true);
+    unquarantineSource("Bad Channel");
+    expect(getQuarantinedSources().has("Bad Channel")).toBe(false);
+  });
+
+  it("auto-quarantines after sustained embed failures", () => {
+    for (let i = 0; i < 4; i += 1) {
+      recordEmbedAttempt("Flaky", true);
+    }
+    recordEmbedAttempt("Flaky", false);
+    expect(getQuarantinedSources().has("Flaky")).toBe(true);
   });
 });
 

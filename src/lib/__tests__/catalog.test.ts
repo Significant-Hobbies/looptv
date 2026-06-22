@@ -67,8 +67,8 @@ describe("getCatalogFreshness", () => {
 describe("Smart Mix", () => {
   it("scores videos from preferred sources and tags higher", () => {
     const profile = createSmartMixProfile({ sourceWeights: { Alpha: 2 }, tagWeights: { fun: 3 } });
-    const preferred = scoreVideo({ id: "a", title: "A", duration: 300, date: "", tags: ["fun"], source: "Alpha", viewCount: 1000 }, profile);
-    const other = scoreVideo({ id: "b", title: "B", duration: 300, date: "", tags: ["serious"], source: "Beta", viewCount: 1000 }, profile);
+    const preferred = scoreVideo({ id: "a", title: "A", duration: 300, date: "", tags: ["fun"], source: "Alpha", viewCount: 100_000 }, profile);
+    const other = scoreVideo({ id: "b", title: "B", duration: 300, date: "", tags: ["serious"], source: "Beta", viewCount: 100_000 }, profile);
     expect(preferred.score).toBeGreaterThan(other.score);
     expect(preferred.reason).toContain("Alpha source match");
   });
@@ -115,6 +115,20 @@ describe("pickRandom", () => {
   it("returns null when all videos are excluded", () => {
     const v1 = makeVideo("v1");
     expect(pickRandom([v1], v1.id)).toBeNull();
+  });
+
+  it("prefers the highest-view band", () => {
+    const filler = Array.from({ length: 13 }, (_, i) => ({
+      ...makeVideo(`f${i}`),
+      viewCount: 50_000 + i,
+    }));
+    const high = { ...makeVideo("high"), viewCount: 10_000_000 };
+    const low = { ...makeVideo("low"), viewCount: 10_000 };
+    const pool = [...filler, high, low];
+
+    for (let i = 0; i < 40; i += 1) {
+      expect(pickRandom(pool)?.id).not.toBe("low");
+    }
   });
 });
 

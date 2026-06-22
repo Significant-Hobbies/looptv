@@ -1,0 +1,66 @@
+name: Fetch Catalog Sources
+
+on:
+  schedule:
+    # 1st and 15th of each month at 06:00 UTC (~bi-weekly)
+    - cron: "0 6 1,15 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: catalog-fetch
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Restore source cache
+        uses: actions/cache@v4
+        with:
+          path: data/sources
+          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+          restore-keys: |
+            catalog-sources-v2-
+
+      - name: Install yt-dlp
+        run: pip install -q yt-dlp
+
+      - name: Fetch source shard
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_TOTAL: 4
+          FETCH_CONCURRENCY: "6"
+          CACHE_MAX_AGE_DAYS: "13"
+        run: bash scripts/fetch-sources.sh
+
+      - name: Upload shard artifact
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_TOTAL: 4
+        run: |
+          mkdir -p shard-out
+          node scripts/shard-handles.mjs "$SHARD_INDEX" "$SHARD_TOTAL" | while read -r handle; do
+            safe=$(echo "$handle" | tr -d '@')
+            if [ -f "data/sources/${safe}.jsonl" ]; then
+              cp "data/sources/${safe}.jsonl" "shard-out/"
+            fi
+          done
+          echo "Shard files: $(find shard-out -name '*.jsonl' | wc -l | tr -d ' ')"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: catalog-sources-shard-${{ matrix.shard }}
+          path: shard-out
+          if-no-files-found: error
+          retention-days: 3

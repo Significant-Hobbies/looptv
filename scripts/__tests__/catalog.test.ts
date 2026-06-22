@@ -65,4 +65,22 @@ describe("catalog.json validation", () => {
       }
     }
   });
+
+  it("every video meets the minimum view threshold", () => {
+    const hasPopulatedViewCounts = stationEntries.some(([, station]) =>
+      station.videos.some((video) => (video.viewCount ?? 0) > 0),
+    );
+    if (!hasPopulatedViewCounts) {
+      return;
+    }
+
+    for (const [stationId, station] of stationEntries) {
+      for (const video of station.videos) {
+        expect(
+          video.viewCount,
+          `station=${stationId}, video=${video.id} has viewCount ${video.viewCount ?? "missing"}`,
+        ).toBeGreaterThanOrEqual(10_000);
+      }
+    }
+  });
 });

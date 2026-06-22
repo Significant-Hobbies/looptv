@@ -1,3 +1,4 @@
+import { pickFromTopViewBand } from "./catalog-quality";
 import type { Catalog, CatalogSummary, SourceMeta, Video } from "./types";
 
 let catalogCache: Catalog | null = null;
@@ -71,20 +72,61 @@ export async function loadCatalog(): Promise<Catalog> {
   return inflight;
 }
 
+export async function refreshCatalog(): Promise<Catalog> {
+  catalogCache = null;
+  if (inflight) return inflight;
+  inflight = fetchCatalogWithRetry()
+    .then((c) => {
+      catalogCache = c;
+      return c;
+    })
+    .finally(() => {
+      inflight = null;
+    });
+  return inflight;
+}
+
+async function fetchSummaryWithRetry(): Promise<CatalogSummary> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
+      const url = shouldBypassCache
+        ? `/catalog-summary.json?v=${Date.now()}`
+        : "/catalog-summary.json";
+      const res = await fetch(url, {
+        cache: shouldBypassCache ? "no-store" : "force-cache",
+      });
+      if (!res.ok) throw new Error(`Failed to load catalog summary: ${res.status}`);
+      return assertUsableSummary((await res.json()) as CatalogSummary);
+    } catch (err) {
+      lastErr = err;
+      if (attempt < RETRY_DELAYS_MS.length) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+      }
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Failed to load catalog summary");
+}
+
+export async function refreshCatalogSummary(): Promise<CatalogSummary> {
+  summaryCache = null;
+  if (summaryInflight) return summaryInflight;
+  summaryInflight = fetchSummaryWithRetry()
+    .then((summary) => {
+      summaryCache = summary;
+      return summary;
+    })
+    .finally(() => {
+      summaryInflight = null;
+    });
+  return summaryInflight;
+}
+
 export async function loadCatalogSummary(): Promise<CatalogSummary> {
   if (summaryCache) return summaryCache;
   if (summaryInflight) return summaryInflight;
-  summaryInflight = fetch("/catalog-summary.json", { cache: "force-cache" })
-    .then(async (res) => {
-      if (!res.ok) throw new Error(`Failed to load catalog summary: ${res.status}`);
-      try {
-        return assertUsableSummary((await res.json()) as CatalogSummary);
-      } catch {
-        const fresh = await fetch(`/catalog-summary.json?v=${Date.now()}`, { cache: "no-store" });
-        if (!fresh.ok) throw new Error(`Failed to refresh catalog summary: ${fresh.status}`);
-        return assertUsableSummary((await fresh.json()) as CatalogSummary);
-      }
-    })
+  summaryInflight = fetchSummaryWithRetry()
     .then((summary) => {
       summaryCache = summary;
       return summary;
@@ -181,9 +223,7 @@ export function getSourceFreshness(
 }
 
 export function pickRandom(videos: Video[], exclude?: string): Video | null {
-  const filtered = exclude ? videos.filter((v) => v.id !== exclude) : videos;
-  if (filtered.length === 0) return null;
-  return filtered[Math.floor(Math.random() * filtered.length)];
+  return pickFromTopViewBand(videos, exclude);
 }
 
 export function formatDuration(seconds: number): string {

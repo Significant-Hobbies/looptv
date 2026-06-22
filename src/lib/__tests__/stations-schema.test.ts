@@ -64,4 +64,14 @@ describe("stations-schema", () => {
     });
     expect(ok.success).toBe(true);
   });
+
+  it("keeps topPercentile overrides within a strict quality band", () => {
+    for (const station of stations) {
+      for (const source of station.sources) {
+        if (source.topPercentile == null) continue;
+        expect(source.topPercentile).toBeGreaterThan(0);
+        expect(source.topPercentile).toBeLessThanOrEqual(50);
+      }
+    }
+  });
 });

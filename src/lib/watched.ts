@@ -1,3 +1,5 @@
+import { shouldAutoQuarantine } from "./source-health";
+
 const WATCHED_KEY = "looptv_watched";
 const STATS_KEY = "looptv_stats";
 const BLOCKED_KEY = "looptv_blocked_sources";
@@ -166,6 +168,7 @@ export function resetSmartMixProfile(): void {
 }
 
 const EMBED_HEALTH_KEY = "looptv_embed_health";
+const QUARANTINED_KEY = "looptv_quarantined_sources";
 
 export interface EmbedHealthRecord {
   blocked: number;
@@ -183,8 +186,43 @@ export function getEmbedHealth(): Record<string, EmbedHealthRecord> {
   }
 }
 
-export function recordEmbedAttempt(source: string, blocked: boolean): void {
+export function getQuarantinedSources(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(QUARANTINED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+export function quarantineSource(source: string): void {
   if (typeof window === "undefined" || !source) return;
+  const quarantined = getQuarantinedSources();
+  if (quarantined.has(source)) return;
+  quarantined.add(source);
+  localStorage.setItem(QUARANTINED_KEY, JSON.stringify([...quarantined]));
+}
+
+export function unquarantineSource(source: string): void {
+  if (typeof window === "undefined" || !source) return;
+  const quarantined = getQuarantinedSources();
+  quarantined.delete(source);
+  localStorage.setItem(QUARANTINED_KEY, JSON.stringify([...quarantined]));
+}
+
+/** Auto-quarantine when embed failure rate crosses the health threshold. */
+export function maybeAutoQuarantineSource(source: string): boolean {
+  if (typeof window === "undefined" || !source) return false;
+  const health = getEmbedHealth()[source];
+  if (!shouldAutoQuarantine(health)) return false;
+  const before = getQuarantinedSources();
+  quarantineSource(source);
+  return !before.has(source);
+}
+
+export function recordEmbedAttempt(source: string, blocked: boolean): boolean {
+  if (typeof window === "undefined" || !source) return false;
   const health = getEmbedHealth();
   const entry = health[source] ?? { blocked: 0, checked: 0, sampledAt: "" };
   entry.checked++;
@@ -194,6 +232,7 @@ export function recordEmbedAttempt(source: string, blocked: boolean): void {
   try {
     localStorage.setItem(EMBED_HEALTH_KEY, JSON.stringify(health));
   } catch {}
+  return maybeAutoQuarantineSource(source);
 }
 
 export function getSourceEmbedBlockRate(source: string): number {

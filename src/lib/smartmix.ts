@@ -1,4 +1,5 @@
 import type { Catalog, Video } from "./types";
+import { TOP_PICK_BAND_SIZE, videoViewWeight } from "./catalog-quality";
 
 export interface SmartMixProfile {
   favorites: string[];
@@ -63,13 +64,13 @@ export function pickSmartMixVideo(
     .map((video) => ({ video, ...scoreVideo(video, profile) }))
     .sort((a, b) => b.score - a.score || (b.video.viewCount ?? 0) - (a.video.viewCount ?? 0));
 
-  const topBand = ranked.slice(0, Math.min(12, ranked.length));
+  const topBand = ranked.slice(0, Math.min(TOP_PICK_BAND_SIZE, ranked.length));
   const winner = topBand[Math.floor(Math.random() * topBand.length)];
   return winner;
 }
 
 export function scoreVideo(video: Video, profile: SmartMixProfile): { score: number; reason: string } {
-  let score = Math.log10((video.viewCount ?? 1000) + 10);
+  let score = videoViewWeight(video.viewCount);
   const reasons: string[] = [];
 
   if (profile.favorites.includes(video.id)) {

@@ -5,6 +5,11 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import {
+  applySourceQualityFilter,
+  qualifiesRawVideo,
+  validateCatalog,
+} from "./catalog-quality.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = process.argv[2];
@@ -47,9 +52,7 @@ for (const station of stationsConfig) {
     for (const line of lines) {
       try {
         const raw = JSON.parse(line);
-        const dur = raw.duration || 0;
-        if (dur < minDur || dur > maxDur) continue;
-        if (raw.view_count !== undefined && raw.view_count !== null && raw.view_count < 10000) continue;
+        if (!qualifiesRawVideo(raw, minDur, maxDur)) continue;
         videos.push(raw);
       } catch {}
     }
@@ -62,19 +65,6 @@ for (const station of stationsConfig) {
       videoCount: videos.length,
     };
   }
-}
-
-// Log-interpolate percentile: most videos → 10%, fewest → 50%
-const counts = [...sourceCache.values()].map((v) => v.length).filter((c) => c > 0);
-const maxCount = Math.max(...counts);
-const minCount = Math.min(...counts);
-const logMax = Math.log(maxCount);
-const logMin = Math.log(minCount);
-
-function calcPercentile(count) {
-  if (logMax === logMin) return 50;
-  const t = (Math.log(count) - logMin) / (logMax - logMin); // 0 (smallest) → 1 (largest)
-  return Math.round(50 - 40 * t); // 50% (smallest) → 10% (largest)
 }
 
 const catalog = { lastUpdated: "", sourceMeta: {}, stations: {} };
@@ -92,20 +82,15 @@ for (const station of stationsConfig) {
       continue;
     }
 
-    // Apply percentile filter: log-scaled from 10% (biggest) to 50% (smallest)
-    let filtered = [...sourceVideos];
-    const pct = src.topPercentile ?? calcPercentile(filtered.length || 1);
-    if (filtered.length > 0 && pct < 100) {
-      filtered.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
-      const cutoff = Math.ceil(filtered.length * (pct / 100));
-      console.log(`  ${src.name}: top ${pct}% — ${filtered.length} → ${cutoff} videos`);
-      filtered = filtered.slice(0, cutoff);
+    const { filtered, pct } = applySourceQualityFilter(sourceVideos, src);
+    if (sourceVideos.length > 0) {
+      console.log(`  ${src.name}: top ${pct}% — ${sourceVideos.length} → ${filtered.length} videos`);
     }
 
     for (const raw of filtered) {
       const prev = existingVideos.get(raw.id);
       if (prev && prev.tags && prev.tags.length > 1) {
-        prev.viewCount = raw.view_count || prev.viewCount || 0;
+        prev.viewCount = raw.view_count;
         allVideos.push(prev);
       } else {
         totalNew++;
@@ -116,7 +101,7 @@ for (const station of stationsConfig) {
           date: "",
           tags: [src.name],
           source: src.name,
-          viewCount: raw.view_count || 0,
+          viewCount: raw.view_count,
           description: (raw.description || "").slice(0, 300),
         });
       }
@@ -137,6 +122,17 @@ for (const station of stationsConfig) {
 
 catalog.lastUpdated = new Date().toISOString();
 catalog.sourceMeta = sourceMeta;
+
+try {
+  validateCatalog(catalog);
+} catch (err) {
+  console.error(`Catalog quality validation failed: ${err.message}`);
+  console.error(
+    "Hint: cached JSONL may have been fetched with --flat-playlist (no view counts). Re-fetch sources without --flat-playlist.",
+  );
+  process.exit(1);
+}
+
 fs.writeFileSync(OUTPUT, JSON.stringify(catalog));
 const summaryOutput = path.join(path.dirname(OUTPUT), "catalog-summary.json");
 const catalogSummary = {

@@ -4,19 +4,19 @@
     "name": "Saturday Night Live",
     "description": "Sketches, Weekend Update, cold opens, and more",
     "sources": [
-      { "name": "Saturday Night Live", "handle": "@SaturdayNightLive", "channelId": "UCqFzWxSCi39LnW1JKFR3efg", "minDuration": 60, "maxDuration": 1800 }
+      { "name": "Saturday Night Live", "handle": "@SaturdayNightLive", "channelId": "UCqFzWxSCi39LnW1JKFR3efg", "minDuration": 60, "maxDuration": 1800, "topPercentile": 3 }
     ]
   },
   {
     "id": "science",
     "name": "Science",
-    "description": "Kurzgesagt, Veritasium, SmarterEveryDay, and more",
+    "description": "Kurzgesagt, Veritasium, Branch Education, SmarterEveryDay, and more",
     "sources": [
       { "name": "Kurzgesagt", "handle": "@kurzgesagt", "channelId": "UCsXVk37bltHxD1rDPwtNM8Q", "minDuration": 120, "maxDuration": 3600 },
-      { "name": "TED-Ed", "handle": "@TEDEd", "channelId": "UCsooa4yRKGN_zEE8iknghZA", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "TED-Ed", "handle": "@TEDEd", "channelId": "UCsooa4yRKGN_zEE8iknghZA", "minDuration": 120, "maxDuration": 1800, "topPercentile": 5 },
       { "name": "Veritasium", "handle": "@veritasium", "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA", "minDuration": 120, "maxDuration": 3600 },
       { "name": "Be Smart", "handle": "@besmart", "channelId": "UCH4BNI0-FOK2dMXoFtViWHw", "minDuration": 120, "maxDuration": 1800 },
-      { "name": "Science Channel", "handle": "@sciencechannel", "channelId": "UCvJiYiBUbw4tmpRSZT2r1Hw", "minDuration": 60, "maxDuration": 1800 },
+      { "name": "Science Channel", "handle": "@sciencechannel", "channelId": "UCvJiYiBUbw4tmpRSZT2r1Hw", "minDuration": 60, "maxDuration": 1800, "topPercentile": 5 },
       { "name": "minutephysics", "handle": "@MinutePhysics", "channelId": "UCUHW94eEFW7hkUMVaZz4eDg", "minDuration": 60, "maxDuration": 900 },
       { "name": "Physics Girl", "handle": "@physicsgirl", "channelId": "UC7DdEm33SyaTDtWYGO2CwdA", "minDuration": 120, "maxDuration": 1800 },
       { "name": "engineerguy", "handle": "@engineerguyvideo", "channelId": "UC2bkHVIDjXS7sgrgjFtzOXQ", "minDuration": 120, "maxDuration": 1200 },
@@ -24,7 +24,10 @@
       { "name": "This.", "handle": "@this.science", "channelId": "UCujEh8EooZHJe4YDinK3PAg", "minDuration": 60, "maxDuration": 1200 },
       { "name": "SmarterEveryDay", "handle": "@SmarterEveryDay", "channelId": "UC6107grRI4m0o2-emgoDnAA", "minDuration": 120, "maxDuration": 1800 },
       { "name": "Steve Mould", "handle": "@SteveMould", "channelId": "UCEIwxahdLz7bap-VDs9h35A", "minDuration": 120, "maxDuration": 1800 },
-      { "name": "ElectroBOOM", "handle": "@ElectroBOOM", "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA", "minDuration": 120, "maxDuration": 1200 }
+      { "name": "ElectroBOOM", "handle": "@ElectroBOOM", "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA", "minDuration": 120, "maxDuration": 1200 },
+      { "name": "Branch Education", "handle": "@BranchEducation", "channelId": "UCb3ZMYnkBUxR8f_9lx2PoRA", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Domain of Science", "handle": "@ScienceMaps", "channelId": "UCxqAWLTk1CmBvZFPzeZMd9A", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Socratica", "handle": "@Socratica", "channelId": "UCW6TXMZ5Pq6yL6_k5NZ2e0Q", "minDuration": 120, "maxDuration": 1800 }
     ]
   },
   {
@@ -44,7 +47,7 @@
   {
     "id": "tech",
     "name": "Tech",
-    "description": "Fireship, ColdFusion, Sebastian Lague, Technology Connections, and more",
+    "description": "Fireship, Gary Explains, LiveOverflow, ThePrimeagen, Technology Connections, and more",
     "sources": [
       { "name": "Fireship", "handle": "@Fireship", "channelId": "UCsBjURrPoezykLs9EqgamOA", "minDuration": 30, "maxDuration": 1800 },
       { "name": "Beyond Fireship", "handle": "@beyondfireship", "channelId": "UC2Xd-TjJByJyK2w1zNwY0zQ", "minDuration": 60, "maxDuration": 1800 },
@@ -60,7 +63,15 @@
       { "name": "Technology Connections", "handle": "@TechnologyConnections", "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q", "minDuration": 120, "maxDuration": 2100 },
       { "name": "Dave's Garage", "handle": "@DavesGarage", "channelId": "UCNzszbnvQeFzObW0ghk0Ckw", "minDuration": 120, "maxDuration": 1200 },
       { "name": "Stuff Made Here", "handle": "@StuffMadeHere", "channelId": "UCj1VqrHhDte54oLgPG4xpuQ", "minDuration": 120, "maxDuration": 1500 },
-      { "name": "Ben Eater", "handle": "@beneater", "channelId": "UCS0N5baNlQWJCUrhCEo8WlA", "minDuration": 120, "maxDuration": 1800 }
+      { "name": "Ben Eater", "handle": "@beneater", "channelId": "UCS0N5baNlQWJCUrhCEo8WlA", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Gary Explains", "handle": "@GaryExplains", "channelId": "UCgyqtNWZmIxTx3b6OxTSALw", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "PowerCert Animated Videos", "handle": "@PowerCertAnimatedVideos", "channelId": "UC0vBXGSyV14uvJ4hECDOl0Q", "minDuration": 60, "maxDuration": 900 },
+      { "name": "LiveOverflow", "handle": "@LiveOverflow", "channelId": "UCNNfzr9A5dEOscVEDyyzo-A", "minDuration": 120, "maxDuration": 2400 },
+      { "name": "Andreas Kling", "handle": "@awesomekling", "channelId": "UCcEeDpppUARVPYYhlF7ygug", "minDuration": 120, "maxDuration": 3600 },
+      { "name": "ExplainingComputers", "handle": "@ExplainingComputers", "channelId": "UCgKadKkzK-Ea_YnogNKtOlA", "minDuration": 120, "maxDuration": 2400 },
+      { "name": "ThePrimeagen", "handle": "@ThePrimeagen", "channelId": "UCUyeluBRhGPCW4rPe_UvBZQ", "minDuration": 120, "maxDuration": 7200 },
+      { "name": "CodeParade", "handle": "@CodeParade", "channelId": "UC9z7EZAbkphEMg0SP7rw44A", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Mix and Jam", "handle": "@mixandjam", "channelId": "UCYbK_tjZ2OrIZFBvU6CCMiA", "minDuration": 120, "maxDuration": 1200 }
     ]
   },
   {
@@ -68,8 +79,8 @@
     "name": "Comedy",
     "description": "The Onion, CalebCity, Ryan George, ProZD, and more",
     "sources": [
-      { "name": "The Onion", "handle": "@TheOnion", "channelId": "UCfAOh2t5DpxVrgS9NQKjC7A", "minDuration": 30, "maxDuration": 600 },
-      { "name": "Studio C", "handle": "@StudioCtv", "channelId": "UCsZXuHKonP9utl5q2hFCkgA", "minDuration": 60, "maxDuration": 900 },
+      { "name": "The Onion", "handle": "@TheOnion", "channelId": "UCfAOh2t5DpxVrgS9NQKjC7A", "minDuration": 30, "maxDuration": 600, "topPercentile": 5 },
+      { "name": "Studio C", "handle": "@StudioCtv", "channelId": "UCsZXuHKonP9utl5q2hFCkgA", "minDuration": 60, "maxDuration": 900, "topPercentile": 5 },
       { "name": "HISHE", "handle": "@HowItShouldHaveEnded", "channelId": "UCHCph-_jLba_9atyCZJPLQQ", "minDuration": 60, "maxDuration": 900 },
       { "name": "I Mostly Blame Myself", "handle": "@IMostlyBlameMyself", "channelId": "UCVQyWbVBZSWvivXuQjKvQew", "minDuration": 30, "maxDuration": 600 },
       { "name": "BroScienceLife", "handle": "@BroScienceLife", "channelId": "UCduKuJToxWPizJ7I2E6n1kA", "minDuration": 60, "maxDuration": 600 },
@@ -82,7 +93,7 @@
   {
     "id": "cs",
     "name": "CS Deep Dive",
-    "description": "Computerphile, Coding Train, ByteByteGo, and more",
+    "description": "Computerphile, MIT OCW, CS50, ArjanCodes, javidx9, GOTO, and more",
     "sources": [
       { "name": "Computerphile", "handle": "@Computerphile", "channelId": "UC9-y-6csu5WGm29I7JiwpnA", "minDuration": 120, "maxDuration": 2400 },
       { "name": "The Coding Train", "handle": "@TheCodingTrain", "channelId": "UCvjgXvBlbQiydffZU7m1_aw", "minDuration": 120, "maxDuration": 3600 },
@@ -95,13 +106,28 @@
       { "name": "Arpit Bhayani", "handle": "@AsliEngineering", "channelId": "UC_b1GUJv_2QiMP4BxC9-Dxg", "minDuration": 120, "maxDuration": 3600 },
       { "name": "StatQuest", "handle": "@statquest", "channelId": "UCtYLUTtgS3k1Fg4y5tAhLbw", "minDuration": 120, "maxDuration": 1800 },
       { "name": "TechWorld with Nana", "handle": "@TechWorldwithNana", "channelId": "UCdngmbVKX1Tgre699-XLlUA", "minDuration": 120, "maxDuration": 3600 },
-      { "name": "Steve (Builder.io)", "handle": "@Steve8708", "channelId": "UCGmR6lhKMlCkvrvb39vPtdA", "minDuration": 60, "maxDuration": 1800 }
+      { "name": "Steve (Builder.io)", "handle": "@Steve8708", "channelId": "UCGmR6lhKMlCkvrvb39vPtdA", "minDuration": 60, "maxDuration": 1800 },
+      { "name": "MIT OpenCourseWare", "handle": "@mitocw", "channelId": "UCN0QBfKk0ZSytyX_16M11fA", "minDuration": 120, "maxDuration": 7200, "topPercentile": 3 },
+      { "name": "Harvard CS50", "handle": "@cs50", "channelId": "UCcabW7890RKJzL968QWEykA", "minDuration": 120, "maxDuration": 7200, "topPercentile": 3 },
+      { "name": "Stanford Online", "handle": "@stanfordonline", "channelId": "UCBa5G_ESCn8Yd4vw5U-gIcg", "minDuration": 120, "maxDuration": 7200, "topPercentile": 3 },
+      { "name": "ArjanCodes", "handle": "@ArjanCodes", "channelId": "UCVhQ2NnY5Rskt6UjCUkJ_DA", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "javidx9", "handle": "@javidx9", "channelId": "UC77N7im6bfUPvR3PkRKaVGQ", "minDuration": 120, "maxDuration": 3600 },
+      { "name": "The Cherno", "handle": "@TheCherno", "channelId": "UCwE6vJXm1I3XmMA6g92HXxw", "minDuration": 120, "maxDuration": 3600 },
+      { "name": "GOTO Conferences", "handle": "@GOTO-", "channelId": "UCT-nPlVzJI-ccQXlxjSvJmw", "minDuration": 120, "maxDuration": 3600, "topPercentile": 3 },
+      { "name": "InfoQ", "handle": "@infoq", "channelId": "UCkQX1tChV7Z7l1LFF4L9j_g", "minDuration": 120, "maxDuration": 3600, "topPercentile": 3 },
+      { "name": "Corey Schafer", "handle": "@coreyms", "channelId": "UCmY91yfYo5DPqVt4TGkRNJA", "minDuration": 120, "maxDuration": 3600 },
+      { "name": "freeCodeCamp", "handle": "@freecodecamp", "channelId": "UC1emV4A8liRs9p80CY8ElUQ", "minDuration": 120, "maxDuration": 7200, "topPercentile": 3 },
+      { "name": "Dreams of Code", "handle": "@dreamsofcode", "channelId": "UCEEVcDuBRDiwxfXAgQjLGug", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "CS Dojo", "handle": "@CSDojo", "channelId": "UCxX9wt5FWQUAAz4UrysqK9A", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Gaurav Sen", "handle": "@gkcs", "channelId": "UCRPMAqdtSgd0Ipeef7iFsKw", "minDuration": 120, "maxDuration": 2400 },
+      { "name": "Tsoding Daily", "handle": "@TsodingDaily", "channelId": "UCrqM0Ym_NbK1fqeQG2VIohg", "minDuration": 120, "maxDuration": 3600 },
+      { "name": "Creel", "handle": "@WhatsACreel", "channelId": "UC2nWRGqPL6O-Lm8mexWhISQ", "minDuration": 120, "maxDuration": 2400 }
     ]
   },
   {
     "id": "ai",
     "name": "AI / ML",
-    "description": "Karpathy, Yannic Kilcher, Two Minute Papers, and more",
+    "description": "Karpathy, OpenAI, Yannic Kilcher, Two Minute Papers, and more",
     "sources": [
       { "name": "Andrej Karpathy", "handle": "@AndrejKarpathy", "channelId": "UCXUPKJO5MZQN11PqgIvyuvQ", "minDuration": 120, "maxDuration": 7200 },
       { "name": "Two Minute Papers", "handle": "@TwoMinutePapers", "channelId": "UCbfYPyITQ-7l4upoX8nvctg", "minDuration": 60, "maxDuration": 900 },
@@ -110,7 +136,8 @@
       { "name": "Animated AI", "handle": "@animatedai", "channelId": "UC5bSCGdcE9x9ffqqgJlGp5Q", "minDuration": 30, "maxDuration": 600 },
       { "name": "AI Engineer", "handle": "@aiDotEngineer", "channelId": "UCLKPca3kwwd-B59HNr-_lvA", "minDuration": 120, "maxDuration": 3600 },
       { "name": "Simon Oz", "handle": "@szymonozog7862", "channelId": "UC5Obl4eU2zVQwuXv91mypeQ", "minDuration": 60, "maxDuration": 1800 },
-      { "name": "Yifan", "handle": "@YifanBTH", "channelId": "UCJL_hSRHW8414diAIleErnw", "minDuration": 60, "maxDuration": 1800 }
+      { "name": "Yifan", "handle": "@YifanBTH", "channelId": "UCJL_hSRHW8414diAIleErnw", "minDuration": 60, "maxDuration": 1800 },
+      { "name": "OpenAI", "handle": "@OpenAI", "channelId": "UCXZCJLdBC09xxGZ6gcdrc6A", "minDuration": 120, "maxDuration": 3600 }
     ]
   },
   {
@@ -171,7 +198,7 @@
   {
     "id": "math",
     "name": "Math",
-    "description": "3Blue1Brown, Numberphile, CGP Grey, and more",
+    "description": "3Blue1Brown, Numberphile, Freya Holmér, CGP Grey, and more",
     "sources": [
       { "name": "3Blue1Brown", "handle": "@3blue1brown", "channelId": "UCYO_jab_esuFRV4b17AJtAw", "minDuration": 120, "maxDuration": 3600 },
       { "name": "Numberphile", "handle": "@Numberphile", "channelId": "UCoxcjq-8xIDTYp3uz647V5A", "minDuration": 120, "maxDuration": 1800 },
@@ -179,7 +206,8 @@
       { "name": "2swap", "handle": "@twoswap", "channelId": "UCiNLr9wX35KksK77mrQgxiw", "minDuration": 60, "maxDuration": 1800 },
       { "name": "PBS Infinite Series", "handle": "@pbsinfiniteseries", "channelId": "UCs4aHmggTfFrpkPcWSaBN9g", "minDuration": 120, "maxDuration": 1200 },
       { "name": "Primer", "handle": "@PrimerBlobs", "channelId": "UCKzJFdi57J53Vr_BkTfN3uQ", "minDuration": 120, "maxDuration": 1800 },
-      { "name": "CGP Grey", "handle": "@CGPGrey", "channelId": "UC2C_jShtL725hvbm1arSV9w", "minDuration": 120, "maxDuration": 1800 }
+      { "name": "CGP Grey", "handle": "@CGPGrey", "channelId": "UC2C_jShtL725hvbm1arSV9w", "minDuration": 120, "maxDuration": 1800 },
+      { "name": "Freya Holmér", "handle": "@acegikmo", "channelId": "UC7M-Wz4zK8oikt6ATcoTwBA", "minDuration": 120, "maxDuration": 3600 }
     ]
   },
   {
@@ -197,7 +225,7 @@
     "name": "TED Talks",
     "description": "The best TED talks",
     "sources": [
-      { "name": "TED", "handle": "@TED", "channelId": "UCAuUUnT6oDeKwE6v1NGQxug", "minDuration": 300, "maxDuration": 1800 }
+      { "name": "TED", "handle": "@TED", "channelId": "UCAuUUnT6oDeKwE6v1NGQxug", "minDuration": 300, "maxDuration": 1800, "topPercentile": 5 }
     ]
   },
   {
@@ -214,7 +242,7 @@
   {
     "id": "explainers",
     "name": "Explainers",
-    "description": "Wendover, RealLifeLore, Johnny Harris, PolyMatter, and more",
+    "description": "Tom Scott, Wendover, RealLifeLore, Johnny Harris, PolyMatter, and more",
     "sources": [
       { "name": "Wendover Productions", "handle": "@Wendoverproductions", "channelId": "UC9RM-iSvTu1uPJb8X5yp3EQ", "minDuration": 120, "maxDuration": 1500 },
       { "name": "RealLifeLore", "handle": "@reallifelore", "channelId": "UCP5tjEmvPItGyLhmjdwP7Ww", "minDuration": 120, "maxDuration": 2400 },
@@ -223,8 +251,9 @@
       { "name": "Half as Interesting", "handle": "@halfasinteresting", "channelId": "UCuCkxoKLYO_EQ2GeFtbM_bw", "minDuration": 60, "maxDuration": 600 },
       { "name": "Economics Explained", "handle": "@EconomicsExplained", "channelId": "UCZ4AMrDcNrfy3X6nsU8-rPg", "minDuration": 120, "maxDuration": 1200 },
       { "name": "CaspianReport", "handle": "@CaspianReport", "channelId": "UCwnKziETDbHJtx78nIkfYug", "minDuration": 120, "maxDuration": 1200 },
-      { "name": "Vox", "handle": "@Vox", "channelId": "UCLXo7UDZvByw2ixzpQCufnA", "minDuration": 120, "maxDuration": 1200 },
-      { "name": "Neo", "handle": "@neoexplains", "channelId": "UCtYKe7-XbaDjpUwcU5x0bLg", "minDuration": 120, "maxDuration": 1200 }
+      { "name": "Vox", "handle": "@Vox", "channelId": "UCLXo7UDZvByw2ixzpQCufnA", "minDuration": 120, "maxDuration": 1200, "topPercentile": 5 },
+      { "name": "Neo", "handle": "@neoexplains", "channelId": "UCtYKe7-XbaDjpUwcU5x0bLg", "minDuration": 120, "maxDuration": 1200 },
+      { "name": "Tom Scott", "handle": "@TomScottGo", "channelId": "UCHqDTfIX-0DGaHlWvv6JZCw", "minDuration": 60, "maxDuration": 1200 }
     ]
   },
   {

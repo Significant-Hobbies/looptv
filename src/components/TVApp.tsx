@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { Catalog, CatalogSummary, Video } from "@/lib/types";
-import { loadCatalog, loadCatalogSummary, getVideosForStation, pickRandom, formatDuration, getCatalogFreshness, getSourceFreshness } from "@/lib/catalog";
-import { getWatchedIds, markWatched, getBlockedSources, blockSource, unblockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile, getEmbedHealth, type EmbedHealthRecord } from "@/lib/watched";
+import { loadCatalog, loadCatalogSummary, refreshCatalog, refreshCatalogSummary, getVideosForStation, pickRandom, getCatalogFreshness, getSourceFreshness } from "@/lib/catalog";
+import { getWatchedIds, markWatched, getBlockedSources, blockSource, unblockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile, getEmbedHealth, getQuarantinedSources, unquarantineSource, type EmbedHealthRecord } from "@/lib/watched";
+import { derivePlaybackDiagnostic } from "@/lib/playback-diagnostics";
+import { isEmbedUnhealthy, getEmbedBlockRate } from "@/lib/source-health";
 import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
 import { ytErrorReason } from "@/lib/yt-errors";
 import { trackActivated, trackCoreAction } from "@/lib/analytics";
@@ -11,6 +13,8 @@ import Link from "next/link";
 import Player, { type PlayerHandle } from "./Player";
 import Search from "./Search";
 import ChannelHealth from "./ChannelHealth";
+import PlaybackDiagnosticsBanner from "./PlaybackDiagnosticsBanner";
+import ControlRail from "./ControlRail";
 import stations from "../../channels.config";
 import bundledCatalogSummary from "../../public/catalog-summary.json";
 
@@ -34,6 +38,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [hideWatched, setHideWatched] = useState(true);
   const [watchedIds, setWatchedIds] = useState<Set<string>>(() => new Set());
   const [blockedSources, setBlockedSources] = useState<Set<string>>(() => new Set());
+  const [quarantinedSources, setQuarantinedSources] = useState<Set<string>>(() => new Set());
   const [activeSources, setActiveSources] = useState<Set<string> | null>(null); // null = all active
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
@@ -45,11 +50,14 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [smartMixProfile, setSmartMixProfile] = useState<SmartMixProfile>(() => createSmartMixProfile());
   const [smartMixReason, setSmartMixReason] = useState("");
   const [playbackIssue, setPlaybackIssue] = useState<{ reason: string; skipped: number } | null>(null);
+  const [catalogLoadFailed, setCatalogLoadFailed] = useState(false);
+  const [catalogRefreshing, setCatalogRefreshing] = useState(false);
   const [embedHealth, setEmbedHealth] = useState<Record<string, EmbedHealthRecord>>(() => ({}));
   const queueRef = useRef<Video[]>([]);
   const [queueCount, setQueueCount] = useState(0);
   const skippedRef = useRef(new Set<string>());
   const blockedSourcesRef = useRef(new Set<string>());
+  const quarantinedSourcesRef = useRef(new Set<string>());
   const historyRef = useRef<Video[]>([]);
   const [hasHistory, setHasHistory] = useState(false);
   const playerRef = useRef<PlayerHandle>(null);
@@ -80,6 +88,8 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       const blocked = getBlockedSources();
       blockedSourcesRef.current = blocked;
       setBlockedSources(blocked);
+      setQuarantinedSources(getQuarantinedSources());
+      quarantinedSourcesRef.current = getQuarantinedSources();
       setWatchLaterIds(new Set(getWatchLater()));
       setSavedForPlaybackIds(new Set(getSavedForPlayback()));
       setEmbedHealth(getEmbedHealth());
@@ -101,14 +111,22 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
 
   const fetchCatalog = useCallback(() => {
     loadCatalogSummary()
-      .then(setCatalogSummary)
+      .then((summary) => {
+        setCatalogSummary(summary);
+        setCatalogLoadFailed(false);
+      })
       .catch(() => {
         // The full catalog still powers playback; summary only improves first paint.
       });
     loadCatalog()
-      .then((c) => { setCatalog(c); setStatus(""); })
+      .then((c) => {
+        setCatalog(c);
+        setStatus("");
+        setCatalogLoadFailed(false);
+      })
       .catch((err) => {
         console.error("TVApp: catalog load failed after retries", err);
+        setCatalogLoadFailed(true);
         const isDev =
           typeof window !== "undefined" &&
           (window.location.hostname === "localhost" ||
@@ -116,14 +134,44 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         setStatus(
           isDev
             ? "No catalog found. Run: pnpm run build:catalog"
-            : "Catalog couldn't load. Reload the page when you're back online.",
+            : "Catalog couldn't load. Retry when you're back online.",
         );
       });
   }, []);
 
+  const refreshCatalogState = useCallback(async () => {
+    if (catalogRefreshing) return;
+    setCatalogRefreshing(true);
+    try {
+      const [summary, nextCatalog] = await Promise.all([
+        refreshCatalogSummary(),
+        refreshCatalog(),
+      ]);
+      setCatalogSummary(summary);
+      setCatalog(nextCatalog);
+      setCatalogLoadFailed(false);
+      setStatus("");
+    } catch (err) {
+      console.error("TVApp: catalog refresh failed", err);
+      setCatalogLoadFailed(true);
+      setStatus("Catalog couldn't load. Retry when you're back online.");
+    } finally {
+      setCatalogRefreshing(false);
+    }
+  }, [catalogRefreshing]);
+
   useEffect(() => {
     blockedSourcesRef.current = blockedSources;
   }, [blockedSources]);
+
+  useEffect(() => {
+    quarantinedSourcesRef.current = quarantinedSources;
+  }, [quarantinedSources]);
+
+  const syncQuarantinedSources = useCallback((next: Set<string>) => {
+    quarantinedSourcesRef.current = next;
+    setQuarantinedSources(next);
+  }, []);
 
   const syncBlockedSources = useCallback((next: Set<string>) => {
     blockedSourcesRef.current = next;
@@ -179,7 +227,12 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         : getVideosForStation(catalog, activeStation, cat || activeCategory);
       // Filter out watched if enabled, plus skipped (embed errors)
       const available = videos.filter(
-        (v) => !skippedRef.current.has(v.id) && (!hideWatched || !watchedIds.has(v.id)) && (!v.source || !blockedSourcesRef.current.has(v.source)) && (!activeSources || !v.source || activeSources.has(v.source))
+        (v) =>
+          !skippedRef.current.has(v.id) &&
+          (!hideWatched || !watchedIds.has(v.id)) &&
+          (!v.source || !blockedSourcesRef.current.has(v.source)) &&
+          (!v.source || !quarantinedSourcesRef.current.has(v.source)) &&
+          (!activeSources || !v.source || activeSources.has(v.source))
       );
 
       if (available.length < 5) {
@@ -193,7 +246,10 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       const smartPick = isSmartMix
         ? pickSmartMixVideo(catalog, smartMixProfile, {
             watchedIds: hideWatched ? watchedIds : undefined,
-            blockedSources: blockedSourcesRef.current,
+            blockedSources: new Set([
+              ...blockedSourcesRef.current,
+              ...quarantinedSourcesRef.current,
+            ]),
             excludeId: currentVideo?.id,
             recentIds,
           })
@@ -211,7 +267,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         setStatus("No unwatched videos in this category");
       }
     },
-    [catalog, activeStation, activeCategory, currentVideo, hideWatched, watchedIds, activeSources, maybeMarkWatched, isSmartMix, smartMixProfile]
+    [catalog, activeStation, activeCategory, currentVideo, hideWatched, watchedIds, activeSources, maybeMarkWatched, isSmartMix, smartMixProfile],
   );
 
   const playPrev = useCallback(() => {
@@ -311,11 +367,12 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       (v) => v.id !== currentVideo.id &&
       (!hideWatched || !watchedIds.has(v.id)) &&
       (!v.source || !blockedSources.has(v.source)) &&
+      (!v.source || !quarantinedSources.has(v.source)) &&
       (!activeSources || !v.source || activeSources.has(v.source))
     );
     const src = pool.length > 0 ? pool : videos.filter((v) => v.id !== currentVideo.id);
     setNextVideoPreview(src.length > 0 ? src[Math.floor(Math.random() * src.length)] : null);
-  }, [catalog, currentVideo, activeStation, activeCategory, hideWatched, watchedIds, blockedSources, activeSources, isSmartMix]);
+  }, [catalog, currentVideo, activeStation, activeCategory, hideWatched, watchedIds, blockedSources, quarantinedSources, activeSources, isSmartMix]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -362,6 +419,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     (code: number) => {
       const reason = ytErrorReason(code);
       if (currentVideo) skippedRef.current.add(currentVideo.id);
+      setEmbedHealth(getEmbedHealth());
+      setQuarantinedSources(getQuarantinedSources());
+      quarantinedSourcesRef.current = getQuarantinedSources();
       setPlaybackIssue((prev) => ({ reason, skipped: (prev?.skipped ?? 0) + 1 }));
       setStatus(`Skipped: ${reason}. Trying next...`);
       if (retryTimeoutRef.current) {
@@ -372,7 +432,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         playNext();
       }, 500);
     },
-    [currentVideo, playNext]
+    [currentVideo, playNext],
   );
 
   useEffect(
@@ -391,15 +451,65 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const catalogLoaded = catalog !== null;
   const unwatchedCount = allVideos.filter((v) => !watchedIds.has(v.id)).length;
   const catalogFreshness = useMemo(
-    () => mounted
-      ? getCatalogFreshness(catalog?.lastUpdated ?? catalogSummary?.lastUpdated)
-      : { state: "loading" as const, label: "Checking catalog freshness...", ageDays: null, updatedAt: null },
+    () =>
+      mounted
+        ? getCatalogFreshness(catalog?.lastUpdated ?? catalogSummary?.lastUpdated)
+        : {
+            state: "loading" as const,
+            label: "Checking catalog freshness...",
+            ageDays: null,
+            updatedAt: null,
+          },
     [mounted, catalog?.lastUpdated, catalogSummary?.lastUpdated],
   );
-  const catalogFreshnessLabel =
-    catalogFreshness.state === "stale"
-      ? `Channel catalog may be stale - ${catalogFreshness.label}`
-      : catalogFreshness.label;
+
+  const currentSourceFreshness = useMemo(() => {
+    if (!currentVideo?.source || !catalog) return undefined;
+    const handle = stations
+      .flatMap((st) => st.sources)
+      .find((s) => s.name === currentVideo.source)?.handle.replace("@", "");
+    return getSourceFreshness(handle ? catalog.sourceMeta?.[handle] : undefined);
+  }, [catalog, currentVideo?.source]);
+
+  const playbackDiagnostic = useMemo(
+    () =>
+      mounted
+        ? derivePlaybackDiagnostic({
+            catalogLoaded: catalogLoaded,
+            catalogLoadFailed,
+            catalogFreshness,
+            currentSource: currentVideo?.source,
+            sourceFreshness: currentSourceFreshness,
+            embedHealth: currentVideo?.source ? embedHealth[currentVideo.source] : undefined,
+            isQuarantined: currentVideo?.source
+              ? quarantinedSources.has(currentVideo.source)
+              : false,
+            skipStreak: playbackIssue?.skipped ?? 0,
+            lastSkipReason: playbackIssue?.reason,
+          })
+        : null,
+    [
+      mounted,
+      catalogLoaded,
+      catalogLoadFailed,
+      catalogFreshness,
+      currentVideo?.source,
+      currentSourceFreshness,
+      embedHealth,
+      quarantinedSources,
+      playbackIssue,
+    ],
+  );
+
+  const handleUnquarantine = useCallback(
+    (source: string) => {
+      unquarantineSource(source);
+      const next = new Set(quarantinedSourcesRef.current);
+      next.delete(source);
+      syncQuarantinedSources(next);
+    },
+    [syncQuarantinedSources],
+  );
 
   const totalCatalogVideos =
     (catalog && Object.values(catalog.stations).reduce((n, s) => n + s.videos.length, 0)) ||
@@ -435,11 +545,15 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                 const freshness = getSourceFreshness(meta);
                 const isStale = freshness.state === "stale";
                 const health = embedHealth[s.name];
-                const blockRate = health && health.checked >= 5 ? health.blocked / health.checked : 0;
-                const isUnhealthy = blockRate > 0.3;
+                const isUnhealthy = isEmbedUnhealthy(health);
+                const blockRate = getEmbedBlockRate(health);
+                const isQuarantined = quarantinedSources.has(s.name);
                 const title = [
                   freshness.state !== "unknown" ? freshness.label : null,
-                  isUnhealthy ? `${Math.round(blockRate * 100)}% embed blocks` : null,
+                  isQuarantined ? "Auto-quarantined for embed failures" : null,
+                  isUnhealthy && blockRate !== null
+                    ? `${Math.round(blockRate * 100)}% embed blocks`
+                    : null,
                 ].filter(Boolean).join(" · ") || undefined;
                 return (
                   <button
@@ -474,7 +588,10 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                     {isStale && (
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400/80 shrink-0" aria-label="stale" />
                     )}
-                    {isUnhealthy && (
+                    {isQuarantined && (
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400/80 shrink-0" aria-label="quarantined" />
+                    )}
+                    {isUnhealthy && !isQuarantined && (
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-400/80 shrink-0" aria-label="embed issues" />
                     )}
                   </button>
@@ -485,10 +602,23 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           <p className="text-white/40 text-sm">
             {allVideos.length > 0 ? `${unwatchedCount.toLocaleString()} unwatched of ${allVideos.length.toLocaleString()}` : catalogLoaded ? "No videos" : "Loading..."}
           </p>
-          <p className={`text-xs mt-2 ${catalogFreshness.state === "stale" ? "text-yellow-400" : "text-white/25"}`}>
-            {catalogFreshnessLabel}
-          </p>
+          {!playbackDiagnostic && catalogFreshness.state !== "loading" && (
+            <p className="text-xs mt-2 text-white/25">{catalogFreshness.label}</p>
+          )}
         </div>
+
+        {playbackDiagnostic && (
+          <div className="mb-6 w-full max-w-xl">
+            <PlaybackDiagnosticsBanner
+              diagnostic={playbackDiagnostic}
+              refreshing={catalogRefreshing}
+              variant="inline"
+              onRetryCatalog={refreshCatalogState}
+              onOpenHealth={() => setShowHealth(true)}
+              onSearch={() => setSearchOpen(true)}
+            />
+          </div>
+        )}
 
         {categories.length > 1 && (
           <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-2xl">
@@ -541,7 +671,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           catalog={catalog}
           embedHealth={embedHealth}
           blockedSources={blockedSources}
+          quarantinedSources={quarantinedSources}
           onToggleBlock={handleToggleBlock}
+          onUnquarantine={handleUnquarantine}
         />
       </div>
     );
@@ -577,249 +709,122 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             </div>
           </div>
         )}
-        {playbackIssue && currentVideo && (
-          <div className="absolute left-3 right-3 top-3 z-10 mx-auto max-w-xl rounded-lg border border-yellow-400/25 bg-black/80 px-4 py-3 text-sm shadow-lg backdrop-blur">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-medium text-yellow-200">
-                  Skipped {playbackIssue.skipped} unplayable {playbackIssue.skipped === 1 ? "video" : "videos"}
-                </p>
-                <p className="mt-0.5 text-white/55">
-                  Last failure: {playbackIssue.reason}. LoopTV is trying the next item.
-                </p>
-              </div>
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="self-start rounded-lg bg-white/10 px-3 py-2 text-white transition-colors hover:bg-white/15 sm:self-auto"
-              >
-                Search
-              </button>
-            </div>
-          </div>
+        {playbackDiagnostic && (
+          <PlaybackDiagnosticsBanner
+            diagnostic={playbackDiagnostic}
+            refreshing={catalogRefreshing}
+            onRetryCatalog={refreshCatalogState}
+            onOpenHealth={() => setShowHealth(true)}
+            onSearch={() => setSearchOpen(true)}
+          />
         )}
       </div>
 
-      <div className="bg-zinc-950 border-t border-white/10 shrink-0">
-        {/* Wrap on mobile so the ~14 controls never overflow the 390px viewport. */}
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 sm:flex-nowrap sm:px-4">
-          <button
-            onClick={() => { maybeMarkWatched(currentVideo); setMode("lobby"); setCurrentVideo(null); setEmbedHealth(getEmbedHealth()); }}
-            className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0"
-            title="Back to channel"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <div className="min-w-0 flex-1 basis-[60%] sm:basis-auto">
-            {currentVideo && (
-              <div>
-                <p className="text-white text-sm font-medium truncate">{currentVideo.title}</p>
-                <p className="text-white/40 text-xs mt-0.5 flex flex-wrap items-center gap-2">
-                  <span className="text-red-500 font-semibold">{config.name}</span>
-                  {currentVideo.source && (
-                    <span className="text-white/30 inline-flex items-center gap-1">
-                      via {currentVideo.source}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          blockSource(currentVideo.source!);
-                          const next = new Set(blockedSourcesRef.current);
-                          next.add(currentVideo.source!);
-                          syncBlockedSources(next);
-                          playNext();
-                        }}
-                        className="text-white/20 hover:text-red-400 transition-colors ml-0.5"
-                        title={`Block ${currentVideo.source}`}
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                      </button>
-                    </span>
-                  )}
-                  <span>{formatDuration(currentVideo.duration)}</span>
-                  {queueCount > 0 && <span className="text-blue-400">{queueCount} queued</span>}
-                  {status && <span className="text-yellow-500">{status}</span>}
-                  <span className={catalogFreshness.state === "stale" ? "text-yellow-400" : "text-white/25"}>
-                    {catalogFreshnessLabel}
-                  </span>
-                </p>
-                {isSmartMix && (
-                  <p className="text-white/30 text-xs mt-1 truncate">
-                    {smartMixReason || "Learning from favorites, dislikes, tags, sources, skips, and watch history."}
-                  </p>
-                )}
-                {nextVideoPreview && !isSmartMix && (
-                  <p className="hidden sm:block text-white/20 text-xs mt-0.5 truncate">
-                    Up next: {nextVideoPreview.title}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-end gap-1 shrink-0">
-            {currentVideo && (
-              <>
-                <button
-                  onClick={() => {
-                    if (savedForPlaybackIds.has(currentVideo.id)) {
-                      removeSavedForPlayback(currentVideo.id);
-                      setSavedForPlaybackIds((prev) => {
-                        const next = new Set(prev);
-                        next.delete(currentVideo.id);
-                        return next;
-                      });
-                    } else {
-                      addSavedForPlayback(currentVideo.id);
-                      setSavedForPlaybackIds((prev) => new Set([...prev, currentVideo.id]));
-                    }
-                  }}
-                  className={`p-2 rounded-lg transition-colors ${savedForPlaybackIds.has(currentVideo.id) ? "text-blue-300" : "text-white/40 hover:text-blue-300 hover:bg-white/10"}`}
-                  title={savedForPlaybackIds.has(currentVideo.id) ? "Remove browser save" : "Save in browser until watched"}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v10m0 0l4-4m-4 4L8 9m-4 9h16" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => updateSmartPreference("favorite")}
-                  className={`p-2 rounded-lg transition-colors ${smartMixProfile.favorites.includes(currentVideo.id) ? "text-yellow-300" : "text-white/40 hover:text-yellow-300 hover:bg-white/10"}`}
-                  title="Favorite for Smart Mix"
-                >
-                  <svg className="w-5 h-5" fill={smartMixProfile.favorites.includes(currentVideo.id) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.48 3.499l2.006 4.064 4.486.652-3.246 3.164.766 4.468-4.012-2.109-4.012 2.109.766-4.468-3.246-3.164 4.486-.652 2.006-4.064z" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => updateSmartPreference("dislike")}
-                  className={`p-2 rounded-lg transition-colors ${smartMixProfile.dislikes.includes(currentVideo.id) ? "text-red-400" : "text-white/40 hover:text-red-400 hover:bg-white/10"}`}
-                  title="Dislike and skip in Smart Mix"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l2.682-5.364A2 2 0 017.918 4H15v10l-4 7-1-1v-6zM15 4h4v10h-4V4z" />
-                  </svg>
-                </button>
-              </>
-            )}
-            {isSmartMix && (
-              <>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(serializeSmartMixProfile(smartMixProfile));
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }}
-                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                  title="Export Smart Mix profile"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v12m0-12l4 4m-4-4L8 7m-4 10h16v4H4v-4z" /></svg>
-                </button>
-                <button
-                  onClick={() => {
-                    const raw = window.prompt("Paste Smart Mix profile JSON");
-                    if (!raw) return;
-                    try {
-                      const next = parseSmartMixProfile(raw);
-                      setSmartMixProfile(next);
-                      setSmartMixProfileRaw(serializeSmartMixProfile(next));
-                    } catch {
-                      setStatus("Invalid Smart Mix profile JSON");
-                    }
-                  }}
-                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                  title="Import Smart Mix profile"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21V9m0 12l4-4m-4 4l-4-4m-4-10h16V3H4v4z" /></svg>
-                </button>
-                <button
-                  onClick={() => {
-                    resetSmartMixProfile();
-                    setSmartMixProfile(createSmartMixProfile());
-                    setSmartMixReason("");
-                  }}
-                  className="p-2 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-                  title="Reset Smart Mix profile"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0019 5m0 0h-5m5 0v5" /></svg>
-                </button>
-              </>
-            )}
-            {/* Hide watched toggle */}
-            <button
-              onClick={() => setHideWatched((h) => !h)}
-              className={`p-2 rounded-lg transition-colors ${hideWatched ? "text-green-400 hover:bg-white/10" : "text-white/30 hover:text-white/60 hover:bg-white/10"}`}
-              title={`${hideWatched ? "Showing unwatched only" : "Showing all"} (W)`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {hideWatched ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                )}
-              </svg>
-            </button>
-
-            <button
-              onClick={() => {
-                if (currentVideo) {
-                  navigator.clipboard.writeText(`https://youtube.com/watch?v=${currentVideo.id}`);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }
-              }}
-              className={`p-2 rounded-lg transition-colors ${copied ? "text-green-400" : "text-white/60 hover:text-white hover:bg-white/10"}`}
-              title="Copy YouTube link"
-            >
-              {copied ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-              )}
-            </button>
-            <button onClick={() => setSearchOpen(true)} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Search (/)">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            </button>
-            <button
-              onClick={() => setShowGuide((g) => !g)}
-              className={`p-2 rounded-lg transition-colors ${showGuide ? "text-white bg-white/10" : "text-white/60 hover:text-white hover:bg-white/10"}`}
-              title="Channel guide (G)"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h8M4 18h8" />
-              </svg>
-            </button>
-            <div className="w-px h-5 bg-white/10 mx-1" />
-            <button onClick={playPrev} className={`p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg transition-colors ${hasHistory ? "text-white/60 hover:text-white hover:bg-white/10" : "text-white/20 cursor-not-allowed"}`} title="Previous (P)">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" /></svg>
-            </button>
-            <button onClick={() => { playerRef.current?.togglePlay(); setPaused((p) => !p); }} className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white hover:bg-white/10 transition-colors" title="Play/Pause (Space)">
-              {paused ? (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-              ) : (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
-              )}
-            </button>
-            <button onClick={() => playNext()} className="p-3 min-h-11 min-w-11 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Next (N)">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" /></svg>
-            </button>
-            <div className="w-px h-5 bg-white/10 mx-1" />
-            <button onClick={() => { playerRef.current?.toggleMute(); setMuted((m) => !m); }} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Mute (M)">
-              {muted ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" /></svg>
-              ) : (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" /></svg>
-              )}
-            </button>
-            <button onClick={() => { if (document.fullscreenElement) { document.exitFullscreen(); } else { document.documentElement.requestFullscreen(); } }} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors" title="Fullscreen (F)">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
-            </button>
-          </div>
-        </div>
-
-      </div>
+      <ControlRail
+        stationName={config.name}
+        currentVideo={currentVideo}
+        paused={paused}
+        muted={muted}
+        hasHistory={hasHistory}
+        queueCount={queueCount}
+        status={status || undefined}
+        hideWatched={hideWatched}
+        watchLaterActive={currentVideo ? watchLaterIds.has(currentVideo.id) : false}
+        savedForPlayback={currentVideo ? savedForPlaybackIds.has(currentVideo.id) : false}
+        guideOpen={showGuide}
+        isSmartMix={isSmartMix}
+        smartMixReason={smartMixReason}
+        nextVideoPreview={nextVideoPreview}
+        copied={copied}
+        smartMixFavorite={currentVideo ? smartMixProfile.favorites.includes(currentVideo.id) : false}
+        smartMixDisliked={currentVideo ? smartMixProfile.dislikes.includes(currentVideo.id) : false}
+        onBack={() => {
+          maybeMarkWatched(currentVideo);
+          setMode("lobby");
+          setCurrentVideo(null);
+          setEmbedHealth(getEmbedHealth());
+          setQuarantinedSources(getQuarantinedSources());
+        }}
+        onPlayPause={() => {
+          playerRef.current?.togglePlay();
+          setPaused((p) => !p);
+        }}
+        onPrev={playPrev}
+        onNext={() => playNext()}
+        onSearch={() => setSearchOpen(true)}
+        onToggleWatchLater={() => {
+          if (!currentVideo) return;
+          if (watchLaterIds.has(currentVideo.id)) {
+            removeWatchLater(currentVideo.id);
+            setWatchLaterIds((prev) => {
+              const next = new Set(prev);
+              next.delete(currentVideo.id);
+              return next;
+            });
+          } else {
+            addWatchLater(currentVideo.id);
+            setWatchLaterIds((prev) => new Set([...prev, currentVideo.id]));
+          }
+        }}
+        onToggleGuide={() => setShowGuide((g) => !g)}
+        onToggleMute={() => {
+          playerRef.current?.toggleMute();
+          setMuted((m) => !m);
+        }}
+        onToggleHideWatched={() => setHideWatched((h) => !h)}
+        onToggleSavedForPlayback={() => {
+          if (!currentVideo) return;
+          if (savedForPlaybackIds.has(currentVideo.id)) {
+            removeSavedForPlayback(currentVideo.id);
+            setSavedForPlaybackIds((prev) => {
+              const next = new Set(prev);
+              next.delete(currentVideo.id);
+              return next;
+            });
+          } else {
+            addSavedForPlayback(currentVideo.id);
+            setSavedForPlaybackIds((prev) => new Set([...prev, currentVideo.id]));
+          }
+        }}
+        onCopyLink={() => {
+          if (!currentVideo) return;
+          navigator.clipboard.writeText(`https://youtube.com/watch?v=${currentVideo.id}`);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }}
+        onFullscreen={() => {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            document.documentElement.requestFullscreen();
+          }
+        }}
+        onOpenHealth={() => setShowHealth(true)}
+        onOpenShortcuts={() => setShowShortcuts(true)}
+        onSmartMixFavorite={() => updateSmartPreference("favorite")}
+        onSmartMixDislike={() => updateSmartPreference("dislike")}
+        onSmartMixExport={() => {
+          navigator.clipboard.writeText(serializeSmartMixProfile(smartMixProfile));
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        }}
+        onSmartMixImport={() => {
+          const raw = window.prompt("Paste Smart Mix profile JSON");
+          if (!raw) return;
+          try {
+            const next = parseSmartMixProfile(raw);
+            setSmartMixProfile(next);
+            setSmartMixProfileRaw(serializeSmartMixProfile(next));
+          } catch {
+            setStatus("Invalid Smart Mix profile JSON");
+          }
+        }}
+        onSmartMixReset={() => {
+          resetSmartMixProfile();
+          setSmartMixProfile(createSmartMixProfile());
+          setSmartMixReason("");
+        }}
+      />
 
       <Search videos={allVideos} onSelect={playVideo} onQueue={(v) => { queueRef.current.push(v); setQueueCount(queueRef.current.length); }} onClose={() => setSearchOpen(false)} visible={searchOpen} watchLaterIds={watchLaterIds} onToggleWatchLater={(id) => { if (watchLaterIds.has(id)) { removeWatchLater(id); setWatchLaterIds((prev) => { const n = new Set(prev); n.delete(id); return n; }); } else { addWatchLater(id); setWatchLaterIds((prev) => new Set([...prev, id])); } }} />
 
@@ -925,7 +930,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         catalog={catalog}
         embedHealth={embedHealth}
         blockedSources={blockedSources}
+        quarantinedSources={quarantinedSources}
         onToggleBlock={handleToggleBlock}
+        onUnquarantine={handleUnquarantine}
       />
     </div>
   );

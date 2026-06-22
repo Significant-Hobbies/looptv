@@ -77,7 +77,7 @@ python3 scripts/extract-tags.py
 - **Static catalog committed to repo.** Weekly GH Actions cron rebuilds it — only new/untagged videos go through NER to keep CI fast.
 - **Catalog pipeline**: `stations.json` → yt-dlp → JSONL → `process-catalog.mjs` (merge + dedup, preserves NER tags) → `extract-tags.py` (NER on untagged only) → `public/catalog.json`.
 - **Embed error handling**: YouTube errors 101/150 (embedding blocked) caught by `Player.tsx` → auto-skip.
-- **Quality filters**: per-source `minDuration`/`maxDuration` in `stations.json`; global 10K views minimum in `process-catalog.mjs`.
+- **Quality filters**: per-source `minDuration`/`maxDuration` in `stations.json`; global 10K views minimum in `process-catalog.mjs` (requires full yt-dlp metadata, not `--flat-playlist`); top-N% + 200-video cap per source in `scripts/catalog-quality.mjs`.
 - **Adding a station**: add entry to `stations.json`, run `pnpm run build:catalog`, commit updated `catalog.json`.
 - **Turbopack** used — has breaking changes vs webpack; check Next.js docs for Turbopack-specific behavior.
 - No env vars required.

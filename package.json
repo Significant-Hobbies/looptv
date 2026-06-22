@@ -12,7 +12,7 @@
     "format:check": "biome format .",
     "check": "biome check .",
     "typecheck": "tsc --noEmit",
-    "build:catalog": "bash scripts/build-catalog.sh",
+    "build:catalog": "bash scripts/fetch-sources.sh && bash scripts/build-catalog.sh --process-only",
     "build:ner": "python3 scripts/extract-tags.py",
     "fetch:all": "bash scripts/fetch-all-sources.sh",
     "cf:build": "pnpm build",

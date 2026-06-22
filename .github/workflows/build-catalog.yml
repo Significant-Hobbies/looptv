@@ -1,0 +1,117 @@
+name: Build Catalog
+
+on:
+  workflow_run:
+    workflows: [Fetch Catalog Sources]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: catalog-build
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Restore source cache
+        uses: actions/cache@v4
+        with:
+          path: data/sources
+          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+          restore-keys: |
+            catalog-sources-v2-
+
+      - name: Download fetched shards
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: catalog-sources-shard-*
+          path: artifact-shards
+          merge-multiple: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Merge shard artifacts into source cache
+        if: github.event_name != 'workflow_dispatch'
+        run: |
+          mkdir -p data/sources
+          if [ -d artifact-shards ]; then
+            find artifact-shards -name '*.jsonl' -exec cp {} data/sources/ \;
+          fi
+          echo "Source files after merge: $(find data/sources -maxdepth 1 -name '*.jsonl' | wc -l | tr -d ' ')"
+          node --input-type=module -e "
+            import fs from 'fs';
+            const stations = JSON.parse(fs.readFileSync('stations.json', 'utf8'));
+            const handles = new Set(stations.flatMap((s) => s.sources.map((src) => src.handle.replace('@',''))));
+            const have = new Set(fs.readdirSync('data/sources').filter((f) => f.endsWith('.jsonl')).map((f) => f.replace(/\\.jsonl$/, '')));
+            const missing = [...handles].filter((h) => !have.has(h));
+            if (missing.length) {
+              console.error('Missing source JSONL for handles:', missing.join(', '));
+              process.exit(1);
+            }
+          "
+
+      - name: Prepare pnpm
+        run: |
+          corepack enable
+          if node -e "const pm=require('./package.json').packageManager||''; process.exit(pm.startsWith('pnpm@')?0:1)"; then
+            corepack install
+          else
+            corepack prepare pnpm@10.32.1 --activate
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build catalog.json
+        run: bash scripts/build-catalog.sh --process-only
+
+      - name: Smoke test AI gateway
+        env:
+          FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
+          FAGW_PROJECT_ID: looptv
+        run: node scripts/smoke-tag-gateway.mjs
+
+      - name: Tag new videos via AI gateway
+        env:
+          FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
+          FAGW_PROJECT_ID: looptv
+        run: node scripts/tag-videos.mjs
+
+      - name: Save source cache
+        uses: actions/cache/save@v4
+        with:
+          path: data/sources
+          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --stat public/catalog.json
+          echo "changed=$(git diff --name-only public/catalog.json | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/catalog.json
+          NEW_COUNT=$(node -e "const d=JSON.parse(require('fs').readFileSync('public/catalog.json','utf8')); console.log(Object.values(d.stations).reduce((s,st) => s + st.videos.length, 0))")
+          git commit -m "Update catalog: ${NEW_COUNT} videos
+
+          Automated bi-weekly catalog refresh.
+          "
+          git push

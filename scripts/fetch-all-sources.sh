@@ -10,6 +10,12 @@ COUNTS_FILE="$DATA_DIR/counts.txt"
 MIN_CACHE_ROWS_TO_TRUST="${MIN_CACHE_ROWS_TO_TRUST:-5}"
 mkdir -p "$DATA_DIR"
 
+jsonl_has_view_counts() {
+  node --input-type=module -e "import fs from 'fs'; import { hasViewCountsInJsonl } from './scripts/catalog-quality.mjs'; process.exit(hasViewCountsInJsonl(process.argv[1], fs) ? 0 : 1);" "$1"
+}
+
+YTDLP_FETCH=(yt-dlp --dump-json --no-warnings)
+
 # All YouTube handles from user subscriptions
 HANDLES=(
   WelchLabs startuparchive_ pavelmavrin NitishRajput IAmMarkManson psychacks
@@ -52,7 +58,7 @@ for handle in "${HANDLES[@]}"; do
 
   if [ -f "$FILE" ] && [ -s "$FILE" ]; then
     COUNT=$(wc -l < "$FILE" | tr -d ' ')
-    if [ "$COUNT" -ge "$MIN_CACHE_ROWS_TO_TRUST" ]; then
+    if [ "$COUNT" -ge "$MIN_CACHE_ROWS_TO_TRUST" ] && jsonl_has_view_counts "$FILE"; then
       echo "$handle|$COUNT" >> "$COUNTS_FILE"
       SKIPPED=$((SKIPPED + 1))
       printf "[%d/%d] @%-30s CACHED (%s videos)\n" "$DONE" "$TOTAL" "$handle" "$COUNT"
@@ -63,8 +69,7 @@ for handle in "${HANDLES[@]}"; do
     printf "[%d/%d] @%-30s fetching..." "$DONE" "$TOTAL" "$handle"
   fi
 
-  yt-dlp --flat-playlist --dump-json --no-warnings \
-    "https://www.youtube.com/@$handle/videos" > "$FILE" 2>/dev/null || true
+  "${YTDLP_FETCH[@]}" "https://www.youtube.com/@$handle/videos" > "$FILE" 2>/dev/null || true
 
   COUNT=$(wc -l < "$FILE" | tr -d ' ')
   echo "$handle|$COUNT" >> "$COUNTS_FILE"
