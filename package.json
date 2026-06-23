@@ -7,7 +7,8 @@
     "build": "next build --webpack",
     "start": "wrangler pages dev out",
     "test": "vitest run",
-    "lint": "eslint",
+    "test:coverage": "vitest run --coverage",
+    "lint": "biome check .",
     "format": "biome format --write .",
     "format:check": "biome format .",
     "check": "biome check .",
@@ -36,11 +37,10 @@
     "@types/react-dom": "19",
     "@types/youtube": "0.2.0",
     "@vitejs/plugin-react": "6.0.1",
-    "eslint": "10.2.1",
-    "eslint-config-next": "16.2.4",
     "tailwindcss": "4",
     "typescript": "6.0.3",
     "vitest": "4.1.5",
+    "@vitest/coverage-v8": "^4.1.9",
     "wrangler": "4.85.0"
   }
 }

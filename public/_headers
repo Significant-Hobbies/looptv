@@ -1,14 +1,12 @@
-/_next/static/*
-  Cache-Control: public, max-age=31536000, immutable
+# Long-lived browser caching for the static catalog. The catalog is rebuilt
+# weekly via GitHub Actions, so a 1h max-age with a 24h stale-while-revalidate
+# keeps returning visitors instant while staying fresh enough for new uploads.
+/catalog.json
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
 /catalog-summary.json
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-/stations.json
-  Cache-Control: public, max-age=3600
-
-/tags.json
-  Cache-Control: public, max-age=3600
-
-/sw.js
-  Cache-Control: public, max-age=0, must-revalidate
+# Catch-all for any other generated JSON artifacts.
+/*.json
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
