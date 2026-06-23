@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google';
 import './globals.css';
 import { AnalyticsProvider } from '@/components/posthog-provider';
 import { SaaSMakerFeedback } from '@/components/saasmaker-feedback';
+import { VitalsReporter } from '@/components/VitalsReporter';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -55,6 +56,7 @@ export default function RootLayout({
         <AnalyticsProvider>
           {children}
           <SaaSMakerFeedback />
+          <VitalsReporter />
         </AnalyticsProvider>
       </body>
     </html>

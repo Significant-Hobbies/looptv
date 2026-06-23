@@ -26,7 +26,8 @@
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "zod": "^4.4.3",
-    "posthog-js": "^1.372.1"
+    "posthog-js": "^1.372.1",
+    "web-vitals": "^4.2.4"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
