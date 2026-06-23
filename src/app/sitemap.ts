@@ -1,15 +1,15 @@
-import type { MetadataRoute } from "next";
-import stations from "../../channels.config";
+import type { MetadataRoute } from 'next';
+import stations from '../../channels.config';
 
-export const dynamic = "force-static";
+export const dynamic = 'force-static';
 
-const siteUrl = "https://looptv.pages.dev";
+const siteUrl = 'https://looptv.pages.dev';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const stationRoutes: MetadataRoute.Sitemap = stations.map((s) => ({
     url: `${siteUrl}/${s.id}`,
     lastModified: new Date(),
-    changeFrequency: "weekly",
+    changeFrequency: 'weekly',
     priority: 0.8,
   }));
 
@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: siteUrl,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: 'weekly',
       priority: 1,
     },
     ...stationRoutes,

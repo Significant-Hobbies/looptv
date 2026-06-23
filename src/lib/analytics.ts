@@ -19,14 +19,14 @@
  * Browser-only: LoopTV is a static export with no server runtime, so this
  * routes exclusively through `posthog-js` (`track`).
  */
-"use client";
+'use client';
 
-import posthog from "posthog-js";
+import posthog from 'posthog-js';
 
-const PROJECT = "looptv" as const;
+const PROJECT = 'looptv' as const;
 
 /** The product-specific action behind a `core_action` event. */
-export type CoreAction = "video_played" | "station_built";
+export type CoreAction = 'video_played' | 'station_built';
 
 interface AnalyticsEventMap {
   /** The first-ever visit from this browser. */
@@ -41,7 +41,7 @@ interface AnalyticsEventMap {
 
 export function trackEvent(event: string, properties: Record<string, unknown> = {}): void {
   try {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     posthog.capture(event, { project_id: PROJECT, ...properties });
   } catch {
     // Analytics must NEVER break a user flow. Swallow and move on.
@@ -50,20 +50,20 @@ export function trackEvent(event: string, properties: Record<string, unknown> = 
 
 function emit<K extends keyof AnalyticsEventMap>(
   event: K,
-  props: Omit<AnalyticsEventMap[K], "project_id">,
+  props: Omit<AnalyticsEventMap[K], 'project_id'>
 ): void {
   trackEvent(event, props);
 }
 
 // localStorage keys recording lifecycle milestones for the device identity.
-const SIGNUP_KEY = "looptv:signed-up";
-const ACTIVATED_KEY = "looptv:activated";
+const SIGNUP_KEY = 'looptv:signed-up';
+const ACTIVATED_KEY = 'looptv:activated';
 // Per-tab guard so `returned` fires at most once per session start.
-const RETURNED_FIRED_KEY = "looptv:returned-fired";
+const RETURNED_FIRED_KEY = 'looptv:returned-fired';
 
 function readFlag(key: string): boolean {
   try {
-    return localStorage.getItem(key) === "1";
+    return localStorage.getItem(key) === '1';
   } catch {
     return false;
   }
@@ -71,7 +71,7 @@ function readFlag(key: string): boolean {
 
 function writeFlag(key: string): void {
   try {
-    localStorage.setItem(key, "1");
+    localStorage.setItem(key, '1');
   } catch {
     // Non-fatal — worst case the event de-dupes on the next visit.
   }
@@ -79,21 +79,21 @@ function writeFlag(key: string): void {
 
 /** Fire once, on the first-ever visit from this browser. */
 export function trackSignup(): void {
-  if (typeof window === "undefined" || readFlag(SIGNUP_KEY)) return;
+  if (typeof window === 'undefined' || readFlag(SIGNUP_KEY)) return;
   writeFlag(SIGNUP_KEY);
-  emit("signup", {});
+  emit('signup', {});
 }
 
 /** Fire once, when the viewer plays their first video. */
 export function trackActivated(): void {
-  if (typeof window === "undefined" || readFlag(ACTIVATED_KEY)) return;
+  if (typeof window === 'undefined' || readFlag(ACTIVATED_KEY)) return;
   writeFlag(ACTIVATED_KEY);
-  emit("activated", {});
+  emit('activated', {});
 }
 
 /** Fire on each completion of the core product action. */
 export function trackCoreAction(action: CoreAction): void {
-  emit("core_action", { action });
+  emit('core_action', { action });
 }
 
 /**
@@ -102,12 +102,12 @@ export function trackCoreAction(action: CoreAction): void {
  * fresh session counts as a return visit, not a first-ever `signup`).
  */
 export function trackReturned(hasPriorActivity: boolean): void {
-  if (typeof window === "undefined" || !hasPriorActivity) return;
+  if (typeof window === 'undefined' || !hasPriorActivity) return;
   try {
-    if (sessionStorage.getItem(RETURNED_FIRED_KEY) === "1") return;
-    sessionStorage.setItem(RETURNED_FIRED_KEY, "1");
+    if (sessionStorage.getItem(RETURNED_FIRED_KEY) === '1') return;
+    sessionStorage.setItem(RETURNED_FIRED_KEY, '1');
   } catch {
     // sessionStorage unavailable — fall through, worst case it re-fires.
   }
-  emit("returned", {});
+  emit('returned', {});
 }

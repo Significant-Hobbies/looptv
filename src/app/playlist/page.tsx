@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
-import { formatDuration, loadCatalog } from "@/lib/catalog";
-import type { Video } from "@/lib/types";
+import { formatDuration, loadCatalog } from '@/lib/catalog';
+import type { Video } from '@/lib/types';
 
 interface Entry {
   video: Video;
@@ -12,11 +12,11 @@ interface Entry {
 }
 
 function readIds(): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   const params = new URLSearchParams(window.location.search);
-  const raw = params.get("v") ?? "";
+  const raw = params.get('v') ?? '';
   return raw
-    .split(",")
+    .split(',')
     .map((s) => s.trim())
     .filter((s) => /^[A-Za-z0-9_-]{6,20}$/.test(s));
 }
@@ -66,7 +66,7 @@ export default function PlaylistPage() {
 
   const totalSeconds = useMemo(
     () => entries?.reduce((sum, e) => sum + e.video.duration, 0) ?? 0,
-    [entries],
+    [entries]
   );
 
   return (
@@ -77,14 +77,11 @@ export default function PlaylistPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Shared playlist
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Shared playlist</h1>
       <p className="mt-3 text-xs text-zinc-500">
-        Build a share URL like{" "}
-        <code className="text-amber-400">/playlist?v=id1,id2,id3</code> and
-        send it. The catalogue is matched on the receiving end so each viewer
-        sees the videos that exist for them.
+        Build a share URL like <code className="text-amber-400">/playlist?v=id1,id2,id3</code> and
+        send it. The catalogue is matched on the receiving end so each viewer sees the videos that
+        exist for them.
       </p>
 
       {entries == null && <p className="mt-8 text-sm text-zinc-500">Loading…</p>}
@@ -95,25 +92,20 @@ export default function PlaylistPage() {
       )}
       {entries && ids.length > 0 && entries.length === 0 && (
         <p className="mt-8 text-sm text-rose-300">
-          None of those video IDs are in the catalogue. The links might be
-          stale or the videos got deleted from YouTube.
+          None of those video IDs are in the catalogue. The links might be stale or the videos got
+          deleted from YouTube.
         </p>
       )}
       {entries && entries.length > 0 && (
         <>
           <p className="mt-6 text-sm text-zinc-400">
-            {entries.length} video{entries.length === 1 ? "" : "s"} ·{" "}
+            {entries.length} video{entries.length === 1 ? '' : 's'} ·{' '}
             <span className="tabular-nums">{formatDuration(totalSeconds)}</span> total
           </p>
           <ol className="mt-3 divide-y divide-zinc-800">
             {entries.map((e, i) => (
-              <li
-                key={e.video.id}
-                className="flex items-baseline gap-3 py-3 text-sm"
-              >
-                <span className="w-6 text-right tabular-nums text-zinc-500">
-                  {i + 1}
-                </span>
+              <li key={e.video.id} className="flex items-baseline gap-3 py-3 text-sm">
+                <span className="w-6 text-right tabular-nums text-zinc-500">{i + 1}</span>
                 <Link
                   href={`/${e.stationId}`}
                   className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"

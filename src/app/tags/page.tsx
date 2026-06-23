@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
-import { formatDuration, loadCatalog } from "@/lib/catalog";
-import type { Video } from "@/lib/types";
+import { formatDuration, loadCatalog } from '@/lib/catalog';
+import type { Video } from '@/lib/types';
 
 interface TagSummary {
   tag: string;
@@ -21,14 +21,14 @@ export default function TagsPage() {
   const [tags, setTags] = useState<TagSummary[] | null>(null);
   const [catalog, setCatalog] = useState<Awaited<ReturnType<typeof loadCatalog>> | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
     loadCatalog()
       .then((cat) => {
         if (cancelled) return;
-         
+
         setCatalog(cat);
         const counts = new Map<string, TagSummary>();
         for (const [stationId, station] of Object.entries(cat.stations)) {
@@ -84,8 +84,8 @@ export default function TagsPage() {
       </Link>
       <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Tags</h1>
       <p className="mt-3 text-xs text-zinc-500">
-        Topic chips extracted from every video by HuggingFace NER. Tap a tag
-        to see matching videos across all stations.
+        Topic chips extracted from every video by HuggingFace NER. Tap a tag to see matching videos
+        across all stations.
       </p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -114,8 +114,8 @@ export default function TagsPage() {
               onClick={() => setSelected(t.tag)}
               className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors ${
                 selected === t.tag
-                  ? "border-amber-500 text-amber-400"
-                  : "border-zinc-800 text-zinc-400 hover:text-amber-400"
+                  ? 'border-amber-500 text-amber-400'
+                  : 'border-zinc-800 text-zinc-400 hover:text-amber-400'
               }`}
             >
               #{t.tag} <span className="ml-1 tabular-nums text-zinc-600">{t.total}</span>
@@ -127,12 +127,15 @@ export default function TagsPage() {
       {selected && matches && (
         <section className="mt-10 border-t border-zinc-800 pt-6">
           <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-            #{selected} · {matches.length} video{matches.length === 1 ? "" : "s"}
+            #{selected} · {matches.length} video{matches.length === 1 ? '' : 's'}
           </h2>
           <ul className="mt-3 divide-y divide-zinc-800">
             {matches.slice(0, 60).map((m) => (
               <li key={m.video.id} className="flex items-baseline gap-3 py-2 text-sm">
-                <Link href={`/${m.stationId}`} className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline">
+                <Link
+                  href={`/${m.stationId}`}
+                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"
+                >
                   {m.stationId}
                 </Link>
                 <a
@@ -150,7 +153,7 @@ export default function TagsPage() {
             ))}
             {matches.length > 60 && (
               <li className="py-2 text-xs text-zinc-500">
-                +{matches.length - 60} more (refine in /{matches[0]?.stationId ?? ""})
+                +{matches.length - 60} more (refine in /{matches[0]?.stationId ?? ''})
               </li>
             )}
           </ul>

@@ -1,5 +1,5 @@
-import type { Catalog, Video } from "./types";
-import { TOP_PICK_BAND_SIZE, videoViewWeight } from "./catalog-quality";
+import type { Catalog, Video } from './types';
+import { TOP_PICK_BAND_SIZE, videoViewWeight } from './catalog-quality';
 
 export interface SmartMixProfile {
   favorites: string[];
@@ -20,7 +20,7 @@ const DEFAULT_PROFILE: SmartMixProfile = {
   dislikes: [],
   sourceWeights: {},
   tagWeights: {},
-  lastUpdated: "",
+  lastUpdated: '',
 };
 
 export function createSmartMixProfile(input?: Partial<SmartMixProfile>): SmartMixProfile {
@@ -58,7 +58,8 @@ export function pickSmartMixVideo(
     return true;
   });
 
-  if (candidates.length === 0) return { video: null, reason: "No Smart Mix candidates match the current filters.", score: 0 };
+  if (candidates.length === 0)
+    return { video: null, reason: 'No Smart Mix candidates match the current filters.', score: 0 };
 
   const ranked = candidates
     .map((video) => ({ video, ...scoreVideo(video, profile) }))
@@ -69,13 +70,16 @@ export function pickSmartMixVideo(
   return winner;
 }
 
-export function scoreVideo(video: Video, profile: SmartMixProfile): { score: number; reason: string } {
+export function scoreVideo(
+  video: Video,
+  profile: SmartMixProfile
+): { score: number; reason: string } {
   let score = videoViewWeight(video.viewCount);
   const reasons: string[] = [];
 
   if (profile.favorites.includes(video.id)) {
     score += 20;
-    reasons.push("favorited video");
+    reasons.push('favorited video');
   }
 
   if (video.source && profile.sourceWeights[video.source]) {
@@ -84,34 +88,42 @@ export function scoreVideo(video: Video, profile: SmartMixProfile): { score: num
     reasons.push(`${video.source} source match`);
   }
 
-  const tagMatches = (video.tags ?? []).filter((tag) => (profile.tagWeights[tag] ?? 0) > 0).slice(0, 3);
+  const tagMatches = (video.tags ?? [])
+    .filter((tag) => (profile.tagWeights[tag] ?? 0) > 0)
+    .slice(0, 3);
   for (const tag of tagMatches) score += profile.tagWeights[tag] * 2;
-  if (tagMatches.length > 0) reasons.push(`tag match: ${tagMatches.join(", ")}`);
+  if (tagMatches.length > 0) reasons.push(`tag match: ${tagMatches.join(', ')}`);
 
   if (video.duration >= 180 && video.duration <= 900) {
     score += 1;
-    reasons.push("lean-back length");
+    reasons.push('lean-back length');
   }
 
   return {
     score,
-    reason: reasons.length > 0 ? reasons.join("; ") : "high catalog rank with no disliked signals",
+    reason: reasons.length > 0 ? reasons.join('; ') : 'high catalog rank with no disliked signals',
   };
 }
 
-export function applyPreference(profile: SmartMixProfile, video: Video, preference: "favorite" | "dislike"): SmartMixProfile {
+export function applyPreference(
+  profile: SmartMixProfile,
+  video: Video,
+  preference: 'favorite' | 'dislike'
+): SmartMixProfile {
   const next = createSmartMixProfile(profile);
   next.lastUpdated = new Date().toISOString();
 
-  if (preference === "favorite") {
+  if (preference === 'favorite') {
     next.favorites = unique([...next.favorites, video.id]);
     next.dislikes = next.dislikes.filter((id) => id !== video.id);
-    if (video.source) next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) + 1;
+    if (video.source)
+      next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) + 1;
     for (const tag of video.tags ?? []) next.tagWeights[tag] = (next.tagWeights[tag] ?? 0) + 1;
   } else {
     next.dislikes = unique([...next.dislikes, video.id]);
     next.favorites = next.favorites.filter((id) => id !== video.id);
-    if (video.source) next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) - 1;
+    if (video.source)
+      next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) - 1;
     for (const tag of video.tags ?? []) next.tagWeights[tag] = (next.tagWeights[tag] ?? 0) - 1;
   }
 
@@ -124,7 +136,7 @@ export function serializeSmartMixProfile(profile: SmartMixProfile): string {
 
 export function parseSmartMixProfile(raw: string): SmartMixProfile {
   const parsed = JSON.parse(raw);
-  if (!parsed || typeof parsed !== "object") throw new Error("Invalid Smart Mix profile.");
+  if (!parsed || typeof parsed !== 'object') throw new Error('Invalid Smart Mix profile.');
   return createSmartMixProfile(parsed);
 }
 

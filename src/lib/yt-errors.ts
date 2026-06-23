@@ -5,14 +5,14 @@
 export function ytErrorReason(code: number): string {
   switch (code) {
     case 2:
-      return "bad parameter";
+      return 'bad parameter';
     case 5:
-      return "player error";
+      return 'player error';
     case 100:
-      return "video unavailable";
+      return 'video unavailable';
     case 101:
     case 150:
-      return "embed disabled";
+      return 'embed disabled';
     default:
       return `error ${code}`;
   }

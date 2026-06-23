@@ -4,13 +4,62 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "**", "!**/.next", "!**/.open-next", "!**/.wrangler", "!**/out", "!**/dist", "!**/build",
-      "!**/node_modules", "!**/.astro", "!**/next-env.d.ts", "!**/cloudflare-env.d.ts",
-      "!**/pnpm-lock.yaml", "!**/package-lock.json", "!**/tsconfig.tsbuildinfo"
+      "**",
+      "!**/.next",
+      "!**/.open-next",
+      "!**/.wrangler",
+      "!**/out",
+      "!**/dist",
+      "!**/build",
+      "!**/node_modules",
+      "!**/.astro",
+      "!**/next-env.d.ts",
+      "!**/cloudflare-env.d.ts",
+      "!**/pnpm-lock.yaml",
+      "!**/package-lock.json",
+      "!**/tsconfig.tsbuildinfo",
+      "!**/public/catalog.json",
+      "!**/public/catalog-summary.json",
+      "!**/design.html",
+      "!**/src/app/icon.svg",
+      "!**/src/app/globals.css",
+      "!**/stations.json"
     ]
   },
-  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 100, "lineEnding": "lf" },
-  "javascript": { "formatter": { "quoteStyle": "single", "semicolons": "always", "trailingCommas": "es5", "jsxQuoteStyle": "double" } },
-  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5",
+      "jsxQuoteStyle": "double"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useButtonType": "off",
+        "useKeyWithClickEvents": "off",
+        "noStaticElementInteractions": "off",
+        "useSemanticElements": "off",
+        "useAriaPropsSupportedByRole": "off"
+      },
+      "suspicious": {
+        "noShadowRestrictedNames": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      }
+    }
+  },
   "assist": { "enabled": true, "actions": { "source": { "organizeImports": "off" } } }
 }

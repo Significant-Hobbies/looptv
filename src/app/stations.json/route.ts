@@ -1,6 +1,6 @@
-import stations from "../../../channels.config";
+import stations from '../../../channels.config';
 
-export const dynamic = "force-static";
+export const dynamic = 'force-static';
 
 /**
  * Public JSON endpoint exposing the station + source map. Stable URL
@@ -16,14 +16,14 @@ export function GET() {
         stations,
       },
       null,
-      2,
+      2
     ),
     {
       status: 200,
       headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, max-age=3600",
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
       },
-    },
+    }
   );
 }

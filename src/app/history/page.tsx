@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { loadCatalog } from "@/lib/catalog";
-import type { Video } from "@/lib/types";
-import { getWatchedIds } from "@/lib/watched";
+import { loadCatalog } from '@/lib/catalog';
+import type { Video } from '@/lib/types';
+import { getWatchedIds } from '@/lib/watched';
 
 interface Entry {
   video: Video;
@@ -54,9 +54,7 @@ export default function HistoryPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Watch history
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Watch history</h1>
       <p className="mt-3 text-xs text-zinc-500">
         Pulled from this browser&apos;s localStorage. Never sent anywhere.
       </p>
@@ -64,7 +62,7 @@ export default function HistoryPage() {
       {entries == null && <p className="mt-8 text-sm text-zinc-500">Loading…</p>}
       {entries && entries.length === 0 && (
         <p className="mt-8 text-sm text-zinc-400">
-          Nothing watched yet. Try{" "}
+          Nothing watched yet. Try{' '}
           <Link href="/random" className="text-amber-400 hover:underline">
             /random
           </Link>
@@ -74,7 +72,7 @@ export default function HistoryPage() {
       {entries && entries.length > 0 && (
         <>
           <p className="mt-6 text-sm text-zinc-400">
-            {entries.length} video{entries.length === 1 ? "" : "s"} watched.
+            {entries.length} video{entries.length === 1 ? '' : 's'} watched.
           </p>
           <ul className="mt-3 divide-y divide-zinc-800">
             {entries.map((e) => (

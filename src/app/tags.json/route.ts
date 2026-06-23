@@ -1,9 +1,9 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
-import stations from "../../../channels.config";
+import stations from '../../../channels.config';
 
-export const dynamic = "force-static";
+export const dynamic = 'force-static';
 
 interface CatalogVideo {
   id: string;
@@ -31,20 +31,23 @@ interface CatalogShape {
  * /tags UI page.
  */
 export async function GET() {
-  const catalogPath = path.join(process.cwd(), "public", "catalog.json");
+  const catalogPath = path.join(process.cwd(), 'public', 'catalog.json');
   let catalog: CatalogShape;
   try {
-    const raw = await fs.readFile(catalogPath, "utf8");
+    const raw = await fs.readFile(catalogPath, 'utf8');
     catalog = JSON.parse(raw) as CatalogShape;
   } catch {
     return new Response(JSON.stringify({ tags: [] }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
   const stationIds = new Set(stations.map((s) => s.id));
-  const counts = new Map<string, { tag: string; total: number; perStation: Record<string, number> }>();
+  const counts = new Map<
+    string,
+    { tag: string; total: number; perStation: Record<string, number> }
+  >();
   for (const [stationId, block] of Object.entries(catalog.stations)) {
     if (!stationIds.has(stationId)) continue;
     for (const v of block.videos) {
@@ -63,14 +66,14 @@ export async function GET() {
     JSON.stringify(
       { generatedAt: new Date().toISOString(), catalogLastUpdated: catalog.lastUpdated, tags },
       null,
-      2,
+      2
     ),
     {
       status: 200,
       headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, max-age=3600",
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
       },
-    },
+    }
   );
 }

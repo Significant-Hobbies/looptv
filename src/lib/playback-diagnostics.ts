@@ -1,16 +1,16 @@
-import type { CatalogFreshness, SourceFreshness } from "./catalog";
-import type { EmbedHealthRecord } from "./watched";
-import { isEmbedUnhealthy } from "./source-health";
+import type { CatalogFreshness, SourceFreshness } from './catalog';
+import type { EmbedHealthRecord } from './watched';
+import { isEmbedUnhealthy } from './source-health';
 
-export type DiagnosticAction = "retry_catalog" | "open_health" | "search";
+export type DiagnosticAction = 'retry_catalog' | 'open_health' | 'search';
 
 export type DiagnosticKind =
-  | "catalog_unavailable"
-  | "skip_streak"
-  | "source_quarantined"
-  | "source_embed"
-  | "source_stale"
-  | "catalog_stale";
+  | 'catalog_unavailable'
+  | 'skip_streak'
+  | 'source_quarantined'
+  | 'source_embed'
+  | 'source_stale'
+  | 'catalog_stale';
 
 export interface PlaybackDiagnostic {
   kind: DiagnosticKind;
@@ -34,7 +34,7 @@ export interface PlaybackDiagnosticInput {
 
 /** Returns null when playback quality is healthy — no banner needed. */
 export function derivePlaybackDiagnostic(
-  input: PlaybackDiagnosticInput,
+  input: PlaybackDiagnosticInput
 ): PlaybackDiagnostic | null {
   const {
     catalogLoaded,
@@ -48,67 +48,68 @@ export function derivePlaybackDiagnostic(
     lastSkipReason,
   } = input;
 
-  if (!catalogLoaded && catalogFreshness.state === "loading" && !catalogLoadFailed) {
+  if (!catalogLoaded && catalogFreshness.state === 'loading' && !catalogLoadFailed) {
     return null;
   }
 
   if (!catalogLoaded) {
     return {
-      kind: "catalog_unavailable",
+      kind: 'catalog_unavailable',
       headline: "Catalog couldn't load",
-      detail: "Check your connection, then retry without reloading the page.",
-      action: "retry_catalog",
+      detail: 'Check your connection, then retry without reloading the page.',
+      action: 'retry_catalog',
     };
   }
 
   if (skipStreak >= 2) {
     return {
-      kind: "skip_streak",
+      kind: 'skip_streak',
       headline: `Skipped ${skipStreak} unplayable videos in a row`,
       detail: lastSkipReason
         ? `Last failure: ${lastSkipReason}. LoopTV is trying the next item.`
-        : "LoopTV is trying the next item.",
-      action: "search",
+        : 'LoopTV is trying the next item.',
+      action: 'search',
     };
   }
 
   if (currentSource && isQuarantined) {
     return {
-      kind: "source_quarantined",
+      kind: 'source_quarantined',
       headline: `${currentSource} is paused for embed failures`,
-      detail: "This source was auto-hidden after repeated embed blocks. Re-enable it in Channel Health.",
+      detail:
+        'This source was auto-hidden after repeated embed blocks. Re-enable it in Channel Health.',
       source: currentSource,
-      action: "open_health",
+      action: 'open_health',
     };
   }
 
   if (currentSource && isEmbedUnhealthy(embedHealth)) {
     const rate = embedHealth!.blocked / embedHealth!.checked;
     return {
-      kind: "source_embed",
+      kind: 'source_embed',
       headline: `${currentSource} is having embed issues`,
       detail: `${Math.round(rate * 100)}% of recent clips couldn't play here. Other sources in this station should still work.`,
       source: currentSource,
-      action: "open_health",
+      action: 'open_health',
     };
   }
 
-  if (currentSource && sourceFreshness?.state === "stale") {
+  if (currentSource && sourceFreshness?.state === 'stale') {
     return {
-      kind: "source_stale",
+      kind: 'source_stale',
       headline: `${currentSource} catalog data is stale`,
       detail: `${sourceFreshness.label}. Playback may include older clips until the next catalog build.`,
       source: currentSource,
-      action: "open_health",
+      action: 'open_health',
     };
   }
 
-  if (catalogFreshness.state === "stale") {
+  if (catalogFreshness.state === 'stale') {
     return {
-      kind: "catalog_stale",
-      headline: "Channel catalog may be stale",
+      kind: 'catalog_stale',
+      headline: 'Channel catalog may be stale',
       detail: `${catalogFreshness.label}. Retry to fetch the latest catalog, or keep watching cached videos.`,
-      action: "retry_catalog",
+      action: 'retry_catalog',
     };
   }
 

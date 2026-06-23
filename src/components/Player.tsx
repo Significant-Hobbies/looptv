@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback, useImperativeHandle, useState, forwardRef } from "react";
-import { recordEmbedAttempt } from "@/lib/watched";
+import { useEffect, useRef, useCallback, useImperativeHandle, useState, forwardRef } from 'react';
+import { recordEmbedAttempt } from '@/lib/watched';
 
 declare global {
   interface Window {
@@ -43,7 +43,9 @@ const API_LOAD_TIMEOUT_MS = 12000;
 function failApi() {
   if (apiFailed || apiReady) return;
   apiFailed = true;
-  failCallbacks.forEach((cb) => cb());
+  failCallbacks.forEach((cb) => {
+    cb();
+  });
   failCallbacks.length = 0;
   readyCallbacks.length = 0;
 }
@@ -52,14 +54,16 @@ function loadYTApi() {
   if (apiLoaded) return;
   apiLoaded = true;
 
-  const tag = document.createElement("script");
-  tag.src = "https://www.youtube.com/iframe_api";
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
   tag.onerror = failApi;
   document.head.appendChild(tag);
 
   window.onYouTubeIframeAPIReady = () => {
     apiReady = true;
-    readyCallbacks.forEach((cb) => cb());
+    readyCallbacks.forEach((cb) => {
+      cb();
+    });
     readyCallbacks.length = 0;
     failCallbacks.length = 0;
   };
@@ -150,7 +154,8 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
     },
     getWatchProgress() {
       const p = playerRef.current;
-      if (!p || typeof p.getCurrentTime !== "function" || typeof p.getDuration !== "function") return 0;
+      if (!p || typeof p.getCurrentTime !== 'function' || typeof p.getDuration !== 'function')
+        return 0;
       const duration = p.getDuration();
       if (!duration || duration <= 0) return 0;
       return p.getCurrentTime() / duration;
@@ -161,8 +166,8 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
     if (!containerRef.current || playerRef.current) return;
 
     playerRef.current = new window.YT.Player(containerRef.current, {
-      width: "100%",
-      height: "100%",
+      width: '100%',
+      height: '100%',
       videoId: currentVideoRef.current,
       playerVars: {
         autoplay: 1,
@@ -218,7 +223,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
   useEffect(() => {
     currentVideoRef.current = videoId;
     embedTrackedRef.current = false;
-    if (playerRef.current && typeof playerRef.current.loadVideoById === "function") {
+    if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
       playerRef.current.loadVideoById(videoId);
     }
   }, [videoId]);
@@ -231,8 +236,8 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
             Couldn&apos;t load the video player
           </p>
           <p className="text-white/50 text-sm mb-5">
-            The YouTube player couldn&apos;t be reached. Check your connection —
-            a network filter or ad-blocker can also block it.
+            The YouTube player couldn&apos;t be reached. Check your connection — a network filter or
+            ad-blocker can also block it.
           </p>
           <button
             onClick={() => window.location.reload()}

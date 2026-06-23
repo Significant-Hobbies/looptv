@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
-import { formatDuration, loadCatalog } from "@/lib/catalog";
-import type { Video } from "@/lib/types";
-import { getWatchLater, removeWatchLater } from "@/lib/watched";
+import { formatDuration, loadCatalog } from '@/lib/catalog';
+import type { Video } from '@/lib/types';
+import { getWatchLater, removeWatchLater } from '@/lib/watched';
 
 interface QueueEntry {
   video: Video;
@@ -50,9 +50,7 @@ export default function WatchLaterPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Watch later
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Watch later</h1>
       <p className="mt-3 text-xs text-zinc-500">
         Saved on this browser via the player&apos;s &ldquo;watch later&rdquo; bookmark.
       </p>
@@ -66,10 +64,7 @@ export default function WatchLaterPage() {
       {entries && entries.length > 0 && (
         <ul className="mt-6 divide-y divide-zinc-800">
           {entries.map((e) => (
-            <li
-              key={e.video.id}
-              className="flex items-baseline gap-3 py-3 text-sm"
-            >
+            <li key={e.video.id} className="flex items-baseline gap-3 py-3 text-sm">
               <Link
                 href={`/${e.stationId}`}
                 className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"

@@ -27,10 +27,10 @@ export function resolveTopPercentile(source, filteredCount) {
 
 export function hasViewCountsInJsonl(filePath, fs) {
   try {
-    const sample = fs.readFileSync(filePath, "utf-8").split("\n").find(Boolean);
+    const sample = fs.readFileSync(filePath, 'utf-8').split('\n').find(Boolean);
     if (!sample) return false;
     const raw = JSON.parse(sample);
-    return typeof raw.view_count === "number" && raw.view_count >= 0;
+    return typeof raw.view_count === 'number' && raw.view_count >= 0;
   } catch {
     return false;
   }
@@ -39,13 +39,13 @@ export function hasViewCountsInJsonl(filePath, fs) {
 export function qualifiesRawVideo(raw, minDur, maxDur) {
   const dur = raw.duration || 0;
   if (dur < minDur || dur > maxDur) return false;
-  if (typeof raw.view_count !== "number" || raw.view_count < MIN_VIEW_COUNT) return false;
+  if (typeof raw.view_count !== 'number' || raw.view_count < MIN_VIEW_COUNT) return false;
   return true;
 }
 
 export function applySourceQualityFilter(sourceVideos, source) {
   let filtered = sourceVideos.filter(
-    (raw) => typeof raw.view_count === "number" && raw.view_count >= MIN_VIEW_COUNT,
+    (raw) => typeof raw.view_count === 'number' && raw.view_count >= MIN_VIEW_COUNT
   );
   const pct = resolveTopPercentile(source, filtered.length);
   if (filtered.length > 0 && pct < 100) {
@@ -59,11 +59,11 @@ export function applySourceQualityFilter(sourceVideos, source) {
   return { filtered, pct };
 }
 
-export function validateCatalogVideo(video, context = "") {
+export function validateCatalogVideo(video, context = '') {
   if (!video?.id) throw new Error(`Missing video id ${context}`.trim());
-  if (typeof video.viewCount !== "number" || video.viewCount < MIN_VIEW_COUNT) {
+  if (typeof video.viewCount !== 'number' || video.viewCount < MIN_VIEW_COUNT) {
     throw new Error(
-      `Video ${video.id} ${context} has viewCount ${video.viewCount ?? "missing"} (< ${MIN_VIEW_COUNT})`,
+      `Video ${video.id} ${context} has viewCount ${video.viewCount ?? 'missing'} (< ${MIN_VIEW_COUNT})`
     );
   }
 }

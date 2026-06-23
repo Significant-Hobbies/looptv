@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
-import type { Catalog, StationConfig } from "@/lib/types";
-import type { EmbedHealthRecord } from "@/lib/watched";
-import { getSourceFreshness } from "@/lib/catalog";
+import { useMemo, useState } from 'react';
+import type { Catalog, StationConfig } from '@/lib/types';
+import type { EmbedHealthRecord } from '@/lib/watched';
+import { getSourceFreshness } from '@/lib/catalog';
 import {
   countSourcesByHealth,
   getEmbedBlockRate,
   resolveSourceHealthState,
   type SourceHealthState,
-} from "@/lib/source-health";
+} from '@/lib/source-health';
 
 interface Props {
   visible: boolean;
@@ -24,11 +24,11 @@ interface Props {
 }
 
 const STATE_LABELS: Record<SourceHealthState, string> = {
-  fresh: "Fresh",
-  stale: "Stale",
-  unhealthy: "Embed issues",
-  quarantined: "Quarantined",
-  blocked: "Blocked",
+  fresh: 'Fresh',
+  stale: 'Stale',
+  unhealthy: 'Embed issues',
+  quarantined: 'Quarantined',
+  blocked: 'Blocked',
 };
 
 export default function ChannelHealth({
@@ -46,7 +46,7 @@ export default function ChannelHealth({
 
   const allSources = useMemo(
     () => stations.flatMap((st) => st.sources.map((source) => ({ station: st, source }))),
-    [stations],
+    [stations]
   );
 
   const counts = useMemo(
@@ -56,21 +56,18 @@ export default function ChannelHealth({
         catalog?.sourceMeta,
         embedHealth,
         blockedSources,
-        quarantinedSources,
+        quarantinedSources
       ),
-    [allSources, catalog?.sourceMeta, embedHealth, blockedSources, quarantinedSources],
+    [allSources, catalog?.sourceMeta, embedHealth, blockedSources, quarantinedSources]
   );
 
   const hasIssues =
-    counts.stale > 0 ||
-    counts.unhealthy > 0 ||
-    counts.quarantined > 0 ||
-    counts.blocked > 0;
+    counts.stale > 0 || counts.unhealthy > 0 || counts.quarantined > 0 || counts.blocked > 0;
 
   const visibleIssueCount = useMemo(() => {
     if (!catalog || !issuesOnly) return null;
     return allSources.filter(({ source }) => {
-      const handle = source.handle.replace("@", "");
+      const handle = source.handle.replace('@', '');
       const state = resolveSourceHealthState({
         sourceName: source.name,
         meta: catalog.sourceMeta?.[handle],
@@ -78,7 +75,7 @@ export default function ChannelHealth({
         blockedSources,
         quarantinedSources,
       });
-      return state !== "fresh";
+      return state !== 'fresh';
     }).length;
   }, [allSources, catalog, embedHealth, blockedSources, quarantinedSources, issuesOnly]);
 
@@ -99,7 +96,9 @@ export default function ChannelHealth({
               {counts.quarantined > 0 && (
                 <span className="text-amber-400/80">{counts.quarantined} quarantined</span>
               )}
-              {counts.blocked > 0 && <span className="text-white/40">{counts.blocked} blocked</span>}
+              {counts.blocked > 0 && (
+                <span className="text-white/40">{counts.blocked} blocked</span>
+              )}
               {!hasIssues && <span className="text-emerald-400/80">All sources healthy</span>}
             </p>
           ) : (
@@ -113,8 +112,8 @@ export default function ChannelHealth({
               onClick={() => setIssuesOnly((v) => !v)}
               className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
                 issuesOnly
-                  ? "bg-white/15 text-white"
-                  : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/60"
+                  ? 'bg-white/15 text-white'
+                  : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/60'
               }`}
             >
               Issues only
@@ -127,7 +126,12 @@ export default function ChannelHealth({
             title="Close (Esc)"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -145,7 +149,7 @@ export default function ChannelHealth({
 
               const visibleSources = issuesOnly
                 ? st.sources.filter((s) => {
-                    const handle = s.handle.replace("@", "");
+                    const handle = s.handle.replace('@', '');
                     const state = resolveSourceHealthState({
                       sourceName: s.name,
                       meta: catalog.sourceMeta?.[handle],
@@ -153,7 +157,7 @@ export default function ChannelHealth({
                       blockedSources,
                       quarantinedSources,
                     });
-                    return state !== "fresh";
+                    return state !== 'fresh';
                   })
                 : st.sources;
 
@@ -166,14 +170,12 @@ export default function ChannelHealth({
                       {st.name}
                     </p>
                     <p className="text-white/25 text-xs">
-                      {stationVideos > 0
-                        ? `${stationVideos.toLocaleString()} videos`
-                        : "No videos"}
+                      {stationVideos > 0 ? `${stationVideos.toLocaleString()} videos` : 'No videos'}
                     </p>
                   </div>
                   <div className="space-y-1">
                     {visibleSources.map((source) => {
-                      const handle = source.handle.replace("@", "");
+                      const handle = source.handle.replace('@', '');
                       const meta = catalog.sourceMeta?.[handle];
                       const freshness = getSourceFreshness(meta);
                       const healthRecord = embedHealth[source.name];
@@ -188,29 +190,29 @@ export default function ChannelHealth({
                       const videoCount = meta?.videoCount ?? 0;
 
                       const dotColor =
-                        state === "blocked"
-                          ? "bg-white/20"
-                          : state === "quarantined"
-                            ? "bg-amber-400"
-                            : state === "unhealthy"
-                              ? "bg-orange-400"
-                              : state === "stale"
-                                ? "bg-yellow-400"
-                                : "bg-emerald-400";
+                        state === 'blocked'
+                          ? 'bg-white/20'
+                          : state === 'quarantined'
+                            ? 'bg-amber-400'
+                            : state === 'unhealthy'
+                              ? 'bg-orange-400'
+                              : state === 'stale'
+                                ? 'bg-yellow-400'
+                                : 'bg-emerald-400';
 
                       return (
                         <div
                           key={source.handle}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-colors ${
-                            state === "blocked"
-                              ? "bg-white/3 opacity-50"
-                              : state === "quarantined"
-                                ? "bg-amber-500/5"
-                                : state === "unhealthy"
-                                  ? "bg-orange-500/5"
-                                  : state === "stale"
-                                    ? "bg-yellow-500/5"
-                                    : "bg-white/5"
+                            state === 'blocked'
+                              ? 'bg-white/3 opacity-50'
+                              : state === 'quarantined'
+                                ? 'bg-amber-500/5'
+                                : state === 'unhealthy'
+                                  ? 'bg-orange-500/5'
+                                  : state === 'stale'
+                                    ? 'bg-yellow-500/5'
+                                    : 'bg-white/5'
                           }`}
                         >
                           <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} />
@@ -218,9 +220,7 @@ export default function ChannelHealth({
                           <div className="min-w-0 flex-1">
                             <p
                               className={`text-sm truncate ${
-                                state === "blocked"
-                                  ? "line-through text-white/30"
-                                  : "text-white/80"
+                                state === 'blocked' ? 'line-through text-white/30' : 'text-white/80'
                               }`}
                             >
                               {source.name}
@@ -228,9 +228,9 @@ export default function ChannelHealth({
                             <p className="text-white/30 text-xs mt-0.5">
                               {videoCount > 0
                                 ? `${videoCount.toLocaleString()} videos`
-                                : "No videos fetched"}
-                              {freshness.state !== "unknown" && ` · ${freshness.label}`}
-                              {state !== "fresh" && ` · ${STATE_LABELS[state]}`}
+                                : 'No videos fetched'}
+                              {freshness.state !== 'unknown' && ` · ${freshness.label}`}
+                              {state !== 'fresh' && ` · ${STATE_LABELS[state]}`}
                             </p>
                           </div>
 
@@ -238,17 +238,17 @@ export default function ChannelHealth({
                             <span
                               className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${
                                 blockRate > 0.5
-                                  ? "bg-red-500/20 text-red-300"
+                                  ? 'bg-red-500/20 text-red-300'
                                   : blockRate > 0.3
-                                    ? "bg-orange-500/20 text-orange-300"
-                                    : "bg-white/5 text-white/30"
+                                    ? 'bg-orange-500/20 text-orange-300'
+                                    : 'bg-white/5 text-white/30'
                               }`}
                             >
                               {Math.round(blockRate * 100)}% blocked
                             </span>
                           )}
 
-                          {state === "quarantined" && (
+                          {state === 'quarantined' && (
                             <button
                               type="button"
                               onClick={() => onUnquarantine(source.name)}
@@ -262,23 +262,43 @@ export default function ChannelHealth({
                             type="button"
                             onClick={() => onToggleBlock(source.name)}
                             className={`p-1.5 rounded transition-colors shrink-0 ${
-                              state === "blocked"
-                                ? "text-emerald-400 hover:bg-emerald-400/10"
-                                : "text-white/25 hover:text-red-400 hover:bg-red-400/10"
+                              state === 'blocked'
+                                ? 'text-emerald-400 hover:bg-emerald-400/10'
+                                : 'text-white/25 hover:text-red-400 hover:bg-red-400/10'
                             }`}
                             title={
-                              state === "blocked"
+                              state === 'blocked'
                                 ? `Unblock ${source.name}`
                                 : `Block ${source.name}`
                             }
                           >
-                            {state === "blocked" ? (
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            {state === 'blocked' ? (
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                               </svg>
                             ) : (
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                                />
                               </svg>
                             )}
                           </button>
@@ -305,9 +325,9 @@ export default function ChannelHealth({
 
       <div className="border-t border-white/10 px-4 py-3 shrink-0">
         <p className="text-white/25 text-xs leading-relaxed">
-          Sources with sustained embed failures are auto-quarantined in this browser.
-          Re-enable them here, or block a source permanently. To add a channel: edit{" "}
-          <code className="bg-white/10 px-1 rounded">stations.json</code>, then run{" "}
+          Sources with sustained embed failures are auto-quarantined in this browser. Re-enable them
+          here, or block a source permanently. To add a channel: edit{' '}
+          <code className="bg-white/10 px-1 rounded">stations.json</code>, then run{' '}
           <code className="bg-white/10 px-1 rounded">pnpm run build:catalog</code>.
         </p>
       </div>
