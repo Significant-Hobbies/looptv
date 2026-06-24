@@ -1,28 +1,28 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import stations from "../../channels.config";
-import catalogSummary from "../../public/catalog-summary.json";
+import stations from '../../channels.config';
+import catalogSummary from '../../public/catalog-summary.json';
 
-const siteUrl = "https://looptv.pages.dev";
+const siteUrl = 'https://looptv.pages.dev';
 
 export const metadata = {
   title: "LoopTV — channel-surf YouTube like it's TV",
   description:
-    "Pick a station, hit play, and let random clips run nonstop. Topic-grouped public YouTube channels — no account, no API keys, no algorithm.",
+    'Pick a station, hit play, and let random clips run nonstop. Topic-grouped public YouTube channels — no account, no API keys, no algorithm.',
   alternates: { canonical: siteUrl },
   openGraph: {
     title: "LoopTV — channel-surf YouTube like it's TV",
     description:
-      "Pick a station, hit play, and let random clips run nonstop. No account, no API keys.",
+      'Pick a station, hit play, and let random clips run nonstop. No account, no API keys.',
     url: siteUrl,
-    siteName: "LoopTV",
-    type: "website",
+    siteName: 'LoopTV',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     title: "LoopTV — channel-surf YouTube like it's TV",
     description:
-      "Pick a station, hit play, and let random clips run nonstop. No account, no API keys.",
+      'Pick a station, hit play, and let random clips run nonstop. No account, no API keys.',
   },
 };
 
@@ -34,39 +34,39 @@ export default function LandingPage() {
 
   const features = [
     {
-      title: "Stations, not a feed",
+      title: 'Stations, not a feed',
       body: `${totalStations} topic stations group ${totalSources} public YouTube channels — science, comedy, tech, talks, film, and more. Pick one and it plays.`,
     },
     {
-      title: "Random, nonstop playback",
-      body: "No autoplay rabbit hole, no recommendation algorithm. Clips shuffle within the station you chose, like flipping to a channel and leaving it on.",
+      title: 'Random, nonstop playback',
+      body: 'No autoplay rabbit hole, no recommendation algorithm. Clips shuffle within the station you chose, like flipping to a channel and leaving it on.',
     },
     {
-      title: "Yours, on your device",
-      body: "Watched history, blocked sources, and Smart Mix preferences live in your browser. No account to create, nothing leaves your device.",
+      title: 'Yours, on your device',
+      body: 'Watched history, blocked sources, and Smart Mix preferences live in your browser. No account to create, nothing leaves your device.',
     },
   ];
 
   const faqs = [
     {
-      q: "Do I need a YouTube or Google account?",
+      q: 'Do I need a YouTube or Google account?',
       a: "No. Playback runs through the public YouTube IFrame player. There's no sign-in anywhere in LoopTV.",
     },
     {
-      q: "Where does the catalog come from?",
-      a: "yt-dlp fetches public metadata from each channel listed in stations.json. A GitHub Action rebuilds the catalog weekly and commits a static catalog.json — no YouTube API key required.",
+      q: 'Where does the catalog come from?',
+      a: 'yt-dlp fetches public metadata from each channel listed in stations.json. A GitHub Action rebuilds the catalog weekly and commits a static catalog.json — no YouTube API key required.',
     },
     {
       q: "What happens when a video can't be embedded?",
-      a: "YouTube returns error 101 or 150 when a channel blocks embedding for a specific clip. The player catches it and immediately picks the next random video — no error toast, no interruption.",
+      a: 'YouTube returns error 101 or 150 when a channel blocks embedding for a specific clip. The player catches it and immediately picks the next random video — no error toast, no interruption.',
     },
     {
-      q: "Where is my watch history stored?",
+      q: 'Where is my watch history stored?',
       a: "Entirely in your browser's localStorage. Clearing site data wipes it. There is no server-side account or database.",
     },
     {
-      q: "Can I add my own channels?",
-      a: "Yes — LoopTV is MIT-licensed. Fork the repo, append a station to stations.json, run pnpm run build:catalog (requires yt-dlp), and deploy.",
+      q: 'Can I add my own channels?',
+      a: 'Yes — LoopTV is MIT-licensed. Fork the repo, append a station to stations.json, run pnpm run build:catalog (requires yt-dlp), and deploy.',
     },
   ];
 
@@ -77,16 +77,13 @@ export default function LandingPage() {
     <main className="mx-auto max-w-5xl px-6 pb-20 pt-12 text-zinc-300">
       {/* ── Hero ── */}
       <section className="text-center sm:py-12">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          LoopTV
-        </p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">LoopTV</p>
         <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-medium tracking-tight text-white sm:text-5xl md:text-6xl">
           Channel-surf YouTube like it&apos;s TV.
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base">
-          Pick a station, hit play, and let random clips run nonstop.{" "}
-          {totalStations} stations, {totalSources} channels,{" "}
-          {totalVideos.toLocaleString()} videos in today&apos;s catalog. No
+          Pick a station, hit play, and let random clips run nonstop. {totalStations} stations,{' '}
+          {totalSources} channels, {totalVideos.toLocaleString()} videos in today&apos;s catalog. No
           account, no API keys, no algorithm deciding what&apos;s next.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -112,10 +109,7 @@ export default function LandingPage() {
         </h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-xl border border-white/10 bg-white/5 p-5"
-            >
+            <div key={f.title} className="rounded-xl border border-white/10 bg-white/5 p-5">
               <h3 className="text-sm font-semibold text-white">{f.title}</h3>
               <p className="mt-2 text-xs leading-5 text-zinc-400">{f.body}</p>
             </div>
@@ -129,15 +123,13 @@ export default function LandingPage() {
           A glimpse of the dial
         </h2>
         <p className="mt-3 max-w-prose text-sm leading-6 text-zinc-400">
-          Each tile is a real station in today&apos;s catalog. Click any one to
-          tune in.
+          Each tile is a real station in today&apos;s catalog. Click any one to tune in.
         </p>
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {previewStations.map((s) => {
             const count =
-              (catalogSummary.stations as Record<string, { videoCount: number }>)[
-                s.id
-              ]?.videoCount ?? 0;
+              (catalogSummary.stations as Record<string, { videoCount: number }>)[s.id]
+                ?.videoCount ?? 0;
             return (
               <Link
                 key={s.id}
@@ -148,8 +140,8 @@ export default function LandingPage() {
                   {s.name}
                 </p>
                 <p className="mt-1 text-[11px] leading-4 text-zinc-500">
-                  {count.toLocaleString()} videos · {s.sources.length}{" "}
-                  {s.sources.length === 1 ? "channel" : "channels"}
+                  {count.toLocaleString()} videos · {s.sources.length}{' '}
+                  {s.sources.length === 1 ? 'channel' : 'channels'}
                 </p>
               </Link>
             );
@@ -167,9 +159,7 @@ export default function LandingPage() {
 
       {/* ── FAQ ── */}
       <section className="mt-20">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          FAQ
-        </h2>
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">FAQ</h2>
         <dl className="mt-4 divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5">
           {faqs.map((f) => (
             <div key={f.q} className="p-5">
@@ -185,9 +175,7 @@ export default function LandingPage() {
         <h2 className="text-2xl font-medium tracking-tight text-white">
           Ready to leave something good on in the background?
         </h2>
-        <p className="mt-2 text-sm text-zinc-400">
-          Tune to a random station and let it run.
-        </p>
+        <p className="mt-2 text-sm text-zinc-400">Tune to a random station and let it run.</p>
         <Link
           href="/random"
           className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500"

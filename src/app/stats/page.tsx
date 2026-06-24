@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import { getStats, getWatchedIds, type WatchStats } from "@/lib/watched";
+import { getStats, getWatchedIds, type WatchStats } from '@/lib/watched';
 
 function formatSeconds(s: number): string {
   if (s < 60) return `${s}s`;
@@ -32,9 +32,7 @@ export default function StatsPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Your watch stats
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Your watch stats</h1>
       <p className="mt-3 text-xs text-zinc-500">
         Pulled from this browser&apos;s localStorage. Never sent anywhere.
       </p>
@@ -43,7 +41,7 @@ export default function StatsPage() {
         <p className="mt-8 text-sm text-zinc-500">Loading…</p>
       ) : stats.totalWatched === 0 ? (
         <p className="mt-8 text-sm text-zinc-400">
-          Nothing watched yet. Try{" "}
+          Nothing watched yet. Try{' '}
           <Link href="/random" className="text-amber-400 hover:underline">
             /random
           </Link>
@@ -111,9 +109,7 @@ export default function StatsPage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-        {label}
-      </p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{label}</p>
       <p className="mt-1 text-2xl font-semibold tabular-nums text-white">{value}</p>
     </div>
   );

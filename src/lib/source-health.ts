@@ -1,6 +1,6 @@
-import type { SourceMeta } from "./types";
-import { getSourceFreshness } from "./catalog";
-import type { EmbedHealthRecord } from "./watched";
+import type { SourceMeta } from './types';
+import { getSourceFreshness } from './catalog';
+import type { EmbedHealthRecord } from './watched';
 
 /** Minimum embed samples before treating block rate as meaningful. */
 export const MIN_EMBED_SAMPLES = 5;
@@ -8,16 +8,9 @@ export const MIN_EMBED_SAMPLES = 5;
 /** Block rate above which a source is flagged unhealthy / auto-quarantined. */
 export const UNHEALTHY_EMBED_BLOCK_RATE = 0.3;
 
-export type SourceHealthState =
-  | "fresh"
-  | "stale"
-  | "unhealthy"
-  | "quarantined"
-  | "blocked";
+export type SourceHealthState = 'fresh' | 'stale' | 'unhealthy' | 'quarantined' | 'blocked';
 
-export function getEmbedBlockRate(
-  record: EmbedHealthRecord | undefined,
-): number | null {
+export function getEmbedBlockRate(record: EmbedHealthRecord | undefined): number | null {
   if (!record || record.checked < MIN_EMBED_SAMPLES) return null;
   return record.blocked / record.checked;
 }
@@ -38,16 +31,15 @@ export function resolveSourceHealthState(input: {
   blockedSources: Set<string>;
   quarantinedSources: Set<string>;
 }): SourceHealthState {
-  const { sourceName, meta, embedHealth, blockedSources, quarantinedSources } =
-    input;
+  const { sourceName, meta, embedHealth, blockedSources, quarantinedSources } = input;
 
-  if (blockedSources.has(sourceName)) return "blocked";
-  if (quarantinedSources.has(sourceName)) return "quarantined";
+  if (blockedSources.has(sourceName)) return 'blocked';
+  if (quarantinedSources.has(sourceName)) return 'quarantined';
 
   const freshness = getSourceFreshness(meta);
-  if (freshness.state === "stale") return "stale";
-  if (isEmbedUnhealthy(embedHealth)) return "unhealthy";
-  return "fresh";
+  if (freshness.state === 'stale') return 'stale';
+  if (isEmbedUnhealthy(embedHealth)) return 'unhealthy';
+  return 'fresh';
 }
 
 export function countSourcesByHealth(
@@ -55,7 +47,7 @@ export function countSourcesByHealth(
   catalogMeta: Record<string, SourceMeta> | undefined,
   embedHealth: Record<string, EmbedHealthRecord>,
   blockedSources: Set<string>,
-  quarantinedSources: Set<string>,
+  quarantinedSources: Set<string>
 ): Record<SourceHealthState, number> {
   const counts: Record<SourceHealthState, number> = {
     fresh: 0,
@@ -66,7 +58,7 @@ export function countSourcesByHealth(
   };
 
   for (const source of sources) {
-    const handle = source.handle.replace("@", "");
+    const handle = source.handle.replace('@', '');
     const state = resolveSourceHealthState({
       sourceName: source.name,
       meta: catalogMeta?.[handle],

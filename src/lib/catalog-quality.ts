@@ -12,14 +12,14 @@ export function videoViewWeight(viewCount?: number): number {
 export function pickFromTopViewBand<T extends { id: string; viewCount?: number }>(
   items: T[],
   excludeId?: string,
-  bandSize: number = TOP_PICK_BAND_SIZE,
+  bandSize: number = TOP_PICK_BAND_SIZE
 ): T | null {
   const filtered = excludeId ? items.filter((item) => item.id !== excludeId) : items;
   if (filtered.length === 0) return null;
   if (filtered.length === 1) return filtered[0];
 
   const ranked = [...filtered].sort(
-    (a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0) || a.id.localeCompare(b.id),
+    (a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0) || a.id.localeCompare(b.id)
   );
   const band = ranked.slice(0, Math.min(bandSize, ranked.length));
   return band[Math.floor(Math.random() * band.length)] ?? null;

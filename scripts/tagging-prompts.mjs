@@ -2,7 +2,7 @@
 
 export const TAGGING_PROFILES = {
   sketch: {
-    id: "sketch",
+    id: 'sketch',
     systemPrompt: `You are a video tagging assistant for comedy sketches and parody clips.
 Given a list of YouTube videos (title + description), return a JSON array of tag arrays.
 
@@ -17,7 +17,7 @@ Rules:
 - The output array MUST have the same number of entries as the input list`,
   },
   talks: {
-    id: "talks",
+    id: 'talks',
     systemPrompt: `You are a video tagging assistant for TED-style talks.
 Given a list of YouTube videos (title + description), return a JSON array of tag arrays.
 
@@ -31,7 +31,7 @@ Rules:
 - The output array MUST have the same number of entries as the input list`,
   },
   film: {
-    id: "film",
+    id: 'film',
     systemPrompt: `You are a video tagging assistant for film and video-essay content.
 Given a list of YouTube videos (title + description), return a JSON array of tag arrays.
 
@@ -45,7 +45,7 @@ Rules:
 - The output array MUST have the same number of entries as the input list`,
   },
   topics: {
-    id: "topics",
+    id: 'topics',
     systemPrompt: `You are a video tagging assistant. Given a list of YouTube videos (title + description), return a JSON array of tag arrays.
 
 Rules:
@@ -61,14 +61,14 @@ Rules:
 
 /** Station id → tagging profile id. Unlisted stations use "topics". */
 export const STATION_TAGGING_PROFILE = {
-  snl: "sketch",
-  comedy: "sketch",
-  talks: "talks",
-  film: "film",
+  snl: 'sketch',
+  comedy: 'sketch',
+  talks: 'talks',
+  film: 'film',
 };
 
 export function getTaggingProfileId(stationId) {
-  return STATION_TAGGING_PROFILE[stationId] ?? "topics";
+  return STATION_TAGGING_PROFILE[stationId] ?? 'topics';
 }
 
 export function getSystemPrompt(stationId) {
@@ -79,9 +79,9 @@ export function getSystemPrompt(stationId) {
 export function buildUserPrompt(videos) {
   const items = videos.map(
     (video, index) =>
-      `${index + 1}. ${video.title}${video.description ? ` — ${video.description.slice(0, 200)}` : ""}`,
+      `${index + 1}. ${video.title}${video.description ? ` — ${video.description.slice(0, 200)}` : ''}`
   );
-  return items.join("\n");
+  return items.join('\n');
 }
 
 export function createStationBatches(items, batchSize) {

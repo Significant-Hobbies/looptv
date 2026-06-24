@@ -1,29 +1,29 @@
 // Tag videos using free AI gateway with parallel multi-model requests
 // Usage: node scripts/tag-videos.mjs [catalog_path]
 
-import fs from "fs";
+import fs from 'node:fs';
 import {
   buildUserPrompt,
   createStationBatches,
   getSystemPrompt,
   getTaggingProfileId,
-} from "./tagging-prompts.mjs";
+} from './tagging-prompts.mjs';
 
-const CATALOG_PATH = process.argv[2] || "public/catalog.json";
-const GATEWAY = "https://free-ai-gateway.sarthakagrawal927.workers.dev/v1/chat/completions";
-const API_KEY = process.env.FAGW_API_KEY || "x";
-const PROJECT_ID = process.env.FAGW_PROJECT_ID || "looptv";
+const CATALOG_PATH = process.argv[2] || 'public/catalog.json';
+const GATEWAY = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1/chat/completions';
+const API_KEY = process.env.FAGW_API_KEY || 'x';
+const PROJECT_ID = process.env.FAGW_PROJECT_ID || 'looptv';
 const BATCH_SIZE = 15;
 const CONCURRENCY_PER_MODEL = 2;
 
 const MODELS = [
-  "gemini-2.5-flash",
-  "groq-llama-70b",
-  "sambanova-llama-70b",
-  "nvidia-llama-70b",
-  "cerebras-gpt-oss-120b",
-  "workers-ai-llama-3.3-70b",
-  "openrouter-llama-70b-free",
+  'gemini-2.5-flash',
+  'groq-llama-70b',
+  'sambanova-llama-70b',
+  'nvidia-llama-70b',
+  'cerebras-gpt-oss-120b',
+  'workers-ai-llama-3.3-70b',
+  'openrouter-llama-70b-free',
 ];
 const MAX_BATCH_ATTEMPTS = Math.max(2, MODELS.length * 2);
 
@@ -34,14 +34,14 @@ async function callModel(model, stationId, videos, retries = 2) {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const res = await fetch(GATEWAY, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_KEY}` },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
         body: JSON.stringify({
           model,
           project_id: PROJECT_ID,
           messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt },
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: prompt },
           ],
           temperature: 0.1,
         }),
@@ -58,10 +58,10 @@ async function callModel(model, stationId, videos, retries = 2) {
       }
 
       const data = await res.json();
-      const content = data.choices?.[0]?.message?.content || "";
+      const content = data.choices?.[0]?.message?.content || '';
 
       const match = content.match(/\[[\s\S]*\]/);
-      if (!match) throw new Error("No JSON array in response");
+      if (!match) throw new Error('No JSON array in response');
 
       const tags = JSON.parse(match[0]);
       if (!Array.isArray(tags) || tags.length !== videos.length) {
@@ -94,8 +94,8 @@ async function processQueue(model, batches, results, stats) {
     if (tags) {
       for (let i = 0; i < batch.videos.length; i++) {
         const video = batch.videos[i];
-        const videoTags = new Set([video.source || "", ...tags[i]]);
-        videoTags.delete("");
+        const videoTags = new Set([video.source || '', ...tags[i]]);
+        videoTags.delete('');
         results.set(video.id, [...videoTags].slice(0, 10));
       }
       stats.success += batch.videos.length;
@@ -112,7 +112,7 @@ async function processQueue(model, batches, results, stats) {
     if (total % 100 < BATCH_SIZE || batches.length === 0) {
       const pct = Math.round((stats.success / stats.total) * 100);
       process.stdout.write(
-        `\r  Tagged: ${stats.success}/${stats.total} (${pct}%) | Queue: ${batches.length} | Retries: ${stats.retries}`,
+        `\r  Tagged: ${stats.success}/${stats.total} (${pct}%) | Queue: ${batches.length} | Retries: ${stats.retries}`
       );
     }
 
@@ -129,11 +129,11 @@ function summarizeProfiles(items) {
   return [...counts.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([profileId, count]) => `${profileId}=${count}`)
-    .join(", ");
+    .join(', ');
 }
 
 async function main() {
-  const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, "utf-8"));
+  const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf-8'));
 
   const needsTagging = [];
   for (const [stationId, station] of Object.entries(catalog.stations)) {
@@ -147,12 +147,14 @@ async function main() {
   console.log(`Videos needing tags: ${needsTagging.length}`);
   console.log(`Profiles: ${summarizeProfiles(needsTagging)}`);
   console.log(`Project: ${PROJECT_ID}`);
-  console.log(`Models: ${MODELS.length} (${MODELS.join(", ")})`);
-  console.log(`Batch size: ${BATCH_SIZE}, Concurrency: ${MODELS.length * CONCURRENCY_PER_MODEL} workers`);
+  console.log(`Models: ${MODELS.length} (${MODELS.join(', ')})`);
+  console.log(
+    `Batch size: ${BATCH_SIZE}, Concurrency: ${MODELS.length * CONCURRENCY_PER_MODEL} workers`
+  );
   console.log(`Max attempts per batch: ${MAX_BATCH_ATTEMPTS}`);
 
   if (needsTagging.length === 0) {
-    console.log("Nothing to tag!");
+    console.log('Nothing to tag!');
     return;
   }
 
@@ -165,7 +167,7 @@ async function main() {
 
   console.log(`Batches: ${batches.length}`);
   console.log(
-    `Estimated time: ~${Math.ceil(batches.length / (MODELS.length * CONCURRENCY_PER_MODEL) * 3.5 / 60)} minutes\n`,
+    `Estimated time: ~${Math.ceil(((batches.length / (MODELS.length * CONCURRENCY_PER_MODEL)) * 3.5) / 60)} minutes\n`
   );
 
   const results = new Map();

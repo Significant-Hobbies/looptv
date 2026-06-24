@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import stations from "../../../channels.config";
+import stations from '../../../channels.config';
 
 /**
  * /random — bounces to a random station. Useful for share links and
@@ -12,7 +12,7 @@ import stations from "../../../channels.config";
 export default function RandomStation() {
   useEffect(() => {
     const pick = stations[Math.floor(Math.random() * stations.length)];
-    window.location.replace(pick ? `/${pick.id}` : "/");
+    window.location.replace(pick ? `/${pick.id}` : '/');
   }, []);
 
   return (

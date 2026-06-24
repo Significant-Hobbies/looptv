@@ -1,5 +1,5 @@
-import { pickFromTopViewBand } from "./catalog-quality";
-import type { Catalog, CatalogSummary, SourceMeta, Video } from "./types";
+import { pickFromTopViewBand } from './catalog-quality';
+import type { Catalog, CatalogSummary, SourceMeta, Video } from './types';
 
 let catalogCache: Catalog | null = null;
 let inflight: Promise<Catalog> | null = null;
@@ -11,7 +11,7 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 export const STALE_CATALOG_DAYS = 10;
 
 export type CatalogFreshness = {
-  state: "loading" | "fresh" | "stale" | "unknown";
+  state: 'loading' | 'fresh' | 'stale' | 'unknown';
   label: string;
   ageDays: number | null;
   updatedAt: Date | null;
@@ -20,20 +20,20 @@ export type CatalogFreshness = {
 function catalogVideoCount(catalog: Catalog): number {
   return Object.values(catalog.stations ?? {}).reduce(
     (total, station) => total + (Array.isArray(station.videos) ? station.videos.length : 0),
-    0,
+    0
   );
 }
 
 function assertUsableCatalog(catalog: Catalog): Catalog {
   if (!catalog?.stations || catalogVideoCount(catalog) === 0) {
-    throw new Error("Catalog loaded but contains no videos");
+    throw new Error('Catalog loaded but contains no videos');
   }
   return catalog;
 }
 
 function assertUsableSummary(summary: CatalogSummary): CatalogSummary {
   if (!summary?.stations || (summary.totalVideos ?? 0) === 0) {
-    throw new Error("Catalog summary loaded but contains no videos");
+    throw new Error('Catalog summary loaded but contains no videos');
   }
   return summary;
 }
@@ -43,8 +43,8 @@ async function fetchCatalogWithRetry(): Promise<Catalog> {
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
-      const url = shouldBypassCache ? `/catalog.json?v=${Date.now()}` : "/catalog.json";
-      const res = await fetch(url, { cache: shouldBypassCache ? "no-store" : "force-cache" });
+      const url = shouldBypassCache ? `/catalog.json?v=${Date.now()}` : '/catalog.json';
+      const res = await fetch(url, { cache: shouldBypassCache ? 'no-store' : 'force-cache' });
       if (!res.ok) throw new Error(`Failed to load catalog: ${res.status}`);
       return assertUsableCatalog((await res.json()) as Catalog);
     } catch (err) {
@@ -54,7 +54,7 @@ async function fetchCatalogWithRetry(): Promise<Catalog> {
       }
     }
   }
-  throw lastErr instanceof Error ? lastErr : new Error("Failed to load catalog");
+  throw lastErr instanceof Error ? lastErr : new Error('Failed to load catalog');
 }
 
 export async function loadCatalog(): Promise<Catalog> {
@@ -93,9 +93,9 @@ async function fetchSummaryWithRetry(): Promise<CatalogSummary> {
       const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
       const url = shouldBypassCache
         ? `/catalog-summary.json?v=${Date.now()}`
-        : "/catalog-summary.json";
+        : '/catalog-summary.json';
       const res = await fetch(url, {
-        cache: shouldBypassCache ? "no-store" : "force-cache",
+        cache: shouldBypassCache ? 'no-store' : 'force-cache',
       });
       if (!res.ok) throw new Error(`Failed to load catalog summary: ${res.status}`);
       return assertUsableSummary((await res.json()) as CatalogSummary);
@@ -106,7 +106,7 @@ async function fetchSummaryWithRetry(): Promise<CatalogSummary> {
       }
     }
   }
-  throw lastErr instanceof Error ? lastErr : new Error("Failed to load catalog summary");
+  throw lastErr instanceof Error ? lastErr : new Error('Failed to load catalog summary');
 }
 
 export async function refreshCatalogSummary(): Promise<CatalogSummary> {
@@ -142,14 +142,14 @@ export function getVideosForStation(
   stationId: string,
   categoryId: string
 ): Video[] {
-  if (stationId === "all") {
+  if (stationId === 'all') {
     return Object.values(catalog.stations).flatMap((s) => s.videos);
   }
 
   const station = catalog.stations[stationId];
   if (!station) return [];
 
-  if (categoryId === "all") return station.videos;
+  if (categoryId === 'all') return station.videos;
 
   const ids = station.categoryVideoIds[categoryId];
   if (!ids) return [];
@@ -160,12 +160,12 @@ export function getVideosForStation(
 
 export function getCatalogFreshness(
   lastUpdated?: string | null,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): CatalogFreshness {
   if (!lastUpdated) {
     return {
-      state: "loading",
-      label: "Checking catalog freshness...",
+      state: 'loading',
+      label: 'Checking catalog freshness...',
       ageDays: null,
       updatedAt: null,
     };
@@ -174,18 +174,18 @@ export function getCatalogFreshness(
   const updatedAt = new Date(lastUpdated);
   if (Number.isNaN(updatedAt.getTime())) {
     return {
-      state: "unknown",
-      label: "Catalog freshness unknown",
+      state: 'unknown',
+      label: 'Catalog freshness unknown',
       ageDays: null,
       updatedAt: null,
     };
   }
 
   const ageDays = Math.max(0, Math.floor((now.getTime() - updatedAt.getTime()) / MS_PER_DAY));
-  const ageLabel = ageDays === 0 ? "today" : ageDays === 1 ? "1 day ago" : `${ageDays} days ago`;
+  const ageLabel = ageDays === 0 ? 'today' : ageDays === 1 ? '1 day ago' : `${ageDays} days ago`;
 
   return {
-    state: ageDays > STALE_CATALOG_DAYS ? "stale" : "fresh",
+    state: ageDays > STALE_CATALOG_DAYS ? 'stale' : 'fresh',
     label: `Catalog updated ${ageLabel}`,
     ageDays,
     updatedAt,
@@ -195,28 +195,27 @@ export function getCatalogFreshness(
 export const STALE_SOURCE_DAYS = 14;
 
 export type SourceFreshness = {
-  state: "fresh" | "stale" | "unknown";
+  state: 'fresh' | 'stale' | 'unknown';
   label: string;
   ageDays: number | null;
 };
 
 export function getSourceFreshness(
   meta: SourceMeta | undefined | null,
-  now: Date = new Date(),
+  now: Date = new Date()
 ): SourceFreshness {
   const fetchedAt = meta?.lastSuccessfulFetch || meta?.fetchedAt;
   if (!fetchedAt) {
-    return { state: "unknown", label: "Never fetched", ageDays: null };
+    return { state: 'unknown', label: 'Never fetched', ageDays: null };
   }
   const date = new Date(fetchedAt);
   if (Number.isNaN(date.getTime())) {
-    return { state: "unknown", label: "Fetch time unknown", ageDays: null };
+    return { state: 'unknown', label: 'Fetch time unknown', ageDays: null };
   }
   const ageDays = Math.max(0, Math.floor((now.getTime() - date.getTime()) / MS_PER_DAY));
-  const ageLabel =
-    ageDays === 0 ? "today" : ageDays === 1 ? "1 day ago" : `${ageDays} days ago`;
+  const ageLabel = ageDays === 0 ? 'today' : ageDays === 1 ? '1 day ago' : `${ageDays} days ago`;
   return {
-    state: ageDays > STALE_SOURCE_DAYS ? "stale" : "fresh",
+    state: ageDays > STALE_SOURCE_DAYS ? 'stale' : 'fresh',
     label: `Fetched ${ageLabel}`,
     ageDays,
   };
@@ -230,6 +229,6 @@ export function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
-  if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }

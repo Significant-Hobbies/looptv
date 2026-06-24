@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
-import type { Catalog, StationConfig } from "@/lib/types";
+import { useMemo, useState } from 'react';
+import type { Catalog, StationConfig } from '@/lib/types';
 import {
   buildCatalogPreview,
   createStationConfigSnippet,
   createStationDraft,
   createStationPrExport,
-} from "@/lib/station-builder";
-import { trackCoreAction } from "@/lib/analytics";
+} from '@/lib/station-builder';
+import { trackCoreAction } from '@/lib/analytics';
 
 interface StationBuilderProps {
   catalog: Catalog | null;
@@ -17,13 +17,20 @@ interface StationBuilderProps {
   onClose: () => void;
 }
 
-export default function StationBuilder({ catalog, stations, visible, onClose }: StationBuilderProps) {
-  const [name, setName] = useState("My Station");
-  const [description, setDescription] = useState("");
-  const [sourcesText, setSourcesText] = useState("Veritasium | @veritasium\nKurzgesagt | @kurzgesagt");
+export default function StationBuilder({
+  catalog,
+  stations,
+  visible,
+  onClose,
+}: StationBuilderProps) {
+  const [name, setName] = useState('My Station');
+  const [description, setDescription] = useState('');
+  const [sourcesText, setSourcesText] = useState(
+    'Veritasium | @veritasium\nKurzgesagt | @kurzgesagt'
+  );
   const [minDuration, setMinDuration] = useState(60);
   const [maxDuration, setMaxDuration] = useState(1800);
-  const [copied, setCopied] = useState<"json" | "pr" | null>(null);
+  const [copied, setCopied] = useState<'json' | 'pr' | null>(null);
 
   const draft = useMemo(
     () => createStationDraft({ name, description, sourcesText, minDuration, maxDuration }),
@@ -39,13 +46,13 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
 
   if (!visible) return null;
 
-  const copyText = async (kind: "json" | "pr", text: string) => {
+  const copyText = async (kind: 'json' | 'pr', text: string) => {
     if (!isValidDraft) return;
     await navigator.clipboard.writeText(text);
     setCopied(kind);
     setTimeout(() => setCopied(null), 1800);
     // Exporting a station config is the completed "build a station" action.
-    trackCoreAction("station_built");
+    trackCoreAction('station_built');
   };
 
   return (
@@ -65,7 +72,12 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
               title="Close station builder"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18 18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -73,7 +85,9 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
           <div className="grid gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <div className="space-y-4 border-b border-white/10 p-5 lg:border-b-0 lg:border-r">
               <label className="block">
-                <span className="text-xs font-medium uppercase tracking-wide text-white/40">Station name</span>
+                <span className="text-xs font-medium uppercase tracking-wide text-white/40">
+                  Station name
+                </span>
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
@@ -82,7 +96,9 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
               </label>
 
               <label className="block">
-                <span className="text-xs font-medium uppercase tracking-wide text-white/40">Description</span>
+                <span className="text-xs font-medium uppercase tracking-wide text-white/40">
+                  Description
+                </span>
                 <input
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
@@ -92,7 +108,9 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
               </label>
 
               <label className="block">
-                <span className="text-xs font-medium uppercase tracking-wide text-white/40">Sources</span>
+                <span className="text-xs font-medium uppercase tracking-wide text-white/40">
+                  Sources
+                </span>
                 <textarea
                   value={sourcesText}
                   onChange={(event) => setSourcesText(event.target.value)}
@@ -101,13 +119,16 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                   className="mt-2 w-full resize-none rounded-lg border border-white/10 bg-black px-3 py-2 font-mono text-sm text-white outline-none transition-colors placeholder:text-white/20 focus:border-white/30"
                 />
                 <span className="mt-2 block text-xs text-white/30">
-                  One source per line: <code>Name | @handle</code>. YouTube <code>@handle</code> URLs also work.
+                  One source per line: <code>Name | @handle</code>. YouTube <code>@handle</code>{' '}
+                  URLs also work.
                 </span>
               </label>
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block">
-                  <span className="text-xs font-medium uppercase tracking-wide text-white/40">Min seconds</span>
+                  <span className="text-xs font-medium uppercase tracking-wide text-white/40">
+                    Min seconds
+                  </span>
                   <input
                     type="number"
                     min={0}
@@ -117,7 +138,9 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                   />
                 </label>
                 <label className="block">
-                  <span className="text-xs font-medium uppercase tracking-wide text-white/40">Max seconds</span>
+                  <span className="text-xs font-medium uppercase tracking-wide text-white/40">
+                    Max seconds
+                  </span>
                   <input
                     type="number"
                     min={0}
@@ -135,7 +158,7 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                     <p className="mt-1 text-xs text-white/40">ID: {draft.id}</p>
                   </div>
                   <p className="text-right text-sm text-white/50">
-                    {draft.sources.length} source{draft.sources.length === 1 ? "" : "s"}
+                    {draft.sources.length} source{draft.sources.length === 1 ? '' : 's'}
                   </p>
                 </div>
                 {!isValidDraft && (
@@ -154,17 +177,22 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                     <p className="mt-1 text-xs text-white/40">
                       {catalog
                         ? `${preview.totalVideos.toLocaleString()} existing videos match these sources.`
-                        : "Catalog is still loading."}
+                        : 'Catalog is still loading.'}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   {preview.sourcePreviews.map((source) => (
-                    <div key={source.source.handle} className="rounded-lg border border-white/10 bg-black p-3">
+                    <div
+                      key={source.source.handle}
+                      className="rounded-lg border border-white/10 bg-black p-3"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-white">{source.source.name}</p>
+                          <p className="truncate text-sm font-medium text-white">
+                            {source.source.name}
+                          </p>
                           <p className="mt-0.5 text-xs text-white/35">{source.source.handle}</p>
                         </div>
                         <span className="shrink-0 rounded-full bg-white/10 px-2 py-1 text-xs text-white/60">
@@ -176,13 +204,16 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                       </p>
                       {source.matchedStations.length > 0 && (
                         <p className="mt-2 text-xs text-white/35">
-                          Already appears in {source.matchedStations.join(", ")}
+                          Already appears in {source.matchedStations.join(', ')}
                         </p>
                       )}
                       {source.commonTags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
                           {source.commonTags.map((tag) => (
-                            <span key={tag} className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/35">
+                            <span
+                              key={tag}
+                              className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/35"
+                            >
                               {tag}
                             </span>
                           ))}
@@ -198,7 +229,8 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                         </ul>
                       ) : (
                         <p className="mt-3 text-xs text-white/25">
-                          No committed catalog matches yet. The PR catalog build can add this source.
+                          No committed catalog matches yet. The PR catalog build can add this
+                          source.
                         </p>
                       )}
                     </div>
@@ -212,10 +244,10 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                     <h3 className="text-sm font-semibold text-white">stations.json entry</h3>
                     <button
                       disabled={!isValidDraft}
-                      onClick={() => copyText("json", jsonSnippet)}
+                      onClick={() => copyText('json', jsonSnippet)}
                       className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {copied === "json" ? "Copied" : "Copy JSON"}
+                      {copied === 'json' ? 'Copied' : 'Copy JSON'}
                     </button>
                   </div>
                   <textarea
@@ -231,10 +263,10 @@ export default function StationBuilder({ catalog, stations, visible, onClose }: 
                     <h3 className="text-sm font-semibold text-white">PR Export</h3>
                     <button
                       disabled={!isValidDraft}
-                      onClick={() => copyText("pr", prExport)}
+                      onClick={() => copyText('pr', prExport)}
                       className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      {copied === "pr" ? "Copied" : "Copy PR"}
+                      {copied === 'pr' ? 'Copied' : 'Copy PR'}
                     </button>
                   </div>
                   <textarea

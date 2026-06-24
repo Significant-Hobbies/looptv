@@ -1,37 +1,74 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import type { Catalog, CatalogSummary, Video } from "@/lib/types";
-import { loadCatalog, loadCatalogSummary, refreshCatalog, refreshCatalogSummary, getVideosForStation, pickRandom, getCatalogFreshness, getSourceFreshness } from "@/lib/catalog";
-import { getWatchedIds, markWatched, getBlockedSources, blockSource, unblockSource, getWatchLater, addWatchLater, removeWatchLater, getSavedForPlayback, addSavedForPlayback, removeSavedForPlayback, getSmartMixProfileRaw, setSmartMixProfileRaw, resetSmartMixProfile, getEmbedHealth, getQuarantinedSources, unquarantineSource, type EmbedHealthRecord } from "@/lib/watched";
-import { derivePlaybackDiagnostic } from "@/lib/playback-diagnostics";
-import { isEmbedUnhealthy, getEmbedBlockRate } from "@/lib/source-health";
-import { applyPreference, createSmartMixProfile, parseSmartMixProfile, pickSmartMixVideo, serializeSmartMixProfile, type SmartMixProfile } from "@/lib/smartmix";
-import { ytErrorReason } from "@/lib/yt-errors";
-import { trackActivated, trackCoreAction } from "@/lib/analytics";
-import Link from "next/link";
-import Player, { type PlayerHandle } from "./Player";
-import Search from "./Search";
-import ChannelHealth from "./ChannelHealth";
-import PlaybackDiagnosticsBanner from "./PlaybackDiagnosticsBanner";
-import ControlRail from "./ControlRail";
-import stations from "../../channels.config";
-import bundledCatalogSummary from "../../public/catalog-summary.json";
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import type { Catalog, CatalogSummary, Video } from '@/lib/types';
+import {
+  loadCatalog,
+  loadCatalogSummary,
+  refreshCatalog,
+  refreshCatalogSummary,
+  getVideosForStation,
+  pickRandom,
+  getCatalogFreshness,
+  getSourceFreshness,
+} from '@/lib/catalog';
+import {
+  getWatchedIds,
+  markWatched,
+  getBlockedSources,
+  blockSource,
+  unblockSource,
+  getWatchLater,
+  addWatchLater,
+  removeWatchLater,
+  getSavedForPlayback,
+  addSavedForPlayback,
+  removeSavedForPlayback,
+  getSmartMixProfileRaw,
+  setSmartMixProfileRaw,
+  resetSmartMixProfile,
+  getEmbedHealth,
+  getQuarantinedSources,
+  unquarantineSource,
+  type EmbedHealthRecord,
+} from '@/lib/watched';
+import { derivePlaybackDiagnostic } from '@/lib/playback-diagnostics';
+import { isEmbedUnhealthy, getEmbedBlockRate } from '@/lib/source-health';
+import {
+  applyPreference,
+  createSmartMixProfile,
+  parseSmartMixProfile,
+  pickSmartMixVideo,
+  serializeSmartMixProfile,
+  type SmartMixProfile,
+} from '@/lib/smartmix';
+import { ytErrorReason } from '@/lib/yt-errors';
+import { trackActivated, trackCoreAction } from '@/lib/analytics';
+import Link from 'next/link';
+import Player, { type PlayerHandle } from './Player';
+import Search from './Search';
+import ChannelHealth from './ChannelHealth';
+import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
+import ControlRail from './ControlRail';
+import stations from '../../channels.config';
+import bundledCatalogSummary from '../../public/catalog-summary.json';
 
-const SMART_MIX_ID = "smart-mix";
+const SMART_MIX_ID = 'smart-mix';
 const INITIAL_CATALOG_SUMMARY = bundledCatalogSummary as CatalogSummary;
 
 export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
-  const [catalogSummary, setCatalogSummary] = useState<CatalogSummary | null>(INITIAL_CATALOG_SUMMARY);
+  const [catalogSummary, setCatalogSummary] = useState<CatalogSummary | null>(
+    INITIAL_CATALOG_SUMMARY
+  );
   const [activeStation, setActiveStation] = useState(initialChannel || stations[0].id);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState('all');
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
-  const [status, setStatus] = useState<string>("Loading...");
+  const [status, setStatus] = useState<string>('Loading...');
   // TVApp is only ever mounted with an initialChannel (via [channel]/page.tsx),
   // so playback always starts in the lobby. The standalone "landing" picker
   // lives in app/page.tsx instead.
-  const [mode, setMode] = useState<"lobby" | "playing">("lobby");
+  const [mode, setMode] = useState<'lobby' | 'playing'>('lobby');
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -47,9 +84,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [copied, setCopied] = useState(false);
   const [watchLaterIds, setWatchLaterIds] = useState<Set<string>>(() => new Set());
   const [savedForPlaybackIds, setSavedForPlaybackIds] = useState<Set<string>>(() => new Set());
-  const [smartMixProfile, setSmartMixProfile] = useState<SmartMixProfile>(() => createSmartMixProfile());
-  const [smartMixReason, setSmartMixReason] = useState("");
-  const [playbackIssue, setPlaybackIssue] = useState<{ reason: string; skipped: number } | null>(null);
+  const [smartMixProfile, setSmartMixProfile] = useState<SmartMixProfile>(() =>
+    createSmartMixProfile()
+  );
+  const [smartMixReason, setSmartMixReason] = useState('');
+  const [playbackIssue, setPlaybackIssue] = useState<{ reason: string; skipped: number } | null>(
+    null
+  );
   const [catalogLoadFailed, setCatalogLoadFailed] = useState(false);
   const [catalogRefreshing, setCatalogRefreshing] = useState(false);
   const [embedHealth, setEmbedHealth] = useState<Record<string, EmbedHealthRecord>>(() => ({}));
@@ -66,17 +107,28 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   // build-time SSR and the first client render produce identical HTML.
   const [mounted, setMounted] = useState(false);
 
-  const isPlayAll = activeStation === "all";
+  const isPlayAll = activeStation === 'all';
   const isSmartMix = activeStation === SMART_MIX_ID;
   const config = isSmartMix
-    ? { id: SMART_MIX_ID, name: "Smart Mix", description: "Personalized from favorites, dislikes, sources, tags, and local watch signals", sources: [] as { name: string; handle: string }[] }
+    ? {
+        id: SMART_MIX_ID,
+        name: 'Smart Mix',
+        description:
+          'Personalized from favorites, dislikes, sources, tags, and local watch signals',
+        sources: [] as { name: string; handle: string }[],
+      }
     : isPlayAll
-    ? { id: "all", name: "All Stations", description: "Shuffle across all stations", sources: [] as { name: string; handle: string }[] }
-    : stations.find((s) => s.id === activeStation) ?? stations[0];
+      ? {
+          id: 'all',
+          name: 'All Stations',
+          description: 'Shuffle across all stations',
+          sources: [] as { name: string; handle: string }[],
+        }
+      : (stations.find((s) => s.id === activeStation) ?? stations[0]);
 
   // v2: Topic-based categories via zero-shot classification
   // NER categories (person/place extraction) were too noisy for useful filtering
-  const categories = useMemo(() => [{ id: "all", name: "All" }], []);
+  const categories = useMemo(() => [{ id: 'all', name: 'All' }], []);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,20 +173,19 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     loadCatalog()
       .then((c) => {
         setCatalog(c);
-        setStatus("");
+        setStatus('');
         setCatalogLoadFailed(false);
       })
       .catch((err) => {
-        console.error("TVApp: catalog load failed after retries", err);
+        console.error('TVApp: catalog load failed after retries', err);
         setCatalogLoadFailed(true);
         const isDev =
-          typeof window !== "undefined" &&
-          (window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1");
+          typeof window !== 'undefined' &&
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
         setStatus(
           isDev
-            ? "No catalog found. Run: pnpm run build:catalog"
-            : "Catalog couldn't load. Retry when you're back online.",
+            ? 'No catalog found. Run: pnpm run build:catalog'
+            : "Catalog couldn't load. Retry when you're back online."
         );
       });
   }, []);
@@ -143,16 +194,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     if (catalogRefreshing) return;
     setCatalogRefreshing(true);
     try {
-      const [summary, nextCatalog] = await Promise.all([
-        refreshCatalogSummary(),
-        refreshCatalog(),
-      ]);
+      const [summary, nextCatalog] = await Promise.all([refreshCatalogSummary(), refreshCatalog()]);
       setCatalogSummary(summary);
       setCatalog(nextCatalog);
       setCatalogLoadFailed(false);
-      setStatus("");
+      setStatus('');
     } catch (err) {
-      console.error("TVApp: catalog refresh failed", err);
+      console.error('TVApp: catalog refresh failed', err);
       setCatalogLoadFailed(true);
       setStatus("Catalog couldn't load. Retry when you're back online.");
     } finally {
@@ -183,24 +231,27 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   }, [fetchCatalog]);
 
   // Mark video as watched only if user watched >= 50%
-  const maybeMarkWatched = useCallback((video: Video | null, forceWatched = false) => {
-    if (!video) return;
-    const progress = playerRef.current?.getWatchProgress() ?? 0;
-    if (forceWatched || progress >= 0.5) {
-      markWatched(video.id, video.duration, activeStation, video.source || "");
-      removeSavedForPlayback(video.id);
-      setSavedForPlaybackIds((prev) => {
-        if (!prev.has(video.id)) return prev;
-        const next = new Set(prev);
-        next.delete(video.id);
-        return next;
-      });
-      setWatchedIds((prev) => {
-        if (prev.has(video.id)) return prev;
-        return new Set([...prev, video.id]);
-      });
-    }
-  }, [activeStation]);
+  const maybeMarkWatched = useCallback(
+    (video: Video | null, forceWatched = false) => {
+      if (!video) return;
+      const progress = playerRef.current?.getWatchProgress() ?? 0;
+      if (forceWatched || progress >= 0.5) {
+        markWatched(video.id, video.duration, activeStation, video.source || '');
+        removeSavedForPlayback(video.id);
+        setSavedForPlaybackIds((prev) => {
+          if (!prev.has(video.id)) return prev;
+          const next = new Set(prev);
+          next.delete(video.id);
+          return next;
+        });
+        setWatchedIds((prev) => {
+          if (prev.has(video.id)) return prev;
+          return new Set([...prev, video.id]);
+        });
+      }
+    },
+    [activeStation]
+  );
 
   const playNext = useCallback(
     (cat?: string) => {
@@ -215,9 +266,12 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         const queued = queueRef.current.shift()!;
         setQueueCount(queueRef.current.length);
         maybeMarkWatched(currentVideo);
-        if (currentVideo) { historyRef.current.push(currentVideo); setHasHistory(true); }
+        if (currentVideo) {
+          historyRef.current.push(currentVideo);
+          setHasHistory(true);
+        }
         setCurrentVideo(queued);
-        setStatus("");
+        setStatus('');
         setPaused(false);
         return;
       }
@@ -258,16 +312,30 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       const next = smartPick ? smartPick.video : pickRandom(pool, currentVideo?.id);
       if (next) {
         maybeMarkWatched(currentVideo);
-        if (currentVideo) { historyRef.current.push(currentVideo); setHasHistory(true); }
+        if (currentVideo) {
+          historyRef.current.push(currentVideo);
+          setHasHistory(true);
+        }
         setCurrentVideo(next);
-        setSmartMixReason(smartPick?.reason ?? "");
-        setStatus("");
+        setSmartMixReason(smartPick?.reason ?? '');
+        setStatus('');
         setPaused(false);
       } else {
-        setStatus("No unwatched videos in this category");
+        setStatus('No unwatched videos in this category');
       }
     },
-    [catalog, activeStation, activeCategory, currentVideo, hideWatched, watchedIds, activeSources, maybeMarkWatched, isSmartMix, smartMixProfile],
+    [
+      catalog,
+      activeStation,
+      activeCategory,
+      currentVideo,
+      hideWatched,
+      watchedIds,
+      activeSources,
+      maybeMarkWatched,
+      isSmartMix,
+      smartMixProfile,
+    ]
   );
 
   const playPrev = useCallback(() => {
@@ -277,47 +345,60 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     }
     maybeMarkWatched(currentVideo);
     const prev = historyRef.current.pop();
-    if (prev) { setCurrentVideo(prev); setStatus(""); setPaused(false); }
+    if (prev) {
+      setCurrentVideo(prev);
+      setStatus('');
+      setPaused(false);
+    }
     setHasHistory(historyRef.current.length > 0);
   }, [currentVideo, maybeMarkWatched]);
 
   const playVideo = useCallback(
     (video: Video) => {
       maybeMarkWatched(currentVideo);
-      if (currentVideo) { historyRef.current.push(currentVideo); setHasHistory(true); }
+      if (currentVideo) {
+        historyRef.current.push(currentVideo);
+        setHasHistory(true);
+      }
       setCurrentVideo(video);
-      setStatus("");
+      setStatus('');
       setPaused(false);
       setSearchOpen(false);
-      setMode("playing");
+      setMode('playing');
     },
     [currentVideo, maybeMarkWatched]
   );
 
-  const switchToStation = useCallback((stationId: string) => {
-    maybeMarkWatched(currentVideo);
-    skippedRef.current.clear();
-    historyRef.current = [];
-    setHasHistory(false);
-    setActiveStation(stationId);
-    setActiveSources(null);
-    setCurrentVideo(null);
-    setShowGuide(false);
-  }, [currentVideo, maybeMarkWatched]);
+  const switchToStation = useCallback(
+    (stationId: string) => {
+      maybeMarkWatched(currentVideo);
+      skippedRef.current.clear();
+      historyRef.current = [];
+      setHasHistory(false);
+      setActiveStation(stationId);
+      setActiveSources(null);
+      setCurrentVideo(null);
+      setShowGuide(false);
+    },
+    [currentVideo, maybeMarkWatched]
+  );
 
-  const handleToggleBlock = useCallback((source: string) => {
-    if (blockedSources.has(source)) {
-      unblockSource(source);
-      const next = new Set(blockedSourcesRef.current);
-      next.delete(source);
-      syncBlockedSources(next);
-    } else {
-      blockSource(source);
-      const next = new Set(blockedSourcesRef.current);
-      next.add(source);
-      syncBlockedSources(next);
-    }
-  }, [blockedSources, syncBlockedSources]);
+  const handleToggleBlock = useCallback(
+    (source: string) => {
+      if (blockedSources.has(source)) {
+        unblockSource(source);
+        const next = new Set(blockedSourcesRef.current);
+        next.delete(source);
+        syncBlockedSources(next);
+      } else {
+        blockSource(source);
+        const next = new Set(blockedSourcesRef.current);
+        next.add(source);
+        syncBlockedSources(next);
+      }
+    },
+    [blockedSources, syncBlockedSources]
+  );
 
   const handleCategoryChange = useCallback(
     (id: string) => {
@@ -328,9 +409,12 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         const available = hideWatched ? videos.filter((v) => !watchedIds.has(v.id)) : videos;
         const next = pickRandom(available.length > 0 ? available : videos);
         if (next) {
-          if (currentVideo) { historyRef.current.push(currentVideo); setHasHistory(true); }
+          if (currentVideo) {
+            historyRef.current.push(currentVideo);
+            setHasHistory(true);
+          }
           setCurrentVideo(next);
-          setStatus("");
+          setStatus('');
           setPaused(false);
         }
       }
@@ -339,21 +423,21 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   );
 
   const startPlaying = useCallback(() => {
-    setMode("playing");
+    setMode('playing');
     playNext();
   }, [playNext]);
 
   useEffect(() => {
-    if (mode === "playing" && catalog && !currentVideo) playNext();
+    if (mode === 'playing' && catalog && !currentVideo) playNext();
   }, [mode, catalog, currentVideo, playNext]);
 
   // Owner analytics: playing a video is the core product action. The first
   // play also marks the viewer as `activated`. trackActivated() de-dupes
   // internally, so it is safe to call on every play.
   useEffect(() => {
-    if (mode === "playing" && currentVideo) {
+    if (mode === 'playing' && currentVideo) {
       trackActivated();
-      trackCoreAction("video_played");
+      trackCoreAction('video_played');
     }
   }, [mode, currentVideo]);
 
@@ -361,49 +445,112 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   // Skipped refs are excluded intentionally — they're a transient runtime set.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!catalog || !currentVideo || isSmartMix) { setNextVideoPreview(null); return; }
+    if (!catalog || !currentVideo || isSmartMix) {
+      setNextVideoPreview(null);
+      return;
+    }
     const videos = getVideosForStation(catalog, activeStation, activeCategory);
     const pool = videos.filter(
-      (v) => v.id !== currentVideo.id &&
-      (!hideWatched || !watchedIds.has(v.id)) &&
-      (!v.source || !blockedSources.has(v.source)) &&
-      (!v.source || !quarantinedSources.has(v.source)) &&
-      (!activeSources || !v.source || activeSources.has(v.source))
+      (v) =>
+        v.id !== currentVideo.id &&
+        (!hideWatched || !watchedIds.has(v.id)) &&
+        (!v.source || !blockedSources.has(v.source)) &&
+        (!v.source || !quarantinedSources.has(v.source)) &&
+        (!activeSources || !v.source || activeSources.has(v.source))
     );
     const src = pool.length > 0 ? pool : videos.filter((v) => v.id !== currentVideo.id);
     setNextVideoPreview(src.length > 0 ? src[Math.floor(Math.random() * src.length)] : null);
-  }, [catalog, currentVideo, activeStation, activeCategory, hideWatched, watchedIds, blockedSources, quarantinedSources, activeSources, isSmartMix]);
+  }, [
+    catalog,
+    currentVideo,
+    activeStation,
+    activeCategory,
+    hideWatched,
+    watchedIds,
+    blockedSources,
+    quarantinedSources,
+    activeSources,
+    isSmartMix,
+  ]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-      if (e.key === "?") { e.preventDefault(); setShowShortcuts((s) => !s); return; }
-      if (e.key === "/") { e.preventDefault(); setSearchOpen(true); return; }
-      if (e.key === "Escape") { e.preventDefault(); setSearchOpen(false); setShowShortcuts(false); setShowGuide(false); setShowHealth(false); return; }
-      if (e.key.toLowerCase() === "h") { e.preventDefault(); setShowHealth((s) => !s); return; }
+      if (e.key === '?') {
+        e.preventDefault();
+        setShowShortcuts((s) => !s);
+        return;
+      }
+      if (e.key === '/') {
+        e.preventDefault();
+        setSearchOpen(true);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setSearchOpen(false);
+        setShowShortcuts(false);
+        setShowGuide(false);
+        setShowHealth(false);
+        return;
+      }
+      if (e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        setShowHealth((s) => !s);
+        return;
+      }
       if (searchOpen) return;
 
-      if (mode === "lobby") {
-        if (e.key === " " || e.key.toLowerCase() === "n") {
+      if (mode === 'lobby') {
+        if (e.key === ' ' || e.key.toLowerCase() === 'n') {
           e.preventDefault();
           startPlaying();
         }
         return;
       }
 
-      if (mode !== "playing") return;
+      if (mode !== 'playing') return;
       switch (e.key.toLowerCase()) {
-        case " ": e.preventDefault(); playerRef.current?.togglePlay(); setPaused((p) => !p); break;
-        case "n": case "arrowright": e.preventDefault(); playNext(); break;
-        case "p": case "arrowleft": e.preventDefault(); playPrev(); break;
-        case "m": e.preventDefault(); playerRef.current?.toggleMute(); setMuted((m) => !m); break;
-        case "f": e.preventDefault(); if (document.fullscreenElement) { document.exitFullscreen(); } else { document.documentElement.requestFullscreen(); } break;
-        case "g": e.preventDefault(); setShowGuide((g) => !g); break;
-        case "w": e.preventDefault(); setHideWatched((h) => !h); break;
+        case ' ':
+          e.preventDefault();
+          playerRef.current?.togglePlay();
+          setPaused((p) => !p);
+          break;
+        case 'n':
+        case 'arrowright':
+          e.preventDefault();
+          playNext();
+          break;
+        case 'p':
+        case 'arrowleft':
+          e.preventDefault();
+          playPrev();
+          break;
+        case 'm':
+          e.preventDefault();
+          playerRef.current?.toggleMute();
+          setMuted((m) => !m);
+          break;
+        case 'f':
+          e.preventDefault();
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            document.documentElement.requestFullscreen();
+          }
+          break;
+        case 'g':
+          e.preventDefault();
+          setShowGuide((g) => !g);
+          break;
+        case 'w':
+          e.preventDefault();
+          setHideWatched((h) => !h);
+          break;
         default: {
-          const n = parseInt(e.key);
+          const n = parseInt(e.key, 10);
           if (n >= 1 && n <= Math.min(categories.length, 9)) {
             e.preventDefault();
             handleCategoryChange(categories[n - 1].id);
@@ -411,9 +558,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         }
       }
     };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [mode, playNext, playPrev, handleCategoryChange, categories, searchOpen, startPlaying, switchToStation]);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [mode, playNext, playPrev, handleCategoryChange, categories, searchOpen, startPlaying]);
 
   const handleError = useCallback(
     (code: number) => {
@@ -432,7 +579,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         playNext();
       }, 500);
     },
-    [currentVideo, playNext],
+    [currentVideo, playNext]
   );
 
   useEffect(
@@ -442,12 +589,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         retryTimeoutRef.current = null;
       }
     },
-    [],
+    []
   );
 
-  const allVideos = isPlayAll || isSmartMix
-    ? Object.values(catalog?.stations ?? {}).flatMap((s) => s.videos)
-    : catalog?.stations?.[activeStation]?.videos ?? [];
+  const allVideos =
+    isPlayAll || isSmartMix
+      ? Object.values(catalog?.stations ?? {}).flatMap((s) => s.videos)
+      : (catalog?.stations?.[activeStation]?.videos ?? []);
   const catalogLoaded = catalog !== null;
   const unwatchedCount = allVideos.filter((v) => !watchedIds.has(v.id)).length;
   const catalogFreshness = useMemo(
@@ -455,19 +603,20 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       mounted
         ? getCatalogFreshness(catalog?.lastUpdated ?? catalogSummary?.lastUpdated)
         : {
-            state: "loading" as const,
-            label: "Checking catalog freshness...",
+            state: 'loading' as const,
+            label: 'Checking catalog freshness...',
             ageDays: null,
             updatedAt: null,
           },
-    [mounted, catalog?.lastUpdated, catalogSummary?.lastUpdated],
+    [mounted, catalog?.lastUpdated, catalogSummary?.lastUpdated]
   );
 
   const currentSourceFreshness = useMemo(() => {
     if (!currentVideo?.source || !catalog) return undefined;
     const handle = stations
       .flatMap((st) => st.sources)
-      .find((s) => s.name === currentVideo.source)?.handle.replace("@", "");
+      .find((s) => s.name === currentVideo.source)
+      ?.handle.replace('@', '');
     return getSourceFreshness(handle ? catalog.sourceMeta?.[handle] : undefined);
   }, [catalog, currentVideo]);
 
@@ -498,7 +647,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       embedHealth,
       quarantinedSources,
       playbackIssue,
-    ],
+    ]
   );
 
   const handleUnquarantine = useCallback(
@@ -508,7 +657,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       next.delete(source);
       syncQuarantinedSources(next);
     },
-    [syncQuarantinedSources],
+    [syncQuarantinedSources]
   );
 
   const totalCatalogVideos =
@@ -516,21 +665,33 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
     catalogSummary?.totalVideos ||
     0;
 
-  const updateSmartPreference = useCallback((preference: "favorite" | "dislike") => {
-    if (!currentVideo) return;
-    const next = applyPreference(smartMixProfile, currentVideo, preference);
-    setSmartMixProfile(next);
-    setSmartMixProfileRaw(serializeSmartMixProfile(next));
-    if (preference === "dislike") playNext();
-  }, [currentVideo, playNext, smartMixProfile]);
+  const updateSmartPreference = useCallback(
+    (preference: 'favorite' | 'dislike') => {
+      if (!currentVideo) return;
+      const next = applyPreference(smartMixProfile, currentVideo, preference);
+      setSmartMixProfile(next);
+      setSmartMixProfileRaw(serializeSmartMixProfile(next));
+      if (preference === 'dislike') playNext();
+    },
+    [currentVideo, playNext, smartMixProfile]
+  );
 
   // ── Lobby: channel selected ──
-  if (mode === "lobby") {
-
+  if (mode === 'lobby') {
     return (
       <div className="fixed inset-0 bg-black flex flex-col items-center justify-center px-6">
-        <Link href="/" className="absolute top-6 left-6 text-white/30 hover:text-white/60 transition-colors text-sm flex items-center gap-1.5">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        <Link
+          href="/"
+          className="absolute top-6 left-6 text-white/30 hover:text-white/60 transition-colors text-sm flex items-center gap-1.5"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
           All channels
         </Link>
 
@@ -540,21 +701,24 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             <div className="flex flex-wrap justify-center gap-1.5 mb-3 max-w-xl">
               {config.sources.map((s) => {
                 const isActive = !activeSources || activeSources.has(s.name);
-                const handle = s.handle.replace("@", "");
+                const handle = s.handle.replace('@', '');
                 const meta = catalog?.sourceMeta?.[handle];
                 const freshness = getSourceFreshness(meta);
-                const isStale = freshness.state === "stale";
+                const isStale = freshness.state === 'stale';
                 const health = embedHealth[s.name];
                 const isUnhealthy = isEmbedUnhealthy(health);
                 const blockRate = getEmbedBlockRate(health);
                 const isQuarantined = quarantinedSources.has(s.name);
-                const title = [
-                  freshness.state !== "unknown" ? freshness.label : null,
-                  isQuarantined ? "Auto-quarantined for embed failures" : null,
-                  isUnhealthy && blockRate !== null
-                    ? `${Math.round(blockRate * 100)}% embed blocks`
-                    : null,
-                ].filter(Boolean).join(" · ") || undefined;
+                const title =
+                  [
+                    freshness.state !== 'unknown' ? freshness.label : null,
+                    isQuarantined ? 'Auto-quarantined for embed failures' : null,
+                    isUnhealthy && blockRate !== null
+                      ? `${Math.round(blockRate * 100)}% embed blocks`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ') || undefined;
                 return (
                   <button
                     key={s.handle}
@@ -580,19 +744,28 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                     }}
                     className={`px-2.5 py-1 rounded-full text-xs transition-colors flex items-center gap-1 ${
                       isActive
-                        ? "bg-white/15 text-white/70"
-                        : "bg-white/5 text-white/20 line-through"
+                        ? 'bg-white/15 text-white/70'
+                        : 'bg-white/5 text-white/20 line-through'
                     }`}
                   >
                     {s.name}
                     {isStale && (
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400/80 shrink-0" aria-label="stale" />
+                      <span
+                        className="inline-block w-1.5 h-1.5 rounded-full bg-yellow-400/80 shrink-0"
+                        aria-label="stale"
+                      />
                     )}
                     {isQuarantined && (
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400/80 shrink-0" aria-label="quarantined" />
+                      <span
+                        className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400/80 shrink-0"
+                        aria-label="quarantined"
+                      />
                     )}
                     {isUnhealthy && !isQuarantined && (
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-400/80 shrink-0" aria-label="embed issues" />
+                      <span
+                        className="inline-block w-1.5 h-1.5 rounded-full bg-orange-400/80 shrink-0"
+                        aria-label="embed issues"
+                      />
                     )}
                   </button>
                 );
@@ -600,9 +773,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             </div>
           )}
           <p className="text-white/40 text-sm">
-            {allVideos.length > 0 ? `${unwatchedCount.toLocaleString()} unwatched of ${allVideos.length.toLocaleString()}` : catalogLoaded ? "No videos" : "Loading..."}
+            {allVideos.length > 0
+              ? `${unwatchedCount.toLocaleString()} unwatched of ${allVideos.length.toLocaleString()}`
+              : catalogLoaded
+                ? 'No videos'
+                : 'Loading...'}
           </p>
-          {!playbackDiagnostic && catalogFreshness.state !== "loading" && (
+          {!playbackDiagnostic && catalogFreshness.state !== 'loading' && (
             <p className="text-xs mt-2 text-white/25">{catalogFreshness.label}</p>
           )}
         </div>
@@ -628,8 +805,8 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                   cat.id === activeCategory
-                    ? "bg-white text-black font-medium"
-                    : "bg-white/10 text-white/60 hover:bg-white/15 hover:text-white"
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-white/10 text-white/60 hover:bg-white/15 hover:text-white'
                 }`}
               >
                 {cat.name}
@@ -644,7 +821,9 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             disabled={allVideos.length === 0}
             className="bg-red-600 hover:bg-red-500 disabled:bg-white/10 disabled:text-white/30 text-white text-lg font-semibold px-8 py-3.5 rounded-xl transition-colors flex items-center gap-3"
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
             Play
           </button>
           <button
@@ -652,18 +831,47 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             disabled={allVideos.length === 0}
             className="bg-white/10 hover:bg-white/15 disabled:opacity-30 text-white text-lg px-6 py-3.5 rounded-xl transition-colors flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
             Search
           </button>
         </div>
 
         <div className="text-white/20 text-xs text-center mt-10">
-          <kbd className="bg-white/5 px-1.5 py-0.5 rounded">Space</kbd> Play
-          &nbsp;&middot;&nbsp;
+          <kbd className="bg-white/5 px-1.5 py-0.5 rounded">Space</kbd> Play &nbsp;&middot;&nbsp;
           <kbd className="bg-white/5 px-1.5 py-0.5 rounded">/</kbd> Search
         </div>
 
-        <Search videos={allVideos} onSelect={playVideo} onQueue={(v) => { queueRef.current.push(v); setQueueCount(queueRef.current.length); }} onClose={() => setSearchOpen(false)} visible={searchOpen} watchLaterIds={watchLaterIds} onToggleWatchLater={(id) => { if (watchLaterIds.has(id)) { removeWatchLater(id); setWatchLaterIds((prev) => { const n = new Set(prev); n.delete(id); return n; }); } else { addWatchLater(id); setWatchLaterIds((prev) => new Set([...prev, id])); } }} />
+        <Search
+          videos={allVideos}
+          onSelect={playVideo}
+          onQueue={(v) => {
+            queueRef.current.push(v);
+            setQueueCount(queueRef.current.length);
+          }}
+          onClose={() => setSearchOpen(false)}
+          visible={searchOpen}
+          watchLaterIds={watchLaterIds}
+          onToggleWatchLater={(id) => {
+            if (watchLaterIds.has(id)) {
+              removeWatchLater(id);
+              setWatchLaterIds((prev) => {
+                const n = new Set(prev);
+                n.delete(id);
+                return n;
+              });
+            } else {
+              addWatchLater(id);
+              setWatchLaterIds((prev) => new Set([...prev, id]));
+            }
+          }}
+        />
         <ChannelHealth
           visible={showHealth}
           onClose={() => setShowHealth(false)}
@@ -690,8 +898,14 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             source={currentVideo.source}
             onEnded={playNext}
             onError={handleError}
-            onReady={() => { setStatus(""); setPlaybackIssue(null); }}
-            onPlay={() => { setPaused(false); setPlaybackIssue(null); }}
+            onReady={() => {
+              setStatus('');
+              setPlaybackIssue(null);
+            }}
+            onPlay={() => {
+              setPaused(false);
+              setPlaybackIssue(null);
+            }}
             onPause={() => setPaused(true)}
           />
         )}
@@ -699,12 +913,12 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           <div className="absolute inset-0 bg-black flex items-center justify-center px-6">
             <div className="text-center max-w-sm">
               <p className="text-white text-base font-medium mb-2">
-                {status || (catalogLoaded ? "No playable video selected" : "Loading channel...")}
+                {status || (catalogLoaded ? 'No playable video selected' : 'Loading channel...')}
               </p>
               <p className="text-white/45 text-sm">
                 {catalogLoaded
-                  ? "Try another channel or search the catalog for something playable."
-                  : "The catalog is loading before playback can start."}
+                  ? 'Try another channel or search the catalog for something playable.'
+                  : 'The catalog is loading before playback can start.'}
               </p>
             </div>
           </div>
@@ -736,11 +950,13 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         smartMixReason={smartMixReason}
         nextVideoPreview={nextVideoPreview}
         copied={copied}
-        smartMixFavorite={currentVideo ? smartMixProfile.favorites.includes(currentVideo.id) : false}
+        smartMixFavorite={
+          currentVideo ? smartMixProfile.favorites.includes(currentVideo.id) : false
+        }
         smartMixDisliked={currentVideo ? smartMixProfile.dislikes.includes(currentVideo.id) : false}
         onBack={() => {
           maybeMarkWatched(currentVideo);
-          setMode("lobby");
+          setMode('lobby');
           setCurrentVideo(null);
           setEmbedHealth(getEmbedHealth());
           setQuarantinedSources(getQuarantinedSources());
@@ -801,32 +1017,55 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         }}
         onOpenHealth={() => setShowHealth(true)}
         onOpenShortcuts={() => setShowShortcuts(true)}
-        onSmartMixFavorite={() => updateSmartPreference("favorite")}
-        onSmartMixDislike={() => updateSmartPreference("dislike")}
+        onSmartMixFavorite={() => updateSmartPreference('favorite')}
+        onSmartMixDislike={() => updateSmartPreference('dislike')}
         onSmartMixExport={() => {
           navigator.clipboard.writeText(serializeSmartMixProfile(smartMixProfile));
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         }}
         onSmartMixImport={() => {
-          const raw = window.prompt("Paste Smart Mix profile JSON");
+          const raw = window.prompt('Paste Smart Mix profile JSON');
           if (!raw) return;
           try {
             const next = parseSmartMixProfile(raw);
             setSmartMixProfile(next);
             setSmartMixProfileRaw(serializeSmartMixProfile(next));
           } catch {
-            setStatus("Invalid Smart Mix profile JSON");
+            setStatus('Invalid Smart Mix profile JSON');
           }
         }}
         onSmartMixReset={() => {
           resetSmartMixProfile();
           setSmartMixProfile(createSmartMixProfile());
-          setSmartMixReason("");
+          setSmartMixReason('');
         }}
       />
 
-      <Search videos={allVideos} onSelect={playVideo} onQueue={(v) => { queueRef.current.push(v); setQueueCount(queueRef.current.length); }} onClose={() => setSearchOpen(false)} visible={searchOpen} watchLaterIds={watchLaterIds} onToggleWatchLater={(id) => { if (watchLaterIds.has(id)) { removeWatchLater(id); setWatchLaterIds((prev) => { const n = new Set(prev); n.delete(id); return n; }); } else { addWatchLater(id); setWatchLaterIds((prev) => new Set([...prev, id])); } }} />
+      <Search
+        videos={allVideos}
+        onSelect={playVideo}
+        onQueue={(v) => {
+          queueRef.current.push(v);
+          setQueueCount(queueRef.current.length);
+        }}
+        onClose={() => setSearchOpen(false)}
+        visible={searchOpen}
+        watchLaterIds={watchLaterIds}
+        onToggleWatchLater={(id) => {
+          if (watchLaterIds.has(id)) {
+            removeWatchLater(id);
+            setWatchLaterIds((prev) => {
+              const n = new Set(prev);
+              n.delete(id);
+              return n;
+            });
+          } else {
+            addWatchLater(id);
+            setWatchLaterIds((prev) => new Set([...prev, id]));
+          }
+        }}
+      />
 
       {showGuide && (
         <div className="fixed inset-0 z-[100] flex">
@@ -836,34 +1075,57 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
               <span className="text-white text-sm font-semibold">Channels</span>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => { setShowGuide(false); setShowHealth(true); }}
+                  onClick={() => {
+                    setShowGuide(false);
+                    setShowHealth(true);
+                  }}
                   className="text-white/40 hover:text-white text-xs flex items-center gap-1 hover:bg-white/10 px-2 py-1 rounded transition-colors"
                   title="Channel Health (H)"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
                   </svg>
                   Health
                 </button>
-                <kbd className="text-white/25 text-xs font-mono bg-white/5 px-1.5 py-0.5 rounded">G</kbd>
+                <kbd className="text-white/25 text-xs font-mono bg-white/5 px-1.5 py-0.5 rounded">
+                  G
+                </kbd>
               </div>
             </div>
             <div className="py-1">
               {[
-                { id: "all", name: "Play All", count: totalCatalogVideos },
-                { id: SMART_MIX_ID, name: "Smart Mix", count: null as number | null },
+                { id: 'all', name: 'Play All', count: totalCatalogVideos },
+                { id: SMART_MIX_ID, name: 'Smart Mix', count: null as number | null },
               ].map(({ id, name, count }) => {
                 const isActive = activeStation === id;
                 return (
                   <button
                     key={id}
                     onClick={() => switchToStation(id)}
-                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${isActive ? "bg-white/10" : "hover:bg-white/5"}`}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}`}
                   >
-                    <span className={`text-sm font-medium ${isActive ? "text-white" : "text-white/60"}`}>{name}</span>
+                    <span
+                      className={`text-sm font-medium ${isActive ? 'text-white' : 'text-white/60'}`}
+                    >
+                      {name}
+                    </span>
                     <span className="flex items-center gap-2">
-                      {count != null && <span className="text-white/25 text-xs">{count.toLocaleString()}</span>}
-                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />}
+                      {count != null && (
+                        <span className="text-white/25 text-xs">{count.toLocaleString()}</span>
+                      )}
+                      {isActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                      )}
                     </span>
                   </button>
                 );
@@ -879,12 +1141,20 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
                   <button
                     key={st.id}
                     onClick={() => switchToStation(st.id)}
-                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${isActive ? "bg-white/10" : "hover:bg-white/5"}`}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}`}
                   >
-                    <span className={`text-sm ${isActive ? "text-white font-medium" : "text-white/60"}`}>{st.name}</span>
+                    <span
+                      className={`text-sm ${isActive ? 'text-white font-medium' : 'text-white/60'}`}
+                    >
+                      {st.name}
+                    </span>
                     <span className="flex items-center gap-2">
-                      <span className="text-white/25 text-xs">{count > 0 ? count.toLocaleString() : "–"}</span>
-                      {isActive && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />}
+                      <span className="text-white/25 text-xs">
+                        {count > 0 ? count.toLocaleString() : '–'}
+                      </span>
+                      {isActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                      )}
                     </span>
                   </button>
                 );
@@ -896,26 +1166,31 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
 
       {showShortcuts && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowShortcuts(false)} />
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowShortcuts(false)}
+          />
           <div className="relative bg-zinc-900 rounded-xl border border-white/10 p-6 max-w-sm w-full mx-4">
             <h2 className="text-white text-lg font-semibold mb-4">Keyboard Shortcuts</h2>
             <div className="space-y-2 text-sm">
               {[
-                ["Space", "Play / Pause"],
-                ["N / →", "Next video"],
-                ["P / ←", "Previous video"],
-                ["M", "Mute / Unmute"],
-                ["F", "Fullscreen"],
-                ["G", "Channel guide"],
-                ["H", "Channel health"],
-                ["W", "Toggle watched filter"],
-                ["/", "Search"],
-                ["?", "This help"],
-                ["Esc", "Close overlay"],
+                ['Space', 'Play / Pause'],
+                ['N / →', 'Next video'],
+                ['P / ←', 'Previous video'],
+                ['M', 'Mute / Unmute'],
+                ['F', 'Fullscreen'],
+                ['G', 'Channel guide'],
+                ['H', 'Channel health'],
+                ['W', 'Toggle watched filter'],
+                ['/', 'Search'],
+                ['?', 'This help'],
+                ['Esc', 'Close overlay'],
               ].map(([key, desc]) => (
                 <div key={key} className="flex items-center justify-between">
                   <span className="text-white/50">{desc}</span>
-                  <kbd className="bg-white/10 text-white/70 px-2 py-0.5 rounded text-xs font-mono">{key}</kbd>
+                  <kbd className="bg-white/10 text-white/70 px-2 py-0.5 rounded text-xs font-mono">
+                    {key}
+                  </kbd>
                 </div>
               ))}
             </div>

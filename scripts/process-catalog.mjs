@@ -2,28 +2,28 @@
 // Merges with existing catalog — preserves NER tags for known videos
 // Usage: node scripts/process-catalog.mjs <temp_dir> <output_path>
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   applySourceQualityFilter,
   qualifiesRawVideo,
   validateCatalog,
-} from "./catalog-quality.mjs";
+} from './catalog-quality.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = process.argv[2];
 const OUTPUT = process.argv[3];
 
 const stationsConfig = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "..", "stations.json"), "utf-8")
+  fs.readFileSync(path.join(__dirname, '..', 'stations.json'), 'utf-8')
 );
 
 // Load existing catalog to preserve NER-enriched tags
 let existing = { stations: {} };
 if (fs.existsSync(OUTPUT)) {
   try {
-    existing = JSON.parse(fs.readFileSync(OUTPUT, "utf-8"));
+    existing = JSON.parse(fs.readFileSync(OUTPUT, 'utf-8'));
   } catch {}
 }
 
@@ -40,14 +40,14 @@ const sourceCache = new Map(); // handle → videos[]
 const sourceMeta = {}; // handle → { fetchedAt, lastSuccessfulFetch, videoCount }
 for (const station of stationsConfig) {
   for (const src of station.sources) {
-    const handle = src.handle.replace("@", "");
+    const handle = src.handle.replace('@', '');
     if (sourceCache.has(handle)) continue;
     const filePath = path.join(TEMP_DIR, `${handle}.jsonl`);
     if (!fs.existsSync(filePath)) continue;
     const fetchedAt = fs.statSync(filePath).mtime.toISOString();
     const minDur = src.minDuration ?? 60;
     const maxDur = src.maxDuration ?? 3600;
-    const lines = fs.readFileSync(filePath, "utf-8").trim().split("\n");
+    const lines = fs.readFileSync(filePath, 'utf-8').trim().split('\n');
     const videos = [];
     for (const line of lines) {
       try {
@@ -61,13 +61,13 @@ for (const station of stationsConfig) {
     const prevMeta = existing.sourceMeta?.[handle];
     sourceMeta[handle] = {
       fetchedAt,
-      lastSuccessfulFetch: videos.length > 0 ? fetchedAt : (prevMeta?.lastSuccessfulFetch ?? ""),
+      lastSuccessfulFetch: videos.length > 0 ? fetchedAt : (prevMeta?.lastSuccessfulFetch ?? ''),
       videoCount: videos.length,
     };
   }
 }
 
-const catalog = { lastUpdated: "", sourceMeta: {}, stations: {} };
+const catalog = { lastUpdated: '', sourceMeta: {}, stations: {} };
 let totalNew = 0;
 const emptyStations = [];
 
@@ -75,7 +75,7 @@ for (const station of stationsConfig) {
   const allVideos = [];
 
   for (const src of station.sources) {
-    const handle = src.handle.replace("@", "");
+    const handle = src.handle.replace('@', '');
     const sourceVideos = sourceCache.get(handle);
     if (!sourceVideos) {
       console.warn(`  Warning: no data for ${src.handle}, skipping`);
@@ -84,25 +84,27 @@ for (const station of stationsConfig) {
 
     const { filtered, pct } = applySourceQualityFilter(sourceVideos, src);
     if (sourceVideos.length > 0) {
-      console.log(`  ${src.name}: top ${pct}% — ${sourceVideos.length} → ${filtered.length} videos`);
+      console.log(
+        `  ${src.name}: top ${pct}% — ${sourceVideos.length} → ${filtered.length} videos`
+      );
     }
 
     for (const raw of filtered) {
       const prev = existingVideos.get(raw.id);
-      if (prev && prev.tags && prev.tags.length > 1) {
+      if (prev?.tags && prev.tags.length > 1) {
         prev.viewCount = raw.view_count;
         allVideos.push(prev);
       } else {
         totalNew++;
         allVideos.push({
           id: raw.id,
-          title: raw.title || "",
+          title: raw.title || '',
           duration: raw.duration || 0,
-          date: "",
+          date: '',
           tags: [src.name],
           source: src.name,
           viewCount: raw.view_count,
-          description: (raw.description || "").slice(0, 300),
+          description: (raw.description || '').slice(0, 300),
         });
       }
     }
@@ -113,11 +115,9 @@ for (const station of stationsConfig) {
     emptyStations.push(station.id);
   }
 
-  const sourceNames = station.sources.map((s) => s.name).join(" + ");
+  const sourceNames = station.sources.map((s) => s.name).join(' + ');
   const newInStation = allVideos.filter((v) => v.description).length;
-  console.log(
-    `${station.id}: ${allVideos.length} videos (${sourceNames}), ${newInStation} new`
-  );
+  console.log(`${station.id}: ${allVideos.length} videos (${sourceNames}), ${newInStation} new`);
 }
 
 catalog.lastUpdated = new Date().toISOString();
@@ -128,16 +128,19 @@ try {
 } catch (err) {
   console.error(`Catalog quality validation failed: ${err.message}`);
   console.error(
-    "Hint: cached JSONL may have been fetched with --flat-playlist (no view counts). Re-fetch sources without --flat-playlist.",
+    'Hint: cached JSONL may have been fetched with --flat-playlist (no view counts). Re-fetch sources without --flat-playlist.'
   );
   process.exit(1);
 }
 
 fs.writeFileSync(OUTPUT, JSON.stringify(catalog));
-const summaryOutput = path.join(path.dirname(OUTPUT), "catalog-summary.json");
+const summaryOutput = path.join(path.dirname(OUTPUT), 'catalog-summary.json');
 const catalogSummary = {
   lastUpdated: catalog.lastUpdated,
-  totalVideos: Object.values(catalog.stations).reduce((total, station) => total + station.videos.length, 0),
+  totalVideos: Object.values(catalog.stations).reduce(
+    (total, station) => total + station.videos.length,
+    0
+  ),
   stations: Object.fromEntries(
     Object.entries(catalog.stations).map(([stationId, station]) => [
       stationId,
@@ -153,7 +156,7 @@ console.log(`Summary: ${summaryOutput}`);
 
 if (emptyStations.length > 0) {
   console.error(
-    `Catalog build produced empty stations: ${emptyStations.join(", ")}. Refusing to ship an empty TV catalog.`
+    `Catalog build produced empty stations: ${emptyStations.join(', ')}. Refusing to ship an empty TV catalog.`
   );
   process.exit(1);
 }

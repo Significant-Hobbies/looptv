@@ -12,7 +12,7 @@ test.describe('LoopTV mobile primary flow', () => {
 
     // No horizontal scroll: scroll width must not exceed the viewport width.
     const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
     expect(overflow).toBeLessThanOrEqual(1);
 
@@ -30,7 +30,7 @@ test.describe('LoopTV mobile primary flow', () => {
     await page.waitForTimeout(1500);
 
     const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
     );
     expect(overflow).toBeLessThanOrEqual(1);
   });

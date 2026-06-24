@@ -1,10 +1,10 @@
-import Link from "next/link";
+import Link from 'next/link';
 
-import stations from "../../../channels.config";
+import stations from '../../../channels.config';
 
 export const metadata = {
-  title: "Channels — LoopTV",
-  description: "All YouTube channels sourced into LoopTV, grouped by station.",
+  title: 'Channels — LoopTV',
+  description: 'All YouTube channels sourced into LoopTV, grouped by station.',
 };
 
 export default function ChannelsPage() {
@@ -16,12 +16,10 @@ export default function ChannelsPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Channels
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Channels</h1>
       <p className="mt-3 text-sm text-zinc-400">
-        Every channel sourced into the catalog, grouped by station.
-        Click a YouTube handle to open the original channel.
+        Every channel sourced into the catalog, grouped by station. Click a YouTube handle to open
+        the original channel.
       </p>
 
       <div className="mt-10 space-y-10">
@@ -42,8 +40,7 @@ export default function ChannelsPage() {
                     rel="noopener noreferrer"
                     className="text-zinc-300 hover:text-amber-400"
                   >
-                    {src.name}{" "}
-                    <span className="text-[10px] text-zinc-600">{src.handle}</span>
+                    {src.name} <span className="text-[10px] text-zinc-600">{src.handle}</span>
                   </a>
                 </li>
               ))}
@@ -53,9 +50,9 @@ export default function ChannelsPage() {
       </div>
 
       <p className="mt-12 text-xs text-zinc-500">
-        Channels listed here are external. LoopTV does not host their
-        videos — playback uses the public YouTube IFrame player on the
-        original creators&apos; content. Each creator owns their work.
+        Channels listed here are external. LoopTV does not host their videos — playback uses the
+        public YouTube IFrame player on the original creators&apos; content. Each creator owns their
+        work.
       </p>
     </main>
   );

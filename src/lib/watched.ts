@@ -1,11 +1,11 @@
-import { shouldAutoQuarantine } from "./source-health";
+import { shouldAutoQuarantine } from './source-health';
 
-const WATCHED_KEY = "looptv_watched";
-const STATS_KEY = "looptv_stats";
-const BLOCKED_KEY = "looptv_blocked_sources";
-const WATCH_LATER_KEY = "looptv_watch_later";
-const SAVED_FOR_PLAYBACK_KEY = "looptv_saved_for_playback";
-const SMART_MIX_KEY = "looptv_smart_mix_profile";
+const WATCHED_KEY = 'looptv_watched';
+const STATS_KEY = 'looptv_stats';
+const BLOCKED_KEY = 'looptv_blocked_sources';
+const WATCH_LATER_KEY = 'looptv_watch_later';
+const SAVED_FOR_PLAYBACK_KEY = 'looptv_saved_for_playback';
+const SMART_MIX_KEY = 'looptv_smart_mix_profile';
 
 export interface WatchStats {
   totalWatched: number;
@@ -21,12 +21,12 @@ function defaultStats(): WatchStats {
     totalSeconds: 0,
     byStation: {},
     bySource: {},
-    lastWatched: "",
+    lastWatched: '',
   };
 }
 
 export function getWatchedIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+  if (typeof window === 'undefined') return new Set();
   try {
     const raw = localStorage.getItem(WATCHED_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
@@ -42,7 +42,7 @@ export function markWatched(
   stationId: string,
   source: string
 ): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
 
   // Add to watched set
   const ids = getWatchedIds();
@@ -61,7 +61,7 @@ export function markWatched(
 }
 
 export function getStats(): WatchStats {
-  if (typeof window === "undefined") return defaultStats();
+  if (typeof window === 'undefined') return defaultStats();
   try {
     const raw = localStorage.getItem(STATS_KEY);
     return raw ? { ...defaultStats(), ...JSON.parse(raw) } : defaultStats();
@@ -71,13 +71,13 @@ export function getStats(): WatchStats {
 }
 
 export function clearWatched(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.removeItem(WATCHED_KEY);
   localStorage.removeItem(STATS_KEY);
 }
 
 export function getBlockedSources(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+  if (typeof window === 'undefined') return new Set();
   try {
     const raw = localStorage.getItem(BLOCKED_KEY);
     return raw ? new Set(JSON.parse(raw)) : new Set();
@@ -87,21 +87,21 @@ export function getBlockedSources(): Set<string> {
 }
 
 export function blockSource(source: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const blocked = getBlockedSources();
   blocked.add(source);
   localStorage.setItem(BLOCKED_KEY, JSON.stringify([...blocked]));
 }
 
 export function unblockSource(source: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const blocked = getBlockedSources();
   blocked.delete(source);
   localStorage.setItem(BLOCKED_KEY, JSON.stringify([...blocked]));
 }
 
 export function getWatchLater(): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(WATCH_LATER_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
@@ -112,7 +112,7 @@ export function getWatchLater(): string[] {
 }
 
 export function addWatchLater(videoId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const list = getWatchLater();
   if (!list.includes(videoId)) {
     list.push(videoId);
@@ -121,13 +121,13 @@ export function addWatchLater(videoId: string): void {
 }
 
 export function removeWatchLater(videoId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const list = getWatchLater().filter((id) => id !== videoId);
   localStorage.setItem(WATCH_LATER_KEY, JSON.stringify(list));
 }
 
 export function getSavedForPlayback(): string[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(SAVED_FOR_PLAYBACK_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
@@ -138,7 +138,7 @@ export function getSavedForPlayback(): string[] {
 }
 
 export function addSavedForPlayback(videoId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const list = getSavedForPlayback();
   if (!list.includes(videoId)) {
     list.push(videoId);
@@ -147,28 +147,28 @@ export function addSavedForPlayback(videoId: string): void {
 }
 
 export function removeSavedForPlayback(videoId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const list = getSavedForPlayback().filter((id) => id !== videoId);
   localStorage.setItem(SAVED_FOR_PLAYBACK_KEY, JSON.stringify(list));
 }
 
 export function getSmartMixProfileRaw(): string | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
   return localStorage.getItem(SMART_MIX_KEY);
 }
 
 export function setSmartMixProfileRaw(raw: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.setItem(SMART_MIX_KEY, raw);
 }
 
 export function resetSmartMixProfile(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.removeItem(SMART_MIX_KEY);
 }
 
-const EMBED_HEALTH_KEY = "looptv_embed_health";
-const QUARANTINED_KEY = "looptv_quarantined_sources";
+const EMBED_HEALTH_KEY = 'looptv_embed_health';
+const QUARANTINED_KEY = 'looptv_quarantined_sources';
 
 export interface EmbedHealthRecord {
   blocked: number;
@@ -177,7 +177,7 @@ export interface EmbedHealthRecord {
 }
 
 export function getEmbedHealth(): Record<string, EmbedHealthRecord> {
-  if (typeof window === "undefined") return {};
+  if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(EMBED_HEALTH_KEY);
     return raw ? JSON.parse(raw) : {};
@@ -187,7 +187,7 @@ export function getEmbedHealth(): Record<string, EmbedHealthRecord> {
 }
 
 export function getQuarantinedSources(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+  if (typeof window === 'undefined') return new Set();
   try {
     const raw = localStorage.getItem(QUARANTINED_KEY);
     return raw ? new Set(JSON.parse(raw)) : new Set();
@@ -197,7 +197,7 @@ export function getQuarantinedSources(): Set<string> {
 }
 
 export function quarantineSource(source: string): void {
-  if (typeof window === "undefined" || !source) return;
+  if (typeof window === 'undefined' || !source) return;
   const quarantined = getQuarantinedSources();
   if (quarantined.has(source)) return;
   quarantined.add(source);
@@ -205,7 +205,7 @@ export function quarantineSource(source: string): void {
 }
 
 export function unquarantineSource(source: string): void {
-  if (typeof window === "undefined" || !source) return;
+  if (typeof window === 'undefined' || !source) return;
   const quarantined = getQuarantinedSources();
   quarantined.delete(source);
   localStorage.setItem(QUARANTINED_KEY, JSON.stringify([...quarantined]));
@@ -213,7 +213,7 @@ export function unquarantineSource(source: string): void {
 
 /** Auto-quarantine when embed failure rate crosses the health threshold. */
 export function maybeAutoQuarantineSource(source: string): boolean {
-  if (typeof window === "undefined" || !source) return false;
+  if (typeof window === 'undefined' || !source) return false;
   const health = getEmbedHealth()[source];
   if (!shouldAutoQuarantine(health)) return false;
   const before = getQuarantinedSources();
@@ -222,9 +222,9 @@ export function maybeAutoQuarantineSource(source: string): boolean {
 }
 
 export function recordEmbedAttempt(source: string, blocked: boolean): boolean {
-  if (typeof window === "undefined" || !source) return false;
+  if (typeof window === 'undefined' || !source) return false;
   const health = getEmbedHealth();
-  const entry = health[source] ?? { blocked: 0, checked: 0, sampledAt: "" };
+  const entry = health[source] ?? { blocked: 0, checked: 0, sampledAt: '' };
   entry.checked++;
   if (blocked) entry.blocked++;
   entry.sampledAt = new Date().toISOString();
@@ -242,7 +242,7 @@ export function getSourceEmbedBlockRate(source: string): number {
   return entry.blocked / entry.checked;
 }
 
-const PREFS_KEY = "looptv_prefs";
+const PREFS_KEY = 'looptv_prefs';
 
 export interface UserPrefs {
   defaultStation: string | null;
@@ -261,7 +261,7 @@ function defaultPrefs(): UserPrefs {
 }
 
 export function getUserPrefs(): UserPrefs {
-  if (typeof window === "undefined") return defaultPrefs();
+  if (typeof window === 'undefined') return defaultPrefs();
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     return raw ? { ...defaultPrefs(), ...JSON.parse(raw) } : defaultPrefs();
@@ -271,13 +271,13 @@ export function getUserPrefs(): UserPrefs {
 }
 
 export function setUserPrefs(patch: Partial<UserPrefs>): UserPrefs {
-  if (typeof window === "undefined") return defaultPrefs();
+  if (typeof window === 'undefined') return defaultPrefs();
   const next = { ...getUserPrefs(), ...patch };
   localStorage.setItem(PREFS_KEY, JSON.stringify(next));
   return next;
 }
 
 export function resetUserPrefs(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   localStorage.removeItem(PREFS_KEY);
 }

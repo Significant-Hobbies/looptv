@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
-import { getBlockedSources, unblockSource } from "@/lib/watched";
+import { getBlockedSources, unblockSource } from '@/lib/watched';
 
 export default function BlockedSourcesPage() {
   const [blocked, setBlocked] = useState<string[] | null>(null);
@@ -31,28 +31,23 @@ export default function BlockedSourcesPage() {
       >
         ← LoopTV
       </Link>
-      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">
-        Blocked sources
-      </h1>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Blocked sources</h1>
       <p className="mt-3 text-xs text-zinc-500">
-        Channels you&apos;ve muted from the player&apos;s block button. Their videos
-        won&apos;t surface in any station&apos;s rotation. Stored on this browser only.
+        Channels you&apos;ve muted from the player&apos;s block button. Their videos won&apos;t
+        surface in any station&apos;s rotation. Stored on this browser only.
       </p>
 
       {blocked == null && <p className="mt-8 text-sm text-zinc-500">Loading…</p>}
       {blocked && blocked.length === 0 && (
         <p className="mt-8 text-sm text-zinc-400">
-          Nothing blocked. Use the &ldquo;block source&rdquo; button on a video
-          you&apos;ve had enough of to add it here.
+          Nothing blocked. Use the &ldquo;block source&rdquo; button on a video you&apos;ve had
+          enough of to add it here.
         </p>
       )}
       {blocked && blocked.length > 0 && (
         <ul className="mt-6 divide-y divide-zinc-800">
           {blocked.map((s) => (
-            <li
-              key={s}
-              className="flex items-center justify-between py-3 text-sm"
-            >
+            <li key={s} className="flex items-center justify-between py-3 text-sm">
               <span className="text-zinc-200">{s}</span>
               <button
                 type="button"

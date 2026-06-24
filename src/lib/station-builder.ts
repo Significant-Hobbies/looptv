@@ -1,4 +1,4 @@
-import type { Catalog, StationConfig, Video, YouTubeSource } from "./types";
+import type { Catalog, StationConfig, Video, YouTubeSource } from './types';
 
 export interface StationBuilderDraft {
   id: string;
@@ -28,24 +28,24 @@ export function slugifyStationId(value: string): string {
   return value
     .trim()
     .toLowerCase()
-    .replace(/['"]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
     .slice(0, 48);
 }
 
 export function normalizeYouTubeHandle(value: string): string {
   const trimmed = value.trim();
-  if (!trimmed) return "";
+  if (!trimmed) return '';
 
   const withoutQuery = trimmed.split(/[?#]/)[0];
   const handleFromUrl = withoutQuery.match(/youtube\.com\/(@[^/]+)/i)?.[1];
-  if (handleFromUrl) return handleFromUrl.replace(/\/+$/g, "");
+  if (handleFromUrl) return handleFromUrl.replace(/\/+$/g, '');
 
-  if (/^https?:\/\//i.test(withoutQuery)) return "";
+  if (/^https?:\/\//i.test(withoutQuery)) return '';
 
-  const handle = withoutQuery.replace(/^@?/, "@").replace(/\/+$/g, "");
-  return handle.length > 1 ? handle : "";
+  const handle = withoutQuery.replace(/^@?/, '@').replace(/\/+$/g, '');
+  return handle.length > 1 ? handle : '';
 }
 
 export function parseSourceLines(
@@ -62,11 +62,11 @@ export function parseSourceLines(
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
-      const [rawName, rawHandle] = line.includes("|")
-        ? line.split("|").map((part) => part.trim())
-        : ["", line];
+      const [rawName, rawHandle] = line.includes('|')
+        ? line.split('|').map((part) => part.trim())
+        : ['', line];
       const handle = normalizeYouTubeHandle(rawHandle ?? rawName);
-      const fallbackName = handle.replace(/^@/, "").replace(/[-_.]+/g, " ");
+      const fallbackName = handle.replace(/^@/, '').replace(/[-_.]+/g, ' ');
       return {
         name: rawName || titleCase(fallbackName),
         handle,
@@ -95,11 +95,14 @@ export function createStationDraft(input: {
   });
 
   return {
-    id: slugifyStationId(name || sources[0]?.name || "custom-station") || "custom-station",
-    name: name || "Custom Station",
+    id: slugifyStationId(name || sources[0]?.name || 'custom-station') || 'custom-station',
+    name: name || 'Custom Station',
     description:
       input.description.trim() ||
-      `${sources.slice(0, 3).map((source) => source.name).join(", ")}${sources.length > 3 ? ", and more" : ""}`,
+      `${sources
+        .slice(0, 3)
+        .map((source) => source.name)
+        .join(', ')}${sources.length > 3 ? ', and more' : ''}`,
     sources,
   };
 }
@@ -168,49 +171,51 @@ export function createStationConfigSnippet(draft: StationBuilderDraft): string {
 
 export function createStationsJsonPatch(draft: StationBuilderDraft): string {
   const entry = createStationConfigSnippet(draft)
-    .split("\n")
+    .split('\n')
     .map((line) => `  ${line}`)
-    .join("\n");
+    .join('\n');
 
   return [
-    "*** Begin Patch",
-    "*** Update File: stations.json",
-    "@@",
-    "-]",
-    "+,",
-    ...entry.split("\n").map((line) => `+${line}`),
-    "+]",
-    "*** End Patch",
-  ].join("\n");
+    '*** Begin Patch',
+    '*** Update File: stations.json',
+    '@@',
+    '-]',
+    '+,',
+    ...entry.split('\n').map((line) => `+${line}`),
+    '+]',
+    '*** End Patch',
+  ].join('\n');
 }
 
 export function createStationPrExport(draft: StationBuilderDraft, preview: CatalogPreview): string {
   const sourceSummary = preview.sourcePreviews
     .map((source) => {
-      const rejected = source.rejectedVideoCount > 0
-        ? `, ${source.rejectedVideoCount.toLocaleString()} rejected by duration filters`
-        : "";
-      const tags = source.commonTags.length > 0 ? `, common tags: ${source.commonTags.join(", ")}` : "";
+      const rejected =
+        source.rejectedVideoCount > 0
+          ? `, ${source.rejectedVideoCount.toLocaleString()} rejected by duration filters`
+          : '';
+      const tags =
+        source.commonTags.length > 0 ? `, common tags: ${source.commonTags.join(', ')}` : '';
       return `- ${source.source.name} (${source.source.handle}): ${source.videoCount.toLocaleString()} catalog videos${rejected}${tags}`;
     })
-    .join("\n");
+    .join('\n');
 
   return [
     `Title: Add ${draft.name} station`,
-    "",
-    "Summary:",
-    `- Add a new LoopTV station with ${draft.sources.length} YouTube source${draft.sources.length === 1 ? "" : "s"}.`,
+    '',
+    'Summary:',
+    `- Add a new LoopTV station with ${draft.sources.length} YouTube source${draft.sources.length === 1 ? '' : 's'}.`,
     `- Current catalog preview finds ${preview.totalVideos.toLocaleString()} matching videos before the catalog rebuild.`,
-    "- Run `pnpm run build:catalog` in the PR to fetch new videos and refresh `public/catalog.json`.",
-    "",
-    "Catalog preview:",
-    sourceSummary || "- No sources yet.",
-    "",
-    "Deterministic stations.json patch:",
-    "```diff",
+    '- Run `pnpm run build:catalog` in the PR to fetch new videos and refresh `public/catalog.json`.',
+    '',
+    'Catalog preview:',
+    sourceSummary || '- No sources yet.',
+    '',
+    'Deterministic stations.json patch:',
+    '```diff',
     createStationsJsonPatch(draft),
-    "```",
-  ].join("\n");
+    '```',
+  ].join('\n');
 }
 
 function passesDurationFilter(video: Video, source: YouTubeSource): boolean {
@@ -241,5 +246,5 @@ function titleCase(value: string): string {
     .split(/\s+/)
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .join(' ');
 }
