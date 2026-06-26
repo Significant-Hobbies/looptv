@@ -9,7 +9,11 @@ interface VitalMetric {
 }
 
 function sendToAnalytics(metric: VitalMetric) {
-  const posthog = (window as any).posthog;
+  const posthog = (
+    window as unknown as {
+      posthog?: { capture?: (event: string, props: Record<string, unknown>) => void };
+    }
+  ).posthog;
   if (posthog && typeof posthog.capture === 'function') {
     posthog.capture('web_vital', {
       name: metric.name,
