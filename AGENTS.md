@@ -14,7 +14,7 @@ This version has breaking changes -- APIs, conventions, and file structure may a
 TV-like random YouTube player with 13 stations, 78 channels, and ~38K videos — zero API keys needed for playback or catalog building.
 
 ## Stack
-- Framework: Next.js 16 (App Router, Turbopack)
+- Framework: Next.js 16 (App Router, webpack — `next build --webpack`)
 - Language: TypeScript (frontend), Python (NER tagging), Bash (catalog pipeline)
 - Styling: Tailwind CSS v4
 - DB: None — static `public/catalog.json` served at runtime; watched history in localStorage
@@ -63,7 +63,7 @@ pnpm test             # vitest run
 pnpm lint             # eslint
 
 # Catalog pipeline (requires yt-dlp: brew install yt-dlp)
-pnpm run build:catalog    # Full rebuild: fetch + process + NER tag
+pnpm run build:catalog    # Fetch + process only (no NER — use `build:ner` separately)
 pnpm run fetch:all        # Fetch raw JSONL for all sources
 pnpm run build:ner        # Run NER tagging only
 
@@ -79,7 +79,7 @@ python3 scripts/extract-tags.py
 - **Embed error handling**: YouTube errors 101/150 (embedding blocked) caught by `Player.tsx` → auto-skip.
 - **Quality filters**: per-source `minDuration`/`maxDuration` in `stations.json`; global 10K views minimum in `process-catalog.mjs` (requires full yt-dlp metadata, not `--flat-playlist`); top-N% + 200-video cap per source in `scripts/catalog-quality.mjs`.
 - **Adding a station**: add entry to `stations.json`, run `pnpm run build:catalog`, commit updated `catalog.json`.
-- **Turbopack** used — has breaking changes vs webpack; check Next.js docs for Turbopack-specific behavior.
+- **webpack** used (`next build --webpack`) — Turbopack is not enabled.
 - No env vars required.
 
 <!-- FLEET-GUIDANCE:START -->
