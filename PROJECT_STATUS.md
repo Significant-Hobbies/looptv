@@ -1,6 +1,6 @@
 # looptv — PROJECT STATUS
 
-Last updated: 2026-06-20
+Last updated: 2026-06-28
 
 ## Why/What
 
