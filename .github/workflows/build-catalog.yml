@@ -6,6 +6,10 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
+      source_run_id:
+        description: "Successful Fetch Catalog Sources run ID to reuse"
+        type: string
+        required: false
       override_audit:
         description: "Bypass catalog audit thresholds (intentional big change — see docs/catalog-auditability.md)"
         type: boolean
@@ -41,17 +45,17 @@ jobs:
             catalog-sources-v3-
 
       - name: Download fetched shards
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name != 'workflow_dispatch' || inputs.source_run_id != ''
         uses: actions/download-artifact@v4
         with:
           pattern: catalog-sources-shard-*
           path: artifact-shards
           merge-multiple: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.source_run_id }}
 
       - name: Merge shard artifacts into source cache
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name != 'workflow_dispatch' || inputs.source_run_id != ''
         run: |
           mkdir -p data/sources
           if [ -d artifact-shards ]; then
@@ -96,16 +100,23 @@ jobs:
         run: bash scripts/build-catalog.sh --process-only
 
       - name: Smoke test AI gateway
+        id: gateway-smoke
+        continue-on-error: true
         env:
           FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
           FAGW_PROJECT_ID: looptv
         run: node scripts/smoke-tag-gateway.mjs
 
       - name: Tag new videos via AI gateway
+        if: steps.gateway-smoke.outcome == 'success'
         env:
           FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
           FAGW_PROJECT_ID: looptv
         run: node scripts/tag-videos.mjs
+
+      - name: Note unavailable AI tagging
+        if: steps.gateway-smoke.outcome != 'success'
+        run: echo "::warning::AI gateway unavailable; continuing without new AI tags."
 
       - name: Audit catalog against manifest
         env:
