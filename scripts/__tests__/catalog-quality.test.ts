@@ -53,6 +53,19 @@ describe('catalog quality', () => {
     expect(filtered[0].view_count).toBeGreaterThan(filtered.at(-1)?.view_count ?? 0);
   });
 
+  it('does not filter a checked-in catalog fallback a second time', () => {
+    const sourceVideos = Array.from({ length: 200 }, (_, index) => ({
+      id: `fallback-${index}`,
+      view_count: 1_000_000 - index,
+      _looptvCatalogFallback: true,
+    }));
+
+    const { filtered, pct } = applySourceQualityFilter(sourceVideos, {});
+
+    expect(filtered).toHaveLength(200);
+    expect(pct).toBe(100);
+  });
+
   it('refuses to ship catalog entries below the view threshold', () => {
     expect(() => validateCatalogVideo({ id: 'x', viewCount: 0 })).toThrow();
     expect(() =>

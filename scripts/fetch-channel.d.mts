@@ -1,4 +1,8 @@
 export function findSourceByHandle(handle: string): Record<string, unknown> | undefined;
+export function catalogFallbackRows(
+  catalog: Record<string, unknown>,
+  source: Record<string, unknown>
+): Array<Record<string, unknown>>;
 export function filterFlatByDuration<T extends { duration?: number }>(
   flatVideos: T[],
   minDur: number,

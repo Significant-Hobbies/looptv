@@ -19,7 +19,7 @@ export function qualifiesRawVideo(
 export function applySourceQualityFilter<T extends { view_count?: number; duration?: number }>(
   sourceVideos: T[],
   source: { topPercentile?: number }
-): { filtered: T[]; rejected: T[] };
+): { filtered: T[]; pct: number };
 export function validateCatalogVideo(
   video: { id?: string; viewCount?: number },
   context?: string

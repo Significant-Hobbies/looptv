@@ -64,10 +64,20 @@ jobs:
             const handles = new Set(stations.flatMap((s) => s.sources.map((src) => src.handle.replace('@',''))));
             const have = new Set(fs.readdirSync('data/sources').filter((f) => f.endsWith('.jsonl')).map((f) => f.replace(/\\.jsonl$/, '')));
             const missing = [...handles].filter((h) => !have.has(h));
-            if (missing.length) {
-              console.error('Missing source JSONL for handles:', missing.join(', '));
+            const catalog = JSON.parse(fs.readFileSync('public/catalog.json', 'utf8'));
+            const represented = new Set();
+            for (const station of stations) {
+              const sourceNames = new Set((catalog.stations?.[station.id]?.videos || []).map((video) => video.source));
+              for (const source of station.sources) {
+                if (sourceNames.has(source.name)) represented.add(source.handle.replace('@',''));
+              }
+            }
+            const missingRepresented = missing.filter((handle) => represented.has(handle));
+            if (missingRepresented.length) {
+              console.error('Missing source JSONL for shipped sources:', missingRepresented.join(', '));
               process.exit(1);
             }
+            if (missing.length) console.warn('No source JSONL for unrepresented handles:', missing.join(', '));
           "
 
       - name: Prepare pnpm

@@ -44,6 +44,10 @@ export function qualifiesRawVideo(raw, minDur, maxDur) {
 }
 
 export function applySourceQualityFilter(sourceVideos, source) {
+  if (sourceVideos.length > 0 && sourceVideos.every((raw) => raw._looptvCatalogFallback === true)) {
+    return { filtered: sourceVideos, pct: 100 };
+  }
+
   let filtered = sourceVideos.filter(
     (raw) => typeof raw.view_count === 'number' && raw.view_count >= MIN_VIEW_COUNT
   );

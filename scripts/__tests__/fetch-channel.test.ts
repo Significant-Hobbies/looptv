@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  catalogFallbackRows,
   computeEnrichBudget,
   filterFlatByDuration,
   findSourceByHandle,
@@ -7,6 +8,29 @@ import {
   ytDlpBaseArgs,
   ytDlpTimeoutMs,
 } from '../fetch-channel.mjs';
+
+const catalog = {
+  stations: {
+    science: {
+      videos: [
+        {
+          id: 'known',
+          title: 'Known video',
+          duration: 300,
+          source: 'Known Source',
+          viewCount: 42_000,
+        },
+        {
+          id: 'other',
+          title: 'Other video',
+          duration: 400,
+          source: 'Other Source',
+          viewCount: 50_000,
+        },
+      ],
+    },
+  },
+};
 
 describe('fetch-channel', () => {
   it('filters flat entries by per-source duration', () => {
@@ -43,5 +67,18 @@ describe('fetch-channel', () => {
     expect(ytDlpTimeoutMs({})).toBeUndefined();
     expect(ytDlpTimeoutMs({ YT_DLP_TIMEOUT_MS: '600000' })).toBe(600000);
     expect(ytDlpTimeoutMs({ YT_DLP_TIMEOUT_MS: 'invalid' })).toBeUndefined();
+  });
+
+  it('converts the checked-in catalog into source fallback rows', () => {
+    expect(catalogFallbackRows(catalog, { stationId: 'science', name: 'Known Source' })).toEqual([
+      {
+        id: 'known',
+        title: 'Known video',
+        duration: 300,
+        view_count: 42_000,
+        description: '',
+        _looptvCatalogFallback: true,
+      },
+    ]);
   });
 });

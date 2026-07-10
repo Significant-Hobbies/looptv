@@ -14,6 +14,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data', 'sources');
 const STATIONS_PATH = path.join(__dirname, '..', 'stations.json');
+const CATALOG_PATH = path.join(__dirname, '..', 'public', 'catalog.json');
 
 const MIN_CACHE_ROWS = Number(process.env.MIN_CACHE_ROWS_TO_TRUST || 5);
 const CACHE_MAX_AGE_DAYS = Number(process.env.CACHE_MAX_AGE_DAYS || 13);
@@ -27,7 +28,7 @@ export function findSourceByHandle(handle) {
   for (const station of stations) {
     for (const src of station.sources) {
       if (src.handle.replace(/^@/, '') === normalized) {
-        return src;
+        return { ...src, stationId: station.id };
       }
     }
   }
@@ -159,12 +160,38 @@ function readCachedCount(outputPath) {
   return fs.readFileSync(outputPath, 'utf8').trim().split('\n').filter(Boolean).length;
 }
 
-function cacheFallback(safe, outputPath, reason) {
+export function catalogFallbackRows(catalog, source) {
+  const videos = catalog?.stations?.[source.stationId]?.videos || [];
+  const matching = videos.filter((video) => video.source === source.name);
+  return [...new Map(matching.map((video) => [video.id, video])).values()].map((video) => ({
+    id: video.id,
+    title: video.title || '',
+    duration: video.duration || 0,
+    view_count: video.viewCount,
+    description: video.description || '',
+    _looptvCatalogFallback: true,
+  }));
+}
+
+function cacheFallback(safe, outputPath, source, reason) {
   const cachedLines = readCachedCount(outputPath);
   if (cachedLines > 0) {
     console.log(`  @${safe.padEnd(30)} ${reason}, kept cache (${cachedLines} videos)`);
     return { handle: safe, mode: 'cache-fallback', count: cachedLines };
   }
+
+  if (fs.existsSync(CATALOG_PATH)) {
+    const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
+    const fallbackRows = catalogFallbackRows(catalog, source);
+    if (fallbackRows.length > 0) {
+      writeJsonl(outputPath, fallbackRows);
+      console.log(
+        `  @${safe.padEnd(30)} ${reason}, seeded catalog fallback (${fallbackRows.length} videos)`
+      );
+      return { handle: safe, mode: 'catalog-fallback', count: fallbackRows.length };
+    }
+  }
+
   console.log(`  @${safe.padEnd(30)} ${reason}, no cache`);
   return { handle: safe, mode: 'failed', count: 0 };
 }
@@ -207,7 +234,7 @@ export function fetchChannel(handle, { fresh = false } = {}) {
   try {
     flat = runYtDlpLines([...ytDlpBaseArgs(), '--flat-playlist', '--dump-json', channelUrl]);
   } catch (error) {
-    return cacheFallback(safe, outputPath, `flat failed (${error.message.slice(0, 80)})`);
+    return cacheFallback(safe, outputPath, source, `flat failed (${error.message.slice(0, 80)})`);
   }
 
   const durationFiltered = filterFlatByDuration(flat, minDur, maxDur);
@@ -228,7 +255,7 @@ export function fetchChannel(handle, { fresh = false } = {}) {
   try {
     enriched = enrichPlaylist(enrichUrl, playlistEnd, minDur, maxDur);
   } catch (error) {
-    return cacheFallback(safe, outputPath, `enrich failed (${error.message.slice(0, 80)})`);
+    return cacheFallback(safe, outputPath, source, `enrich failed (${error.message.slice(0, 80)})`);
   }
 
   if (enriched.length > 0 && enriched.some((row) => typeof row.view_count === 'number')) {
@@ -240,7 +267,7 @@ export function fetchChannel(handle, { fresh = false } = {}) {
     return { handle: safe, mode, count: deduped.length };
   }
 
-  return cacheFallback(safe, outputPath, 'enrich produced no view counts');
+  return cacheFallback(safe, outputPath, source, 'enrich produced no view counts');
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
