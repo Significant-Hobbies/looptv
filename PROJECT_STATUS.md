@@ -1,6 +1,6 @@
 # looptv — PROJECT STATUS
 
-Last updated: 2026-07-03
+Last updated: 2026-07-10
 
 ## Why/What
 
@@ -115,6 +115,7 @@ stations.json → build-catalog.sh (yt-dlp metadata)
 - Fork-friendly: edit `stations.json` and deploy.
 - **Top-content policy:** global 10K-view minimum (requires full yt-dlp metadata — no `--flat-playlist`); per-source duration filters; top-N% by views per channel plus 200-video cap (`scripts/catalog-quality.mjs`); catalog build refuses output below threshold; playback picks from top-12 view band (same as Smart Mix).
 - **Catalog audit (2026-07-03, enhanced):** `catalog-manifest.json` baselines + `scripts/validate-catalog-manifest.mjs` hard-fail the Build Catalog workflow on suspicious swings (station disappearing/empty, per-station drop > max(30%, 5), total drop > 20%, per-station video churn > 50% — catches silent swaps where counts stay stable but the video set changes); per-station count diff + per-video changelog (added/removed/title-changed, with removed titles) land in the job summary and commit message; `override_audit` dispatch input / `CATALOG_AUDIT_OVERRIDE=1` for intentional changes. Manifest stores both per-station counts and a per-video map (`{ videoId: { t, d } }`) so each audit diffs against the previous run's exact video set. See `docs/catalog-auditability.md`.
+- **Catalog fetch resilience (2026-07-10):** eight bounded fetch shards prevent unbounded `yt-dlp` jobs; bot-wall/time-out failures preserve represented sources from the checked-in catalog; the downstream build saves the merged source set under a unique immutable cache key for the next refresh.
 
 ## Todo / Planned / Deferred / Blocked
 
@@ -132,6 +133,7 @@ stations.json → build-catalog.sh (yt-dlp metadata)
 ### Blocked
 
 - Catalog freshness depends on weekly GitHub Action — stale catalog shows diagnostics banner but no push notification.
+- GitHub-hosted runners can hit YouTube bot detection; the catalog fallback preserves shipped sources but cannot discover videos for a source until a live fetch succeeds.
 - NER tagging requires Python + HuggingFace in CI; local rebuild needs `requirements-ner.txt`.
 - Blocked/quarantined state is per-browser — not portable across devices.
 - Production: `looptv.pages.dev` via Cloudflare Pages static export.
