@@ -20,6 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -44,6 +45,31 @@ jobs:
             catalog-sources-v3-${{ hashFiles('stations.json') }}-
             catalog-sources-v3-
 
+      - name: Validate source fetch run
+        if: github.event_name == 'workflow_dispatch' && inputs.source_run_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          run_json=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}")
+          workflow_name=$(jq -r '.name' <<< "$run_json")
+          conclusion=$(jq -r '.conclusion' <<< "$run_json")
+          head_branch=$(jq -r '.head_branch' <<< "$run_json")
+          artifact_json=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN_ID}/artifacts?per_page=100")
+          artifact_count=$(jq '[.artifacts[] | select(.expired == false and (.name | startswith("catalog-sources-shard-")))] | length' <<< "$artifact_json")
+          {
+            echo "### Catalog source artifacts"
+            echo "- Run: ${SOURCE_RUN_ID}"
+            echo "- Workflow: ${workflow_name}"
+            echo "- Conclusion: ${conclusion}"
+            echo "- Branch: ${head_branch}"
+            echo "- Source shard artifacts: ${artifact_count}/8"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$workflow_name" != "Fetch Catalog Sources" ] || [ "$conclusion" != "success" ] || [ "$head_branch" != "main" ] || [ "$artifact_count" -ne 8 ]; then
+            echo "Invalid source run: expected a successful Fetch Catalog Sources run on main with 8 live shard artifacts." >&2
+            exit 1
+          fi
+
       - name: Download fetched shards
         if: github.event_name != 'workflow_dispatch' || inputs.source_run_id != ''
         uses: actions/download-artifact@v4
@@ -61,6 +87,7 @@ jobs:
           if [ -d artifact-shards ]; then
             find artifact-shards -name '*.jsonl' -exec cp {} data/sources/ \;
           fi
+          node scripts/preserve-catalog-source-rows.mjs data/sources
           echo "Source files after merge: $(find data/sources -maxdepth 1 -name '*.jsonl' | wc -l | tr -d ' ')"
           node --input-type=module -e "
             import fs from 'fs';
@@ -97,7 +124,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build catalog.json
+        id: build-catalog
         run: bash scripts/build-catalog.sh --process-only
+
+      - name: Count videos needing AI tags
+        id: pending-tags-before
+        run: echo "count=$(node scripts/catalog-tag-status.mjs public/catalog.json)" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test AI gateway
         id: gateway-smoke
@@ -108,7 +140,7 @@ jobs:
         run: node scripts/smoke-tag-gateway.mjs
 
       - name: Tag new videos via AI gateway
-        if: steps.gateway-smoke.outcome == 'success'
+        if: steps.gateway-smoke.outcome == 'success' && steps.pending-tags-before.outputs.count != '0'
         env:
           FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
           FAGW_PROJECT_ID: looptv
@@ -116,18 +148,56 @@ jobs:
 
       - name: Note unavailable AI tagging
         if: steps.gateway-smoke.outcome != 'success'
-        run: echo "::warning::AI gateway unavailable; continuing without new AI tags."
+        env:
+          GATEWAY_STATUS: ${{ steps.gateway-smoke.outputs.status }}
+          PENDING_TAGS: ${{ steps.pending-tags-before.outputs.count }}
+        run: |
+          if [ "$PENDING_TAGS" = "0" ]; then
+            echo "::warning::AI gateway ${GATEWAY_STATUS:-unknown}; no pending videos, continuing."
+          else
+            echo "::warning::AI gateway ${GATEWAY_STATUS:-unknown}; cache and audit will continue, but shipping ${PENDING_TAGS} pending videos is blocked."
+          fi
+
+      - name: Count videos still needing AI tags
+        id: pending-tags-final
+        if: always() && steps.build-catalog.outcome == 'success'
+        run: echo "count=$(node scripts/catalog-tag-status.mjs public/catalog.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Report AI tagging health
+        if: always() && steps.build-catalog.outcome == 'success'
+        env:
+          GATEWAY_STATUS: ${{ steps.gateway-smoke.outputs.status }}
+          PENDING_TAGS_BEFORE: ${{ steps.pending-tags-before.outputs.count }}
+          PENDING_TAGS_FINAL: ${{ steps.pending-tags-final.outputs.count }}
+        run: |
+          {
+            echo "### Catalog AI tagging"
+            echo "- Gateway status: ${GATEWAY_STATUS:-unknown}"
+            echo "- Pending videos before tagging: ${PENDING_TAGS_BEFORE:-unknown}"
+            echo "- Pending videos after tagging: ${PENDING_TAGS_FINAL:-unknown}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Audit catalog against manifest
+        if: always() && steps.build-catalog.outcome == 'success'
         env:
           CATALOG_AUDIT_OVERRIDE: ${{ github.event_name == 'workflow_dispatch' && inputs.override_audit && '1' || '' }}
         run: node scripts/validate-catalog-manifest.mjs --update --diff-file "$RUNNER_TEMP/catalog-diff.txt"
 
       - name: Save source cache
+        if: always() && steps.build-catalog.outcome == 'success'
         uses: actions/cache/save@v4
         with:
           path: data/sources
           key: catalog-sources-v3-${{ hashFiles('stations.json') }}-${{ github.run_id }}
+
+      - name: Enforce AI tagging shipping gate
+        if: always() && steps.build-catalog.outcome == 'success' && steps.pending-tags-final.outputs.count != '0'
+        env:
+          GATEWAY_STATUS: ${{ steps.gateway-smoke.outputs.status }}
+          PENDING_TAGS: ${{ steps.pending-tags-final.outputs.count }}
+        run: |
+          echo "AI gateway ${GATEWAY_STATUS:-unknown}; refusing to ship ${PENDING_TAGS:-unknown} untagged videos." >&2
+          exit 1
 
       - name: Check for changes
         id: diff
@@ -136,7 +206,7 @@ jobs:
           echo "changed=$(git diff --name-only public/catalog.json catalog-manifest.json | wc -l | tr -d ' ')" >> $GITHUB_OUTPUT
 
       - name: Commit and push
-        if: steps.diff.outputs.changed != '0'
+        if: steps.diff.outputs.changed != '0' && steps.pending-tags-final.outputs.count == '0'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

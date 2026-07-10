@@ -2,6 +2,7 @@
 // Usage: node scripts/tag-videos.mjs [catalog_path]
 
 import fs from 'node:fs';
+import { videosNeedingTags } from './catalog-tag-status.mjs';
 import {
   buildUserPrompt,
   createStationBatches,
@@ -135,14 +136,7 @@ function summarizeProfiles(items) {
 async function main() {
   const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf-8'));
 
-  const needsTagging = [];
-  for (const [stationId, station] of Object.entries(catalog.stations)) {
-    for (const video of station.videos) {
-      if (video.description || (video.tags && video.tags.length <= 1)) {
-        needsTagging.push({ stationId, video });
-      }
-    }
-  }
+  const needsTagging = videosNeedingTags(catalog);
 
   console.log(`Videos needing tags: ${needsTagging.length}`);
   console.log(`Profiles: ${summarizeProfiles(needsTagging)}`);

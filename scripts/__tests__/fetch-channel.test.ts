@@ -5,6 +5,7 @@ import {
   filterFlatByDuration,
   findSourceByHandle,
   isBotDetectionError,
+  mergeCatalogFallbackRows,
   ytDlpBaseArgs,
   ytDlpTimeoutMs,
 } from '../fetch-channel.mjs';
@@ -79,6 +80,23 @@ describe('fetch-channel', () => {
         description: '',
         _looptvCatalogFallback: true,
       },
+    ]);
+  });
+
+  it('merges live rows over the checked-in fallback without dropping old rows', () => {
+    const fallbackRows = [
+      { id: 'old', title: 'Old title', _looptvCatalogFallback: true },
+      { id: 'kept', title: 'Kept', _looptvCatalogFallback: true },
+    ];
+    const liveRows = [
+      { id: 'old', title: 'Live title' },
+      { id: 'new', title: 'New' },
+    ];
+
+    expect(mergeCatalogFallbackRows(liveRows, fallbackRows)).toEqual([
+      { id: 'kept', title: 'Kept', _looptvCatalogFallback: true },
+      { id: 'old', title: 'Live title' },
+      { id: 'new', title: 'New' },
     ]);
   });
 });

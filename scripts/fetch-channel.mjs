@@ -173,6 +173,20 @@ export function catalogFallbackRows(catalog, source) {
   }));
 }
 
+export function mergeCatalogFallbackRows(liveRows, fallbackRows) {
+  return [
+    ...new Map([...fallbackRows, ...liveRows].map((video) => [video.id, video])).values(),
+  ].sort(
+    (a, b) => Number(b._looptvCatalogFallback === true) - Number(a._looptvCatalogFallback === true)
+  );
+}
+
+function readCatalogFallbackRows(source) {
+  if (!fs.existsSync(CATALOG_PATH)) return [];
+  const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
+  return catalogFallbackRows(catalog, source);
+}
+
 function cacheFallback(safe, outputPath, source, reason) {
   const cachedLines = readCachedCount(outputPath);
   if (cachedLines > 0) {
@@ -180,16 +194,13 @@ function cacheFallback(safe, outputPath, source, reason) {
     return { handle: safe, mode: 'cache-fallback', count: cachedLines };
   }
 
-  if (fs.existsSync(CATALOG_PATH)) {
-    const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
-    const fallbackRows = catalogFallbackRows(catalog, source);
-    if (fallbackRows.length > 0) {
-      writeJsonl(outputPath, fallbackRows);
-      console.log(
-        `  @${safe.padEnd(30)} ${reason}, seeded catalog fallback (${fallbackRows.length} videos)`
-      );
-      return { handle: safe, mode: 'catalog-fallback', count: fallbackRows.length };
-    }
+  const fallbackRows = readCatalogFallbackRows(source);
+  if (fallbackRows.length > 0) {
+    writeJsonl(outputPath, fallbackRows);
+    console.log(
+      `  @${safe.padEnd(30)} ${reason}, seeded catalog fallback (${fallbackRows.length} videos)`
+    );
+    return { handle: safe, mode: 'catalog-fallback', count: fallbackRows.length };
   }
 
   console.log(`  @${safe.padEnd(30)} ${reason}, no cache`);
@@ -259,12 +270,14 @@ export function fetchChannel(handle, { fresh = false } = {}) {
   }
 
   if (enriched.length > 0 && enriched.some((row) => typeof row.view_count === 'number')) {
-    const deduped = [...new Map(enriched.map((row) => [row.id, row])).values()];
-    writeJsonl(outputPath, deduped);
+    const liveRows = [...new Map(enriched.map((row) => [row.id, row])).values()];
+    const fallbackRows = readCatalogFallbackRows(source);
+    const merged = mergeCatalogFallbackRows(liveRows, fallbackRows);
+    writeJsonl(outputPath, merged);
     console.log(
-      `  @${safe.padEnd(30)} ${mode} flat=${flat.length} dur=${durationFiltered.length} enriched=${deduped.length}`
+      `  @${safe.padEnd(30)} ${mode} flat=${flat.length} dur=${durationFiltered.length} enriched=${liveRows.length} preserved=${fallbackRows.length} total=${merged.length}`
     );
-    return { handle: safe, mode, count: deduped.length };
+    return { handle: safe, mode, count: merged.length };
   }
 
   return cacheFallback(safe, outputPath, source, 'enrich produced no view counts');

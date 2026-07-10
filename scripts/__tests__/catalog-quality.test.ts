@@ -76,6 +76,18 @@ describe('catalog quality', () => {
     expect(pct).toBe(100);
   });
 
+  it('preserves fallback rows while admitting live rows', () => {
+    const sourceVideos = [
+      { id: 'fallback', view_count: 20_000, _looptvCatalogFallback: true },
+      { id: 'live', view_count: 30_000 },
+    ];
+
+    const { filtered, pct } = applySourceQualityFilter(sourceVideos, {});
+
+    expect(filtered.map((video) => video.id)).toEqual(['live', 'fallback']);
+    expect(pct).toBe(100);
+  });
+
   it('refuses to ship catalog entries below the view threshold', () => {
     expect(() => validateCatalogVideo({ id: 'x', viewCount: 0 })).toThrow();
     expect(() =>

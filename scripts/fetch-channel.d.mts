@@ -3,6 +3,10 @@ export function catalogFallbackRows(
   catalog: Record<string, unknown>,
   source: Record<string, unknown>
 ): Array<Record<string, unknown>>;
+export function mergeCatalogFallbackRows<T extends { id: string }>(
+  liveRows: T[],
+  fallbackRows: T[]
+): T[];
 export function filterFlatByDuration<T extends { duration?: number }>(
   flatVideos: T[],
   minDur: number,
