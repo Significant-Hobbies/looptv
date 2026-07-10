@@ -26,12 +26,13 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Restore source cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: data/sources
-          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+          key: catalog-sources-v3-${{ hashFiles('stations.json') }}-${{ github.run_id }}
           restore-keys: |
-            catalog-sources-v2-
+            catalog-sources-v3-${{ hashFiles('stations.json') }}-
+            catalog-sources-v3-
 
       - name: Install yt-dlp
         run: pip install -q yt-dlp

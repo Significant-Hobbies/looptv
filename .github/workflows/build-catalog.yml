@@ -32,12 +32,13 @@ jobs:
           node-version: "22"
 
       - name: Restore source cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: data/sources
-          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+          key: catalog-sources-v3-${{ hashFiles('stations.json') }}-${{ github.run_id }}
           restore-keys: |
-            catalog-sources-v2-
+            catalog-sources-v3-${{ hashFiles('stations.json') }}-
+            catalog-sources-v3-
 
       - name: Download fetched shards
         if: github.event_name != 'workflow_dispatch'
@@ -105,7 +106,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: data/sources
-          key: catalog-sources-v2-${{ hashFiles('stations.json') }}
+          key: catalog-sources-v3-${{ hashFiles('stations.json') }}-${{ github.run_id }}
 
       - name: Check for changes
         id: diff
