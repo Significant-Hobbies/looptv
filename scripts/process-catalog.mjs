@@ -15,9 +15,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = process.argv[2];
 const OUTPUT = process.argv[3];
 
-const stationsConfig = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '..', 'stations.json'), 'utf-8')
-);
+const stationsPath = process.env.STATIONS_PATH || path.join(__dirname, '..', 'stations.json');
+const stationsConfig = JSON.parse(fs.readFileSync(stationsPath, 'utf-8'));
 
 // Load existing catalog to preserve NER-enriched tags
 let existing = { stations: {} };
@@ -59,11 +58,20 @@ for (const station of stationsConfig) {
     sourceCache.set(handle, videos);
     // Preserve lastSuccessfulFetch from previous catalog if this run yields no videos
     const prevMeta = existing.sourceMeta?.[handle];
-    sourceMeta[handle] = {
-      fetchedAt,
-      lastSuccessfulFetch: videos.length > 0 ? fetchedAt : (prevMeta?.lastSuccessfulFetch ?? ''),
-      videoCount: videos.length,
-    };
+    const isCatalogFallback =
+      videos.length > 0 && videos.every((video) => video._looptvCatalogFallback === true);
+    sourceMeta[handle] = isCatalogFallback
+      ? {
+          fetchedAt: prevMeta?.fetchedAt ?? '',
+          lastSuccessfulFetch: prevMeta?.lastSuccessfulFetch ?? '',
+          videoCount: prevMeta?.videoCount ?? videos.length,
+        }
+      : {
+          fetchedAt,
+          lastSuccessfulFetch:
+            videos.length > 0 ? fetchedAt : (prevMeta?.lastSuccessfulFetch ?? ''),
+          videoCount: videos.length,
+        };
   }
 }
 
