@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   cacheQualifies,
+  cacheAgeDays,
   computeEnrichBudget,
   filterFlatByDuration,
   findSourceByHandle,
   isBotDetectionError,
   isEnrichmentComplete,
   selectApiWorkingSet,
+  sourceRowsFromCatalog,
   ytDlpBaseArgs,
   ytDlpTimeoutMs,
 } from '../fetch-channel.mjs';
@@ -56,6 +58,65 @@ describe('fetch-channel', () => {
     expect(result.rows.every((row) => row._looptvCandidateCount === 1_357)).toBe(true);
   });
 
+  it('uses row provenance instead of extraction mtime for cache age', () => {
+    const now = Date.parse('2026-07-20T00:00:00Z');
+    expect(
+      cacheAgeDays(
+        [{ _looptvFetchedAt: '2026-07-10T00:00:00Z' }],
+        Date.parse('2026-07-20T00:00:00Z'),
+        now
+      )
+    ).toBe(10);
+  });
+
+  it('reconstructs a verified source checkpoint from the committed catalog', () => {
+    const source = {
+      stationId: 'snl',
+      name: 'Saturday Night Live',
+      handle: '@SaturdayNightLive',
+      minDuration: 60,
+      maxDuration: 1800,
+      topPercentile: 30,
+    };
+    const rows = sourceRowsFromCatalog(
+      {
+        sourceMeta: {
+          SaturdayNightLive: {
+            qualityBaseline: 'full-history',
+            fullAuditAt: '2026-07-12T00:00:00Z',
+            lastSuccessfulFetch: '2026-07-12T00:00:00Z',
+            videoCount: 8_912,
+            publicUploadCount: 10_280,
+            qualityPolicy: '60:1800:30:10000:200',
+          },
+        },
+        stations: {
+          snl: {
+            videos: [
+              {
+                id: 'top',
+                title: 'Top sketch',
+                duration: 300,
+                source: 'Saturday Night Live',
+                viewCount: 100_000_000,
+              },
+            ],
+          },
+        },
+      },
+      source
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      id: 'top',
+      _looptvCandidateCount: 8_912,
+      _looptvPublicUploadCount: 10_280,
+      _looptvFullAuditAt: '2026-07-12T00:00:00Z',
+      _looptvQualityPolicy: '60:1800:30:10000:200',
+    });
+    expect(sourceRowsFromCatalog({ sourceMeta: {} }, source)).toEqual([]);
+  });
+
   it('deduplicates, rejects low-view rows, and caps an API working set at 200', () => {
     const rows = [
       ...Array.from({ length: 250 }, (_, index) => ({
@@ -81,6 +142,32 @@ describe('fetch-channel', () => {
     expect(result.candidateCount).toBe(10);
     expect(result.pct).toBe(50);
     expect(result.rows).toHaveLength(5);
+  });
+
+  it('propagates a verified full-history baseline into incremental selections', () => {
+    const policy = '60:1800:30:10000:200';
+    const result = selectApiWorkingSet(
+      Array.from({ length: 250 }, (_, index) => ({
+        id: `recent-${index}`,
+        view_count: 1_000_000 - index,
+      })),
+      { minDuration: 60, maxDuration: 1800, topPercentile: 30 },
+      [
+        {
+          id: 'verified',
+          view_count: 2_000_000,
+          _looptvCandidateCount: 8_912,
+          _looptvPublicUploadCount: 10_280,
+          _looptvFullAuditAt: '2026-07-12T00:00:00Z',
+          _looptvQualityPolicy: policy,
+        },
+      ]
+    );
+    expect(result.rows).toHaveLength(200);
+    expect(result.rows.every((row) => row._looptvFullAuditAt === '2026-07-12T00:00:00Z')).toBe(
+      true
+    );
+    expect(result.rows.every((row) => row._looptvPublicUploadCount === 10_280)).toBe(true);
   });
 
   it('filters flat entries by per-source duration', () => {

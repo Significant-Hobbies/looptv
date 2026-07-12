@@ -278,6 +278,9 @@ describe('process-catalog', () => {
         _looptvFetchedAt: fetchedAt,
         _looptvPreselected: true,
         _looptvCandidateCount: 400,
+        _looptvFullAuditAt: fetchedAt,
+        _looptvPublicUploadCount: 500,
+        _looptvQualityPolicy: '60:3600:100:10000:200',
       })}\n`
     );
 
@@ -297,5 +300,11 @@ describe('process-catalog', () => {
     expect(catalog.lastUpdated).not.toBe('2026-06-01T00:00:00.000Z');
     expect(catalog.sourceMeta.live.lastSuccessfulFetch).toBe(fetchedAt);
     expect(catalog.sourceMeta.live.videoCount).toBe(400);
+    expect(catalog.sourceMeta.live).toMatchObject({
+      qualityBaseline: 'full-history',
+      fullAuditAt: fetchedAt,
+      publicUploadCount: 500,
+      qualityPolicy: '60:3600:100:10000:200',
+    });
   });
 });

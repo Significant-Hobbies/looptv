@@ -6,6 +6,27 @@ export function cacheQualifies(options: {
   ageDays: number;
   trustedApi?: boolean;
 }): boolean;
+export function cacheAgeDays(
+  rows: Array<Record<string, unknown>>,
+  fileMtimeMs: number,
+  nowMs?: number
+): number;
+type CatalogBaselineSource = {
+  handle: string;
+  name: string;
+  stationId: string;
+  minDuration?: number;
+  maxDuration?: number;
+  topPercentile?: number;
+};
+type CatalogBaseline = {
+  sourceMeta?: Record<string, Record<string, unknown>>;
+  stations?: Record<string, { videos?: Array<Record<string, unknown>> }>;
+};
+export function sourceRowsFromCatalog(
+  catalog: CatalogBaseline,
+  source: CatalogBaselineSource
+): Array<Record<string, unknown>>;
 export function selectApiWorkingSet(
   rows: Array<Record<string, unknown>>,
   source: Record<string, unknown>,

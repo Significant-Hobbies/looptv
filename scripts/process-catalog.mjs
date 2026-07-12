@@ -106,6 +106,19 @@ for (const station of stationsConfig) {
       (max, video) => Math.max(max, Number(video._looptvCandidateCount || 0)),
       videos.length
     );
+    const fullAuditAt = videos.reduce(
+      (latest, video) =>
+        video._looptvFullAuditAt && video._looptvFullAuditAt > latest
+          ? video._looptvFullAuditAt
+          : latest,
+      ''
+    );
+    const publicUploadCount = videos.reduce(
+      (max, video) => Math.max(max, Number(video._looptvPublicUploadCount || 0)),
+      0
+    );
+    const qualityPolicy =
+      videos.find((video) => video._looptvQualityPolicy)?._looptvQualityPolicy || '';
     sourceCache.set(handle, {
       videos,
       state,
@@ -113,6 +126,9 @@ for (const station of stationsConfig) {
       liveVideoCount,
       fallbackVideoCount,
       candidateCount,
+      fullAuditAt,
+      publicUploadCount,
+      qualityPolicy,
       prevMeta,
     });
   }
@@ -166,6 +182,11 @@ for (const station of stationsConfig) {
       liveVideoCount: input.liveVideoCount,
       fallbackVideoCount: input.fallbackVideoCount,
       refreshState: input.state,
+      qualityBaseline:
+        input.fullAuditAt && input.qualityPolicy ? 'full-history' : 'incremental-only',
+      fullAuditAt: input.fullAuditAt || input.prevMeta?.fullAuditAt || '',
+      publicUploadCount: input.publicUploadCount || input.prevMeta?.publicUploadCount || 0,
+      qualityPolicy: input.qualityPolicy || input.prevMeta?.qualityPolicy || '',
     };
 
     for (const raw of filtered) {

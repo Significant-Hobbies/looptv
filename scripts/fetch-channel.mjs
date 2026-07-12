@@ -12,6 +12,7 @@ import {
   resolveTopPercentile,
 } from './catalog-quality.mjs';
 import { fetchYouTubeSource } from './youtube-data-api.mjs';
+import { sourcePolicyKey } from './full-catalog-rebaseline.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data', 'sources');
@@ -101,6 +102,55 @@ export function cacheQualifies({ fresh, cachedLines, hasViewCounts, ageDays, tru
   return !fresh && cachedLines >= minimumRows && hasViewCounts && ageDays <= CACHE_MAX_AGE_DAYS;
 }
 
+export function cacheAgeDays(rows, fileMtimeMs, nowMs = Date.now()) {
+  const timestamps = rows
+    .map((row) => Date.parse(row._looptvFetchedAt || ''))
+    .filter(Number.isFinite);
+  const fetchedAtMs = timestamps.length > 0 ? Math.max(...timestamps) : fileMtimeMs;
+  return (nowMs - fetchedAtMs) / 86_400_000;
+}
+
+export function sourceRowsFromCatalog(catalog, source) {
+  const handle = source.handle.replace(/^@/, '');
+  const meta = catalog.sourceMeta?.[handle];
+  const policy = sourcePolicyKey(source);
+  if (
+    meta?.qualityBaseline !== 'full-history' ||
+    !meta.fullAuditAt ||
+    meta.qualityPolicy !== policy
+  )
+    return [];
+  const videos = catalog.stations?.[source.stationId]?.videos || [];
+  return videos
+    .filter((video) => video.source === source.name)
+    .map((video) => ({
+      id: video.id,
+      title: video.title || '',
+      description: '',
+      duration: video.duration || 0,
+      view_count: video.viewCount,
+      timestamp: null,
+      availability: 'public',
+      playable_in_embed: true,
+      webpage_url: `https://www.youtube.com/watch?v=${video.id}`,
+      _looptvFetchedAt: meta.lastSuccessfulFetch || meta.fullAuditAt,
+      _looptvFetchProvider: 'youtube-data-api',
+      _looptvPreselected: true,
+      _looptvCandidateCount: meta.videoCount,
+      _looptvPublicUploadCount: meta.publicUploadCount,
+      _looptvFullAuditAt: meta.fullAuditAt,
+      _looptvQualityPolicy: policy,
+    }));
+}
+
+function catalogBaselineRows(source) {
+  try {
+    return sourceRowsFromCatalog(JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8')), source);
+  } catch {
+    return [];
+  }
+}
+
 function priorCatalogCandidateCount(handle) {
   try {
     const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf8'));
@@ -133,6 +183,9 @@ export function selectApiWorkingSet(rows, source, cachedRows = [], previousCandi
     MAX_VIDEOS_PER_SOURCE,
     Math.max(1, Math.ceil(candidateCount * (pct / 100)))
   );
+  const verifiedCheckpoint = cachedRows.find(
+    (row) => row._looptvFullAuditAt && row._looptvQualityPolicy === sourcePolicyKey(source)
+  );
   return {
     candidateCount,
     pct,
@@ -143,6 +196,13 @@ export function selectApiWorkingSet(rows, source, cachedRows = [], previousCandi
         ...row,
         _looptvPreselected: true,
         _looptvCandidateCount: candidateCount,
+        ...(verifiedCheckpoint
+          ? {
+              _looptvFullAuditAt: verifiedCheckpoint._looptvFullAuditAt,
+              _looptvPublicUploadCount: verifiedCheckpoint._looptvPublicUploadCount,
+              _looptvQualityPolicy: verifiedCheckpoint._looptvQualityPolicy,
+            }
+          : {}),
       })),
   };
 }
@@ -323,10 +383,22 @@ export async function fetchChannel(handle, { fresh = false } = {}) {
 
   fs.mkdirSync(DATA_DIR, { recursive: true });
 
+  let cachedRows = readCachedRows(outputPath);
+  const verifiedPolicy = sourcePolicyKey(source);
+  const cacheHasVerifiedBaseline = cachedRows.some(
+    (row) => row._looptvFullAuditAt && row._looptvQualityPolicy === verifiedPolicy
+  );
+  if (!cacheHasVerifiedBaseline) {
+    const baselineRows = catalogBaselineRows(source);
+    if (baselineRows.length > 0) {
+      writeJsonl(outputPath, baselineRows, baselineRows[0]._looptvFetchedAt);
+      cachedRows = baselineRows;
+    }
+  }
+
   if (fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
     const cachedLines = readCachedCount(outputPath);
-    const cachedRows = readCachedRows(outputPath);
-    const ageDays = (Date.now() - fs.statSync(outputPath).mtimeMs) / 86_400_000;
+    const ageDays = cacheAgeDays(cachedRows, fs.statSync(outputPath).mtimeMs);
     if (
       cacheQualifies({
         fresh,

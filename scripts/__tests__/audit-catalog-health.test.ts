@@ -25,6 +25,9 @@ describe('catalog health audit', () => {
             lastSuccessfulFetch: '2026-07-11T00:00:00.000Z',
             videoCount: 1,
             refreshState: 'live',
+            qualityBaseline: 'full-history',
+            fullAuditAt: '2026-07-10T00:00:00.000Z',
+            publicUploadCount: 10,
           },
         },
         stations: {
@@ -55,6 +58,10 @@ describe('catalog health audit', () => {
       name: 'Missing Source',
       selectedCount: 0,
       health: 'missing',
+    });
+    expect(result.stations[0].sources[0]).toMatchObject({
+      qualityBaseline: 'full-history',
+      publicUploadCount: 10,
     });
     expect(
       result.violations.some((message: string) =>

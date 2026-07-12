@@ -103,6 +103,9 @@ export function auditCatalogHealth({
         minDuration: source.minDuration ?? 60,
         maxDuration: source.maxDuration ?? 3600,
         topPercentile: source.topPercentile ?? null,
+        qualityBaseline: meta?.qualityBaseline ?? 'incremental-only',
+        fullAuditAt: meta?.fullAuditAt || '',
+        publicUploadCount: meta?.publicUploadCount ?? 0,
       };
     });
 
@@ -160,12 +163,14 @@ export function formatCatalogHealthMarkdown(result) {
   ];
   for (const station of result.stations) {
     lines.push(`## ${station.name} (${station.selectedCount})`, '');
-    lines.push('| Source | State | Candidates | Selected | Last successful fetch | Policy |');
-    lines.push('| --- | --- | ---: | ---: | --- | --- |');
+    lines.push(
+      '| Source | State | Baseline | Uploads | Candidates | Selected | Last successful fetch | Policy |'
+    );
+    lines.push('| --- | --- | --- | ---: | ---: | ---: | --- | --- |');
     for (const source of station.sources) {
       const policy = source.topPercentile ? `top ${source.topPercentile}%` : 'automatic percentile';
       lines.push(
-        `| ${source.name} | ${source.health} | ${source.candidateCount} | ${source.selectedCount} | ${source.lastSuccessfulFetch || 'never'} | ${source.minDuration}-${source.maxDuration}s, ${policy} |`
+        `| ${source.name} | ${source.health} | ${source.qualityBaseline} | ${source.publicUploadCount || 'unknown'} | ${source.candidateCount} | ${source.selectedCount} | ${source.lastSuccessfulFetch || 'never'} | ${source.minDuration}-${source.maxDuration}s, ${policy} |`
       );
     }
     lines.push('');

@@ -65,6 +65,7 @@ pnpm lint             # eslint
 # Catalog pipeline (YOUTUBE_API_KEY preferred; yt-dlp fallback)
 pnpm run build:catalog    # Fetch + process only (no NER — use `build:ner` separately)
 pnpm run fetch:all        # Fetch raw JSONL for all sources
+pnpm audit:catalog:full   # Manual resumable full-history quality rebaseline
 pnpm run build:ner        # Run NER tagging only
 
 # Python NER setup
@@ -78,6 +79,8 @@ python3 scripts/extract-tags.py
 - **Catalog pipeline**: `stations.json` → recent-cache gate → YouTube Data API (bounded uploads + 50-ID metadata batches) or yt-dlp fallback → JSONL → `process-catalog.mjs` (merge + dedup, preserves tags) → free-AI tagging on untagged videos only → `public/catalog.json`.
 - **Embed error handling**: YouTube errors 101/150 (embedding blocked) caught by `Player.tsx` → auto-skip.
 - **Quality filters**: per-source `minDuration`/`maxDuration` in `stations.json`; global 10K views minimum in `process-catalog.mjs` (requires full video metadata); top-N% + 200-video cap per source in `scripts/catalog-quality.mjs`.
+- **Full quality rebaseline**: `pnpm audit:catalog:full` is manual-only, defaults to 5 requests/second and a 4,500-request global ceiling, checkpoints each source, and writes `docs/catalog-quality-audit.md`. Normal scheduled refreshes reuse those verified top sets and remain incremental.
+- **Runner cache seeding**: a catalog with `full-history` source metadata can reconstruct compact verified source checkpoints. This prevents an empty or legacy Actions cache from reverting to recent-only ranking; row provenance, not extraction mtime, controls freshness.
 - **Quota controls**: source fetch runs only on the 1st/15th or manual dispatch; complete caches younger than 13 days use zero YouTube requests; stale/missing sources scan at most 250 recent uploads, stop at known IDs, batch 50 IDs per metadata request, and hard-stop at 20 requests per source. Builds/deploys never receive the YouTube key.
 - **Catalog audit**: `scripts/validate-catalog-manifest.mjs` compares generated catalog against checked-in `catalog-manifest.json` baselines and hard-fails CI on suspicious station drops — see `docs/catalog-auditability.md` for thresholds and overrides.
 - **Adding a station**: add entry to `stations.json`, run `pnpm run build:catalog`, commit updated `catalog.json`.

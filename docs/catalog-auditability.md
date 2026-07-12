@@ -24,6 +24,10 @@ stations in an auto-committed `catalog.json`.
   `public/catalog.json` into a station/source report. It verifies source
   membership, duration bounds, the 10K-view floor, unique video IDs,
   per-source selected counts, and fresh-source coverage.
+- **`scripts/full-catalog-rebaseline.mjs`** — manual-only complete upload-history
+  ranking. It applies embedding, duration, and 10K-view eligibility once, applies
+  the source percentile once, caps at 200, checkpoints each source, and records a
+  `full-history` baseline in catalog metadata. See `catalog-quality-audit.md`.
 - **Build Catalog workflow** (`.github/workflows/build-catalog.yml`) — runs the
   source-health audit before the manifest rebaseline and auto-commit. A failed audit
   fails the job; nothing is committed. The commit message body includes the
@@ -87,6 +91,7 @@ node scripts/audit-catalog-health.mjs                  # grouped source audit + 
 node scripts/audit-catalog-health.mjs \
   --markdown-file /tmp/catalog-health.md \
   --json-file /tmp/catalog-health.json
+pnpm audit:catalog:full                  # manual full-history rebaseline
 ```
 
 The source-health audit exits non-zero when coverage or catalog invariants fail.
@@ -101,6 +106,8 @@ Unit tests: `scripts/__tests__/validate-catalog-manifest.test.ts` and
 - `Fetch Catalog Sources` is the only workflow that receives `YOUTUBE_API_KEY`; it runs on the 1st and 15th or by manual dispatch.
 - A complete source cache no older than 13 days makes zero YouTube requests.
 - Stale or missing sources scan at most 250 recent uploads, stop paging after reaching a fully known page, batch metadata requests in groups of 50, and hard-stop at 20 requests per source.
+- Full-history rebaseline is never scheduled. It defaults to five requests per second, refuses to exceed 4,500 requests, checkpoints after each source, and makes zero requests for matching completed checkpoints.
+- The committed catalog can seed a runner's missing or unverified source cache from its full-history top sets. Seeded row timestamps retain the actual audit time, so checkout or artifact extraction cannot reset freshness.
 - `Build Catalog` receives `FAGW_API_KEY`, but calls the gateway only when the pending-tag count is nonzero.
 - CI, deploy, and the static browser application receive neither catalog credential.
 - Both credentials are repository-scoped Actions secrets synchronized from the Fleet Infisical project. To rotate them without exposing values, pipe `infisical secrets get YOUTUBE_API_KEY --plain` into `gh secret set YOUTUBE_API_KEY`, and pipe `Free_ai` into `gh secret set FAGW_API_KEY` from an Infisical-linked directory.

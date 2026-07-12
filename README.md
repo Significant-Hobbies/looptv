@@ -134,6 +134,8 @@ Clearing site data wipes all of it; nothing leaves the browser.
 
 The source workflow runs on the 1st and 15th. Complete source caches younger than 13 days make zero YouTube requests. Stale or missing sources scan at most 250 recent uploads, stop when known IDs are reached, request video metadata in batches of 50, and hard-stop at 20 requests per source. The chained build audits coverage and replacement churn before calling AI, tags only untagged additions, retries only still-pending tags once, and commits only a passing catalog.
 
+For an occasional complete quality rebaseline, `pnpm audit:catalog:full` scans full upload histories at five requests per second with a 4,500-request global ceiling and per-source checkpoints. It is never scheduled. The July 12 baseline used 3,467 requests for all 122 sources; an immediate rerun used zero. See [`docs/catalog-quality-audit.md`](docs/catalog-quality-audit.md).
+
 ## Deployment
 
 Deployed on Cloudflare Pages as a static Next.js export: `looptv.pages.dev`.
