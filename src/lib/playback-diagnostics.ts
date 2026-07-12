@@ -33,6 +33,39 @@ export interface PlaybackDiagnosticInput {
   lastSkipReason?: string;
 }
 
+const DISMISSED_DIAGNOSTIC_KEY = 'looptv_dismissed_playback_diagnostic';
+
+type DiagnosticStorage = Pick<Storage, 'getItem' | 'setItem'>;
+
+export function playbackDiagnosticKey(diagnostic: PlaybackDiagnostic | null): string | null {
+  return diagnostic
+    ? [diagnostic.kind, diagnostic.source ?? '', diagnostic.headline, diagnostic.detail ?? ''].join(
+        ':'
+      )
+    : null;
+}
+
+export function getDismissedPlaybackDiagnosticKey(
+  storage: DiagnosticStorage | undefined = typeof window === 'undefined' ? undefined : localStorage
+): string | null {
+  if (!storage) return null;
+  try {
+    return storage.getItem(DISMISSED_DIAGNOSTIC_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function persistDismissedPlaybackDiagnosticKey(
+  key: string,
+  storage: DiagnosticStorage | undefined = typeof window === 'undefined' ? undefined : localStorage
+): void {
+  if (!storage) return;
+  try {
+    storage.setItem(DISMISSED_DIAGNOSTIC_KEY, key);
+  } catch {}
+}
+
 /** Returns null when playback quality is healthy — no banner needed. */
 export function derivePlaybackDiagnostic(
   input: PlaybackDiagnosticInput

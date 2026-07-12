@@ -32,7 +32,12 @@ import {
   unquarantineSource,
   type EmbedHealthRecord,
 } from '@/lib/watched';
-import { derivePlaybackDiagnostic } from '@/lib/playback-diagnostics';
+import {
+  derivePlaybackDiagnostic,
+  getDismissedPlaybackDiagnosticKey,
+  persistDismissedPlaybackDiagnosticKey,
+  playbackDiagnosticKey as getPlaybackDiagnosticKey,
+} from '@/lib/playback-diagnostics';
 import { isEmbedUnhealthy, getEmbedBlockRate } from '@/lib/source-health';
 import {
   applyPreference,
@@ -146,6 +151,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       setWatchLaterIds(new Set(getWatchLater()));
       setSavedForPlaybackIds(new Set(getSavedForPlayback()));
       setEmbedHealth(getEmbedHealth());
+      setDismissedDiagnosticKey(getDismissedPlaybackDiagnosticKey());
 
       const rawSmartMixProfile = getSmartMixProfileRaw();
       if (rawSmartMixProfile) {
@@ -660,22 +666,15 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
       playbackIssue,
     ]
   );
-  const playbackDiagnosticKey = playbackDiagnostic
-    ? [
-        playbackDiagnostic.kind,
-        playbackDiagnostic.source ?? '',
-        playbackDiagnostic.headline,
-        playbackDiagnostic.detail ?? '',
-      ].join(':')
-    : null;
+  const playbackDiagnosticKey = getPlaybackDiagnosticKey(playbackDiagnostic);
   const visiblePlaybackDiagnostic =
     playbackDiagnosticKey !== dismissedDiagnosticKey ? playbackDiagnostic : null;
 
-  useEffect(() => {
-    if (playbackDiagnosticKey !== dismissedDiagnosticKey) {
-      setDismissedDiagnosticKey(null);
-    }
-  }, [playbackDiagnosticKey, dismissedDiagnosticKey]);
+  const dismissPlaybackDiagnostic = useCallback(() => {
+    if (!playbackDiagnosticKey) return;
+    setDismissedDiagnosticKey(playbackDiagnosticKey);
+    persistDismissedPlaybackDiagnosticKey(playbackDiagnosticKey);
+  }, [playbackDiagnosticKey]);
 
   const handleUnquarantine = useCallback(
     (source: string) => {
@@ -820,7 +819,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
               onRetryCatalog={refreshCatalogState}
               onOpenHealth={() => setShowHealth(true)}
               onSearch={() => setSearchOpen(true)}
-              onDismiss={() => setDismissedDiagnosticKey(playbackDiagnosticKey)}
+              onDismiss={dismissPlaybackDiagnostic}
             />
           </div>
         )}
@@ -958,7 +957,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
             onRetryCatalog={refreshCatalogState}
             onOpenHealth={() => setShowHealth(true)}
             onSearch={() => setSearchOpen(true)}
-            onDismiss={() => setDismissedDiagnosticKey(playbackDiagnosticKey)}
+            onDismiss={dismissPlaybackDiagnostic}
           />
         )}
       </div>

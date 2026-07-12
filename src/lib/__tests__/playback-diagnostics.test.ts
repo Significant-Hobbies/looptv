@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { derivePlaybackDiagnostic } from '../playback-diagnostics';
+import {
+  derivePlaybackDiagnostic,
+  getDismissedPlaybackDiagnosticKey,
+  persistDismissedPlaybackDiagnosticKey,
+  playbackDiagnosticKey,
+} from '../playback-diagnostics';
 
 const now = new Date('2026-05-24T12:00:00.000Z');
 
@@ -112,5 +117,39 @@ describe('derivePlaybackDiagnostic', () => {
       kind: 'catalog_incomplete',
       action: 'open_health',
     });
+  });
+});
+
+describe('playback diagnostic dismissal', () => {
+  it('persists the exact diagnostic signature across reloads', () => {
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+    };
+    const diagnostic = {
+      kind: 'source_embed' as const,
+      source: 'Saturday Night Live',
+      headline: 'Saturday Night Live is having embed issues',
+      detail: "40% of recent clips couldn't play here.",
+    };
+    const key = playbackDiagnosticKey(diagnostic);
+    expect(key).not.toBeNull();
+    persistDismissedPlaybackDiagnosticKey(key!, storage);
+    expect(getDismissedPlaybackDiagnosticKey(storage)).toBe(key);
+  });
+
+  it('changes the signature when the warning materially changes', () => {
+    const first = playbackDiagnosticKey({
+      kind: 'source_embed',
+      source: 'Source A',
+      headline: 'Source A is having embed issues',
+    });
+    const next = playbackDiagnosticKey({
+      kind: 'source_embed',
+      source: 'Source B',
+      headline: 'Source B is having embed issues',
+    });
+    expect(next).not.toBe(first);
   });
 });
