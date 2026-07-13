@@ -3,7 +3,7 @@ import stations from '../../channels.config';
 
 export const dynamic = 'force-static';
 
-const siteUrl = 'https://looptv.pages.dev';
+const siteUrl = 'https://tv.significanthobbies.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const stationRoutes: MetadataRoute.Sitemap = stations.map((s) => ({

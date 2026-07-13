@@ -10,7 +10,7 @@ const geistSans = Geist({
   subsets: ['latin'],
 });
 
-const siteUrl = 'https://looptv.pages.dev';
+const siteUrl = 'https://tv.significanthobbies.com';
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   description:
     'Pick a station. Random clips from curated YouTube channels play nonstop. No account, no algorithm.',
   metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'LoopTV',
     description:
