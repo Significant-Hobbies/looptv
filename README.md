@@ -10,7 +10,7 @@ TV-like app that plays random YouTube videos from curated channels, nonstop. Pic
 
 | Concern | Service |
 |---------|---------|
-| Hosting | Cloudflare Pages (`looptv`, `looptv.pages.dev`) — static Next.js export, deployed via `wrangler pages deploy` |
+| Hosting | Cloudflare Pages (`looptv`, `tv.significanthobbies.com`) - static Next.js export, deployed via `wrangler pages deploy` |
 | Database | None — static `public/catalog.json` served at runtime; watched history in browser `localStorage` |
 | Analytics | PostHog via `local posthog-js wrapper` |
 | AI / tagging | Free-AI gateway in CI for untagged videos; local HuggingFace NER remains available |
@@ -138,7 +138,7 @@ For an occasional complete quality rebaseline, `pnpm audit:catalog:full` scans f
 
 ## Deployment
 
-Deployed on Cloudflare Pages as a static Next.js export: `looptv.pages.dev`.
+Deployed on Cloudflare Pages as a static Next.js export: `tv.significanthobbies.com`.
 
 ```bash
 pnpm build

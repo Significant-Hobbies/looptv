@@ -12,7 +12,7 @@ import {
 import { normalizeBatchTags } from './tag-result.mjs';
 
 const CATALOG_PATH = process.argv[2] || 'public/catalog.json';
-const GATEWAY = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1/chat/completions';
+const GATEWAY = 'https://ai-gateway.sassmaker.com/v1/chat/completions';
 const API_KEY = process.env.FAGW_API_KEY || 'x';
 const PROJECT_ID = process.env.FAGW_PROJECT_ID || 'looptv';
 const BATCH_SIZE = 15;

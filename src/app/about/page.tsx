@@ -3,7 +3,7 @@ import Link from 'next/link';
 import stations from '../../../channels.config';
 import catalogSummary from '../../../public/catalog-summary.json';
 
-const siteUrl = 'https://looptv.pages.dev';
+const siteUrl = 'https://tv.significanthobbies.com';
 
 export const metadata = {
   title: 'About — LoopTV',

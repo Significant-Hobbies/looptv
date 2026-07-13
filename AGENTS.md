@@ -20,7 +20,7 @@ TV-like random YouTube player with 16 stations and 122 curated channels. Playbac
 - DB: None — static `public/catalog.json` served at runtime; watched history in localStorage
 - Auth: None
 - Testing: Vitest (unit)
-- Deploy: Cloudflare Pages (static export, `output: 'export'`) — `looptv.pages.dev`.
+- Deploy: Cloudflare Pages (static export, `output: 'export'`) - `tv.significanthobbies.com`.
 - Package manager: pnpm
 
 ## Repo structure

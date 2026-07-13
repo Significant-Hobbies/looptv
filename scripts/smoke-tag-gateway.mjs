@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const GATEWAY = 'https://free-ai-gateway.sarthakagrawal927.workers.dev/v1/chat/completions';
+const GATEWAY = 'https://ai-gateway.sassmaker.com/v1/chat/completions';
 const API_KEY = process.env.FAGW_API_KEY || '';
 const PROJECT_ID = process.env.FAGW_PROJECT_ID || 'looptv';
 

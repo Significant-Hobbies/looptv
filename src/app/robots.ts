@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://looptv.pages.dev/sitemap.xml',
+    sitemap: 'https://tv.significanthobbies.com/sitemap.xml',
   };
 }

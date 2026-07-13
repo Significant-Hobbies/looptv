@@ -14,7 +14,7 @@ Last updated: 2026-07-12
 
 ### External
 
-- **Hosting:** Cloudflare Pages `looptv.pages.dev`.
+- **Hosting:** Cloudflare Pages at `tv.significanthobbies.com`.
 - **Playback:** YouTube IFrame Player API (free) — no YouTube Data API keys.
 - **Catalog build:** cache-first YouTube Data API + yt-dlp fallback + `scripts/process-catalog.mjs` + free-AI incremental tagging.
 - **Analytics:** PostHog via local wrapper (optional; no PII beyond analytics config).
@@ -29,7 +29,7 @@ Last updated: 2026-07-12
 | Concern | Technology |
 | --- | --- |
 | Frontend | Next.js 16 static export + Tailwind v4 |
-| Hosting | Cloudflare Pages `looptv.pages.dev` |
+| Hosting | Cloudflare Pages at `tv.significanthobbies.com` |
 | Catalog | `public/catalog.json` (static); config `stations.json` |
 | Playback | YouTube IFrame Player API (free) |
 | Catalog build | YouTube Data API + yt-dlp fallback + process-catalog + free-AI tagging |
@@ -141,4 +141,4 @@ stations.json → fetch-sources.sh (cache → Data API → yt-dlp fallback)
 - Catalog freshness depends on the bi-weekly GitHub Action; clients revalidate deployed assets, but there is no push notification for upstream refresh failures.
 - Legacy local NER rebuilds require `requirements-ner.txt`; scheduled CI tagging uses the free-AI gateway.
 - Blocked/quarantined state is per-browser — not portable across devices.
-- Production: `looptv.pages.dev` via Cloudflare Pages static export.
+- Production: `tv.significanthobbies.com` via Cloudflare Pages static export.

@@ -4,7 +4,7 @@ const BODY = `Contact: https://github.com/sarthakagrawal927/looptv/security/advi
 Contact: mailto:sarthakagrawal927@gmail.com
 Preferred-Languages: en
 Expires: 2027-05-15T00:00:00Z
-Canonical: https://looptv.pages.dev/.well-known/security.txt
+Canonical: https://tv.significanthobbies.com/.well-known/security.txt
 `;
 
 export function GET() {
