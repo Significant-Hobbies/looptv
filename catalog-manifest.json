@@ -1,6 +1,6 @@
 {
   "$comment": "Catalog audit baselines. Auto-rebaselined by CI after each passing audit (validate-catalog-manifest.mjs --update). See docs/catalog-auditability.md for thresholds and overrides.",
-  "generatedAt": "2026-07-12T10:44:21.741Z",
+  "generatedAt": "2026-07-15T08:00:50.876Z",
   "thresholds": {
     "maxStationDropPct": 30,
     "minStationDropAbs": 5,
