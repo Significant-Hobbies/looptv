@@ -55,6 +55,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geistSans.variable}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'LoopTV',
+              url: siteUrl,
+              applicationCategory: 'EntertainmentApplication',
+            }),
+          }}
+        />
+      </head>
       <body className="bg-black">
         <AnalyticsProvider>
           {children}
