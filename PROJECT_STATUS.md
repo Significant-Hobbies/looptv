@@ -1,6 +1,6 @@
 # looptv — PROJECT STATUS
 
-Last updated: 2026-07-12
+Last updated: 2026-07-17
 
 ## Why/What
 
@@ -65,6 +65,7 @@ stations.json → fetch-sources.sh (cache → Data API → yt-dlp fallback)
 - **2026-05-25:** React hydration error fix (fleet-smoke task done).
 - **PRD cycle:** Playback diagnostics, source health auto-pruning, lean-back controls redesign — all shipped.
 - **2026-07-12:** quota-aware YouTube Data API refresh path added; repository secrets synchronized from Infisical; yt-dlp retained as fallback.
+- **2026-07-17:** owned-domain metadata and the `tv.significanthobbies.com` Cloudflare Pages target reverified for the current catalog build.
 - **Bi-weekly CI:** catalog rebuild may auto-commit on the 1st and 15th; maintainer review expected for station diffs.
 
 ## Products
