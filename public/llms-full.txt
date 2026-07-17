@@ -1,0 +1,33 @@
+# LoopTV — full agent brief
+
+TV-style random video player for lean-back browsing of curated channels.
+
+## Index
+
+# LoopTV
+
+TV-style random video player for curated channels.
+
+## Agent entrypoints
+
+- https://tv.significanthobbies.com/llms.txt
+- https://tv.significanthobbies.com/api/ai
+- https://tv.significanthobbies.com/index.md
+
+## Product links
+
+- Home: https://tv.significanthobbies.com/ — Player
+
+## Machine surfaces
+
+- https://tv.significanthobbies.com/llms.txt
+- https://tv.significanthobbies.com/llms-full.txt
+- https://tv.significanthobbies.com/api/ai
+- https://tv.significanthobbies.com/index.md
+- https://tv.significanthobbies.com/sitemap.xml
+- https://tv.significanthobbies.com/robots.txt
+
+## Contact / fleet
+
+- Fleet: https://sassmaker.com
+- Agent email for directory verification: sarthakagrawal@agentmail.to
