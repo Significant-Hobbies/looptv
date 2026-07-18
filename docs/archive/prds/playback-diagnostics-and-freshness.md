@@ -1,3 +1,8 @@
+---
+title: PRD — Playback Diagnostics and Catalog Freshness
+description: Shipped PRD for the degraded-playback diagnostics banner.
+---
+
 # PRD: Playback Diagnostics and Catalog Freshness
 
 ## Problem

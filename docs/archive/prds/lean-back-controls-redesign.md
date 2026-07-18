@@ -1,3 +1,8 @@
+---
+title: PRD — Lean-Back Controls Redesign
+description: Shipped PRD for the primary control rail and More drawer.
+---
+
 # PRD: Lean-Back Controls Redesign
 
 ## Problem

@@ -1,3 +1,8 @@
+---
+title: Project Recommendation Context (archived)
+description: Auto-generated CodeVetter-style audit context for Starboard recommendations. Kept for provenance.
+---
+
 # Project Recommendation Context
 
 Generated: 2026-06-06T21:14:19.576Z

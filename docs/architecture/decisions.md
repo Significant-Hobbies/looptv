@@ -1,9 +1,15 @@
+---
+title: Architecture Decision Records
+description: ADRs for LoopTV — the why behind each active architectural choice.
+---
+
 # Architecture Decision Records — LoopTV
 
 <!-- ADRs in reverse-chronological order. Flag unknowable rationale as TBD. -->
 
 ---
 
+<a id="adr-007"></a>
 ## ADR-007 — `next build --webpack` instead of Turbopack
 
 **Date:** 2026-05-28 (inferred from "Align TypeScript config" commit)  
@@ -24,6 +30,7 @@ TBD: capture rationale — no commit message explains it. Likely: Turbopack's st
 
 ---
 
+<a id="adr-006"></a>
 ## ADR-006 — Dual tagging pipeline: BERT NER (local) + LLM gateway (CI)
 
 **Date:** 2026-04-05 (commit `70350e3`)  
@@ -51,6 +58,7 @@ CI now runs `tag-videos.mjs` (LLM gateway, multi-model fan-out) for new-video ta
 
 ---
 
+<a id="adr-005"></a>
 ## ADR-005 — Cloudflare Workers (OpenNext) → Cloudflare Pages (static export)
 
 **Date:** 2026-04-28 (commit `872175b`)  
@@ -78,6 +86,7 @@ Switched to `output: 'export'` (static Next.js export) deployed via `wrangler pa
 
 ---
 
+<a id="adr-004"></a>
 ## ADR-004 — Log-scaled percentile filter per source
 
 **Date:** 2026-04-05 (commit `70350e3`)  
@@ -102,6 +111,7 @@ TBD: capture rationale — inferred from code comment ("avoids large channels cr
 
 ---
 
+<a id="adr-003"></a>
 ## ADR-003 — Static catalog committed to repo (`public/catalog.json`)
 
 **Date:** 2026-04-04 (initial commit, present from day one)  
@@ -131,6 +141,7 @@ The app needs ~38K video records at runtime. Options: runtime DB query, on-deman
 
 ---
 
+<a id="adr-002"></a>
 ## ADR-002 — YouTube IFrame Player API instead of YouTube Data API
 
 **Date:** 2026-04-04 (present from initial build)  
@@ -158,6 +169,7 @@ YouTube IFrame Player API (`https://www.youtube.com/iframe_api`) loaded dynamica
 
 ---
 
+<a id="adr-001"></a>
 ## ADR-001 — yt-dlp for catalog building instead of YouTube Data API
 
 **Date:** 2026-04-04 (present from initial build)  

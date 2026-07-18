@@ -20,7 +20,11 @@
     "build:ner": "python3 scripts/extract-tags.py",
     "fetch:all": "bash scripts/fetch-all-sources.sh",
     "cf:build": "pnpm build",
-    "deploy": "pnpm cf:build && wrangler pages deploy out --project-name=looptv"
+    "deploy": "pnpm cf:build && wrangler pages deploy out --project-name=looptv",
+    "docs:check": "node scripts/validate-docs.mjs",
+    "docs:check:strict": "node scripts/validate-docs.mjs --strict",
+    "docs:build": "blume build",
+    "docs:dev": "blume dev"
   },
   "dependencies": {
     "@saas-maker/feedback": "^0.2.1",

@@ -1,3 +1,8 @@
+---
+title: PROJECT STATUS (snapshot 2026-07-17, archived)
+description: Historical detailed status snapshot preserved for provenance. The living short view is now STATUS.md at the repo root.
+---
+
 # looptv — PROJECT STATUS
 
 Last updated: 2026-07-17

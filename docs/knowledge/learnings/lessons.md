@@ -1,6 +1,11 @@
+---
+title: Engineering Lessons
+description: Concrete lessons evidenced in code or git history.
+---
+
 # Engineering Lessons — LoopTV
 
-Concrete lessons evidenced in code or git history. See [decisions.md](decisions.md) for the "why" behind each choice.
+Concrete lessons evidenced in code or git history. See [architecture/decisions.md](../../architecture/decisions.md) for the "why" behind each choice.
 
 ---
 
@@ -92,7 +97,7 @@ if (emptyStations.length > 0) {
 ## Next.js 16 / Static Export
 
 ### Turbopack opted out for production builds
-`pnpm build` uses `next build --webpack`. Turbopack is used in `pnpm dev` by default but not for production export. See [ADR-007](decisions.md#adr-007).
+`pnpm build` uses `next build --webpack`. Turbopack is used in `pnpm dev` by default but not for production export. See [ADR-007](../../architecture/decisions.md#adr-007).
 
 ### React hydration mismatch from client-only localStorage reads
 `TVApp.tsx` reads `localStorage` for watched state and preferences. On initial server render (or static export pre-render), `localStorage` is undefined, causing hydration mismatches. Fixed by gating all localStorage reads behind a `useEffect` or `typeof window !== 'undefined'` check (commit `Fix TVApp hydration mismatch`, 2026-05-26).

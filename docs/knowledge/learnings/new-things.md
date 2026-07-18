@@ -1,8 +1,13 @@
+---
+title: New Things to Learn
+description: Open learning notes — some entries are TBD pending capture.
+---
+
 # New things to learn — looptv
 
 Zero-API-key YouTube TV player: yt-dlp for catalog, IFrame API for playback, LLM gateway for tagging, static export on CF Pages.
 
-See also: [external-references.md](external-references.md) for authoritative one-liners + links.
+See also: [external-references.md](../external-references.md) for authoritative one-liners + links.
 
 ---
 
@@ -34,7 +39,7 @@ See also: [external-references.md](external-references.md) for authoritative one
 - What: Fan-out script that sends video metadata to 7 free-tier LLM providers with 2 concurrent workers each (14 parallel workers) for topic tag generation
 - Why here: TBD
 - Gotcha (from code): LLM responses often wrap the JSON array in prose — regex extraction `content.match(/\[[\s\S]*\]/)` required (`scripts/tag-videos.mjs:72`); array length mismatch vs. batch size triggers retry; batches retry across all models up to `MAX_BATCH_ATTEMPTS = MODELS.length * 2`
-- Source: See [external-references.md](external-references.md)
+- Source: See [external-references.md](../external-references.md)
 
 ---
 
@@ -42,7 +47,7 @@ See also: [external-references.md](external-references.md) for authoritative one
 - What: ~2MB `public/catalog.json` (plus `public/catalog-summary.json`) served as CDN assets; no runtime DB
 - Why here: TBD
 - Gotcha (from code): `process-catalog.mjs` applies a global 10K-view minimum filter and preserves existing tags on re-runs; `extract-tags.py` strips `description` fields after tagging to keep the file size down
-- Source: See [external-references.md](external-references.md)
+- Source: See [external-references.md](../external-references.md)
 
 ---
 
