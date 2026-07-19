@@ -25,12 +25,12 @@ export interface StationConfig {
   sources: YouTubeSource[];
 }
 
-export interface StationCatalog {
+interface StationCatalog {
   videos: Video[];
   categoryVideoIds: Record<string, string[]>; // auto-derived from tags
 }
 
-export interface SourceEmbedHealth {
+interface SourceEmbedHealth {
   sampledAt: string;
   blocked: number;
   checked: number;

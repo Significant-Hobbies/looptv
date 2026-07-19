@@ -212,7 +212,7 @@ export function unquarantineSource(source: string): void {
 }
 
 /** Auto-quarantine when embed failure rate crosses the health threshold. */
-export function maybeAutoQuarantineSource(source: string): boolean {
+function maybeAutoQuarantineSource(source: string): boolean {
   if (typeof window === 'undefined' || !source) return false;
   const health = getEmbedHealth()[source];
   if (!shouldAutoQuarantine(health)) return false;

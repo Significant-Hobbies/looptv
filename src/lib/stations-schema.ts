@@ -38,5 +38,5 @@ export const StationsConfigSchema = z
     message: 'station ids must be unique',
   });
 
-export type StationConfigParsed = z.infer<typeof StationConfigSchema>;
-export type StationsConfigParsed = z.infer<typeof StationsConfigSchema>;
+type StationConfigParsed = z.infer<typeof StationConfigSchema>;
+type StationsConfigParsed = z.infer<typeof StationsConfigSchema>;
