@@ -1,3 +1,8 @@
+---
+title: PRD — Source Health Dashboard and Auto-Pruning
+description: Shipped PRD for the Channel Health panel and auto-quarantine.
+---
+
 # PRD: Source Health Dashboard and Auto-Pruning
 
 ## Problem

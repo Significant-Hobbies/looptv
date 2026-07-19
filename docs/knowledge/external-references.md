@@ -1,3 +1,8 @@
+---
+title: External References
+description: One-line "what / why it matters here / link" entries for libraries and APIs this repo uses.
+---
+
 # External References — LoopTV
 
 One-line "what / why it matters here / link" entries. No re-explanation of concepts with authoritative sources.

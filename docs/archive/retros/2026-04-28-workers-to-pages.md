@@ -1,3 +1,8 @@
+---
+title: Retro — Workers (OpenNext) → Pages
+description: 2026-04-28 retrospective on the two-migration deploy target pivot.
+---
+
 # Retro: Cloudflare Workers (OpenNext) → Cloudflare Pages
 
 **Date:** 2026-04-28  
@@ -43,4 +48,4 @@ Once the team confirmed the app was 100% client-side, Pages with `output: 'expor
 
 ## Lessons
 
-See [lessons.md — Static Export](../lessons.md#nextjs-16--static-export) for the hydration and OG-image specifics.
+See [knowledge/learnings/lessons.md — Static Export](../../knowledge/learnings/lessons.md#nextjs-16--static-export) for the hydration and OG-image specifics.

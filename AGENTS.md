@@ -10,82 +10,121 @@ This version has breaking changes -- APIs, conventions, and file structure may a
 
 # agents.md — LoopTV
 
+> **Full documentation lives in [`docs/`](docs/index.md).** This file is the
+> concise agent bootloader: purpose, commands, constraints, navigation, and
+> maintenance rules. Link, don't duplicate.
+
 ## Purpose
-TV-like random YouTube player with 16 stations and 122 curated channels. Playback needs no API key; scheduled catalog refreshes use repository-scoped YouTube Data API and free-AI gateway keys with cache-first fallbacks.
+
+TV-like web app that plays random YouTube videos from curated channels —
+lean-back, keyless at runtime. 16 stations, 122 channels, ~8,760 curated
+videos. Maintainers edit `stations.json`; bi-weekly CI refreshes
+`public/catalog.json` via a cache-first YouTube Data API path with yt-dlp
+fallback and incremental free-AI tagging. Deployed to Cloudflare Pages at
+`tv.significanthobbies.com`.
+
+See [docs/product/overview.md](docs/product/overview.md).
 
 ## Stack
-- Framework: Next.js 16 (App Router, webpack — `next build --webpack`)
-- Language: TypeScript (frontend), Python (NER tagging), Bash (catalog pipeline)
-- Styling: Tailwind CSS v4
-- DB: None — static `public/catalog.json` served at runtime; watched history in localStorage
-- Auth: None
-- Testing: Vitest (unit)
-- Deploy: Cloudflare Pages (static export, `output: 'export'`) - `tv.significanthobbies.com`.
-- Package manager: pnpm
 
-## Repo structure
-```
-stations.json               # Station definitions + YouTube channel handles (primary config)
-channels.config.ts          # Re-exports stations.json as typed TS
-public/catalog.json         # Generated video catalog (~38K entries) — committed to repo
-data/sources/               # Raw JSONL from YouTube Data API or yt-dlp fallback (gitignored)
-scripts/
-  build-catalog.sh          # Full pipeline: fetch + process + NER tag
-  fetch-all-sources.sh      # cache-first metadata fetch → data/sources/*.jsonl
-  process-catalog.mjs       # Merge JSONL into catalog.json, preserve existing NER tags
-  tag-videos.mjs            # Additional tagging step
-  extract-tags.py           # HuggingFace NER (dslim/bert-base-NER) tagging
-  __tests__/catalog.test.ts # Vitest tests for catalog processing
-requirements-ner.txt        # Python deps (transformers, torch)
-src/
-  app/
-    page.tsx          # Entry (renders TVApp)
-    layout.tsx        # Root layout (dark theme)
-    [channel]/        # Dynamic per-station pages
-  components/
-    TVApp.tsx         # Main client-side orchestrator (station selection, playback state)
-    Player.tsx        # YouTube IFrame API wrapper — auto-skips on errors 101/150
-    Search.tsx        # Search overlay
-  lib/
-    types.ts          # Station, Video, Catalog interfaces
-    catalog.ts        # Catalog loading, filtering, random selection, search
-    watched.ts        # localStorage watched tracking + stats
-    __tests__/        # Vitest unit tests
-.github/workflows/
-  update-catalog.yml  # Weekly cron: fetch new videos + NER tag + commit catalog
-```
+- Next.js 16 (App Router, **webpack** — `next build --webpack`, not Turbopack)
+- TypeScript (frontend), Python (NER fallback), Bash (catalog pipeline)
+- Tailwind CSS v4
+- No DB, no auth — static `public/catalog.json` + `localStorage` watched state
+- Vitest (unit), Biome (lint/format), Playwright (browser, not in default test)
+- Cloudflare Pages static export (`output: 'export'`)
+- pnpm
 
-## Key commands
+See [docs/architecture/overview.md](docs/architecture/overview.md).
+
+## Essential commands
+
 ```bash
-pnpm dev              # Next.js dev server
-pnpm build            # Production build
-pnpm test             # vitest run
-pnpm lint             # eslint
+pnpm install
+pnpm dev                # Next.js dev server (Turbopack)
+pnpm build              # next build --webpack (production static export)
+pnpm test               # vitest run
+pnpm lint               # biome check .
+pnpm typecheck          # tsc --noEmit
 
-# Catalog pipeline (YOUTUBE_API_KEY preferred; yt-dlp fallback)
-pnpm run build:catalog    # Fetch + process only (no NER — use `build:ner` separately)
-pnpm run fetch:all        # Fetch raw JSONL for all sources
-pnpm audit:catalog:full   # Manual resumable full-history quality rebaseline
-pnpm run build:ner        # Run NER tagging only
+# Catalog (CI-only credentials; checked-in catalog needs no key)
+pnpm run build:catalog              # fetch + process (no NER)
+pnpm run fetch:all                  # fetch raw JSONL for all sources
+pnpm audit:catalog:full             # manual full-history rebaseline (rare)
+pnpm run build:ner                  # local BERT NER fallback (not CI)
 
-# Python NER setup
-pip install -r requirements-ner.txt
-python3 scripts/extract-tags.py
+# Docs (Blume presentation layer — markdown is the source of truth)
+pnpm docs:check                     # validate links + structure
+pnpm docs:build                     # build static docs site via Blume (if installed)
 ```
 
-## Architecture notes
-- **100% client-side playback.** `TVApp.tsx` and `Player.tsx` are `"use client"`. Server renders only the shell; `catalog.json` fetched client-side via `fetch('/catalog.json')`.
-- **Static catalog committed to repo.** Weekly GH Actions cron rebuilds it — only new/untagged videos go through NER to keep CI fast.
-- **Catalog pipeline**: `stations.json` → recent-cache gate → YouTube Data API (bounded uploads + 50-ID metadata batches) or yt-dlp fallback → JSONL → `process-catalog.mjs` (merge + dedup, preserves tags) → free-AI tagging on untagged videos only → `public/catalog.json`.
-- **Embed error handling**: YouTube errors 101/150 (embedding blocked) caught by `Player.tsx` → auto-skip.
-- **Quality filters**: per-source `minDuration`/`maxDuration` in `stations.json`; global 10K views minimum in `process-catalog.mjs` (requires full video metadata); top-N% + configurable per-source cap (default 200) in `scripts/catalog-quality.mjs`.
-- **Full quality rebaseline**: `pnpm audit:catalog:full` is manual-only, defaults to 5 requests/second and a 4,500-request global ceiling, checkpoints each source, and writes `docs/catalog-quality-audit.md`. Normal scheduled refreshes reuse those verified top sets and remain incremental.
-- **Runner cache seeding**: a catalog with `full-history` source metadata can reconstruct compact verified source checkpoints. This prevents an empty or legacy Actions cache from reverting to recent-only ranking; row provenance, not extraction mtime, controls freshness.
-- **Quota controls**: source fetch runs only on the 1st/15th or manual dispatch; complete caches younger than 13 days use zero YouTube requests; stale/missing sources scan at most 250 recent uploads, stop at known IDs, batch 50 IDs per metadata request, and hard-stop at 20 requests per source. Builds/deploys never receive the YouTube key.
-- **Catalog audit**: `scripts/validate-catalog-manifest.mjs` compares generated catalog against checked-in `catalog-manifest.json` baselines and hard-fails CI on suspicious station drops — see `docs/catalog-auditability.md` for thresholds and overrides.
-- **Adding a station**: add entry to `stations.json`, run `pnpm run build:catalog`, commit updated `catalog.json`.
-- **webpack** used (`next build --webpack`) — Turbopack is not enabled.
-- No env vars required.
+See [docs/development/setup.md](docs/development/setup.md) and
+[docs/development/catalog-rebuild.md](docs/development/catalog-rebuild.md).
+
+## Critical constraints
+
+- **No server runtime.** `output: 'export'` — no API routes, no SSR, no
+  `ImageResponse`. See [docs/architecture/decisions.md#adr-005](docs/architecture/decisions.md#adr-005).
+- **No YouTube API key in the browser/build/deploy.** `YOUTUBE_API_KEY` and
+  `FAGW_API_KEY` are repository Actions secrets, CI-only, never in the static
+  app. See [docs/operations/deployment.md](docs/operations/deployment.md).
+- **`next build --webpack`** — Turbopack is opted out for production. See
+  [docs/architecture/decisions.md#adr-007](docs/architecture/decisions.md#adr-007).
+- **Catalog never ships with untagged videos.** The Build Catalog workflow's
+  shipping gate refuses to commit if any video is still pending tags. See
+  [docs/operations/jobs/build-catalog.md](docs/operations/jobs/build-catalog.md).
+- **Catalog audits run before AI tagging.** A rejected catalog spends no
+  tagging quota. See
+  [docs/operations/catalog-auditability.md](docs/operations/catalog-auditability.md).
+- **`stations.json` is the single config file.** Adding a station = edit it +
+  rebuild catalog. See [docs/development/adding-station.md](docs/development/adding-station.md).
+- **Embed errors 101/150 auto-skip** with no user-visible error (TV feel).
+  See [docs/architecture/client-playback.md](docs/architecture/client-playback.md).
+- **Do not commit secrets.** `.env*` is gitignored except `.env.example`.
+  See [docs/operations/runbooks/rotate-secrets.md](docs/operations/runbooks/rotate-secrets.md).
+
+## Documentation navigation
+
+| Want | Go |
+| --- | --- |
+| Current objective / blockers / next steps | [STATUS.md](STATUS.md) |
+| Product purpose, scope, stats | [docs/product/overview.md](docs/product/overview.md) |
+| Shipped features + timeline | [docs/product/features.md](docs/product/features.md) |
+| System shape + data flow | [docs/architecture/overview.md](docs/architecture/overview.md) |
+| Catalog pipeline how/why | [docs/architecture/catalog-pipeline.md](docs/architecture/catalog-pipeline.md) |
+| Client playback + embed errors | [docs/architecture/client-playback.md](docs/architecture/client-playback.md) |
+| Architecture decisions (ADRs) | [docs/architecture/decisions.md](docs/architecture/decisions.md) |
+| Local setup | [docs/development/setup.md](docs/development/setup.md) |
+| Rebuild the catalog | [docs/development/catalog-rebuild.md](docs/development/catalog-rebuild.md) |
+| Add a station | [docs/development/adding-station.md](docs/development/adding-station.md) |
+| Testing + linting | [docs/development/testing.md](docs/development/testing.md) |
+| Deployment + secrets | [docs/operations/deployment.md](docs/operations/deployment.md) |
+| CI jobs | [docs/operations/jobs/](docs/operations/jobs/) |
+| Runbooks | [docs/operations/runbooks/](docs/operations/runbooks/) |
+| Catalog audit rules | [docs/operations/catalog-auditability.md](docs/operations/catalog-auditability.md) |
+| External references | [docs/knowledge/external-references.md](docs/knowledge/external-references.md) |
+| Engineering lessons | [docs/knowledge/learnings/lessons.md](docs/knowledge/learnings/lessons.md) |
+| Failed approaches | [docs/knowledge/failed-approaches/](docs/knowledge/failed-approaches/) |
+| Shipped PRDs + retros | [docs/archive/](docs/archive/) |
+
+## Documentation maintenance rules
+
+1. **Markdown in `docs/` is the source of truth.** Blume is only the
+   presentation and search layer. Code and executable config remain
+   authoritative for implementation details and schedules.
+2. **One fact, one home.** Don't duplicate facts that are easily discoverable
+   from code — link to the code instead. Don't restate a doc in another doc —
+   link.
+3. **Mark unknowns explicitly** with `TBD` or an "Unresolved questions" section
+   in [STATUS.md](STATUS.md). Do not invent rationale.
+4. **Preserve git history** when reorganizing — use `git mv`. Prefer
+   `docs/archive/<name>.md` over deletion.
+5. **Keep pages focused** — 150–300 lines. Split catch-all pages.
+6. **Validate before commit** — run `pnpm docs:check` to catch broken links,
+   orphans, and missing index pages.
+7. **Adding a doc:** drop a `.md` under the right section, add a one-line link
+   from the section's `index.md`, run `pnpm docs:check`. For decisions, follow
+   the ADR shape in [docs/architecture/decisions.md](docs/architecture/decisions.md).
 
 <!-- FLEET-GUIDANCE:START -->
 
@@ -107,43 +146,3 @@ python3 scripts/extract-tags.py
 - Note any paid-AI use in the task or handoff when it materially affects cost, reproducibility, or future maintenance.
 
 <!-- FLEET-GUIDANCE:END -->
-
-## Active context
-
-
-<claude-mem-context>
-# Memory Context
-
-# [looptv] recent context, 2026-04-28 7:50pm GMT+5:30
-
-Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
-Format: ID TIME TYPE TITLE
-Fetch details: get_observations([IDs]) | Search: mem-search skill
-
-Stats: 21 obs (6,897t read) | 202,155t work | 97% savings
-
-### Apr 28, 2026
-305 7:33p 🔵 looptv — current deployment stack: Next.js + OpenNext + Cloudflare Workers
-306 " 🔵 looptv — partially migrated: CI uses Pages, local deploy script uses Workers
-307 " ⚖️ looptv — Pages migration plan: wrangler.toml surgery + remove Workers-only bindings
-308 7:34p 🔄 looptv — migrated from Cloudflare Workers (OpenNext) to Cloudflare Pages (static export)
-309 " 🔵 looptv — lint broken, build succeeds for Pages migration
-310 7:35p 🔵 looptv — two competing eslint configs; saas-maker/next subconfig missing @eslint/eslintrc dep
-311 " 🔵 looptv — static export `out/` fully populated with 17 channel pages
-312 " 🔴 looptv — ESLint fixed: replaced saas-maker config, added .open-next ignore
-313 " 🔵 looptv — eslint-plugin-react@7.37.5 fundamentally incompatible with ESLint 10 flat config
-314 7:36p 🔴 looptv — ESLint crash workaround: disable react/display-name to skip broken plugin rule
-315 " 🔴 looptv — all eslint-plugin-react rules disabled to fix ESLint 10 flat config incompatibility
-316 " ✅ looptv — lint passes; full Pages migration diff confirmed (10 files, -3026 lines)
-317 " ✅ looptv — eslint.config.js deleted; single eslint.config.mjs is canonical config
-318 " ✅ looptv — Pages migration verified and ready to commit
-319 7:37p ✅ looptv — all checks green before commit: 23 tests pass, build succeeds, lint clean
-320 7:39p 🔵 looptv — already migrated to Cloudflare Pages, uncommitted changes pending
-321 " 🔵 looptv exists as both Worker script AND Pages project in Cloudflare account
-322 7:41p 🔵 looptv Worker script bindings confirmed minimal — clean Pages migration
-323 " 🔵 Starboard Worker uses Workers AI binding for embeddings with free-ai-gateway fallback
-324 7:42p 🔵 Cloudflare PayGo billing API returns auth error 10000 — alpha endpoint restricted
-325 7:50p ⚖️ looptv — delete old Cloudflare Worker, link Pages project to GitHub
-
-Access 202k tokens of past work via get_observations([IDs]) or mem-search skill.
-</claude-mem-context>

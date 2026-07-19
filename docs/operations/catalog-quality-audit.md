@@ -1,3 +1,8 @@
+---
+title: Catalog Quality Audit
+description: Verified per-source baseline numbers from the full-history quality rebaseline.
+---
+
 # Catalog quality audit
 
 - Sources: 122

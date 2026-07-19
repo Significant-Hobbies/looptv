@@ -1,3 +1,8 @@
+---
+title: Catalog Generation Auditability
+description: How manifest + source-health audits guard the bi-weekly catalog rebuild against silent regressions.
+---
+
 # Catalog generation auditability
 
 Guards the bi-weekly catalog rebuild against silent regressions: an upstream
