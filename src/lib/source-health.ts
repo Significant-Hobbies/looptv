@@ -3,10 +3,10 @@ import { getSourceFreshness } from './catalog';
 import type { EmbedHealthRecord } from './watched';
 
 /** Minimum embed samples before treating block rate as meaningful. */
-export const MIN_EMBED_SAMPLES = 5;
+const MIN_EMBED_SAMPLES = 5;
 
 /** Block rate above which a source is flagged unhealthy / auto-quarantined. */
-export const UNHEALTHY_EMBED_BLOCK_RATE = 0.3;
+const UNHEALTHY_EMBED_BLOCK_RATE = 0.3;
 
 export type SourceHealthState =
   | 'fresh'

@@ -34,7 +34,7 @@ export function createSmartMixProfile(input?: Partial<SmartMixProfile>): SmartMi
   };
 }
 
-export function allCatalogVideos(catalog: Catalog): Video[] {
+function allCatalogVideos(catalog: Catalog): Video[] {
   return Object.values(catalog.stations).flatMap((station) => station.videos);
 }
 

@@ -8,7 +8,7 @@ let summaryInflight: Promise<CatalogSummary> | null = null;
 
 const RETRY_DELAYS_MS = [400, 1200];
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
-export const STALE_CATALOG_DAYS = 10;
+const STALE_CATALOG_DAYS = 10;
 
 export type CatalogFreshness = {
   state: 'loading' | 'fresh' | 'stale' | 'incomplete' | 'unknown';

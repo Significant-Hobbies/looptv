@@ -2,9 +2,9 @@ import type { CatalogFreshness, SourceFreshness } from './catalog';
 import type { EmbedHealthRecord } from './watched';
 import { isEmbedUnhealthy } from './source-health';
 
-export type DiagnosticAction = 'retry_catalog' | 'open_health' | 'search';
+type DiagnosticAction = 'retry_catalog' | 'open_health' | 'search';
 
-export type DiagnosticKind =
+type DiagnosticKind =
   | 'catalog_unavailable'
   | 'skip_streak'
   | 'source_quarantined'

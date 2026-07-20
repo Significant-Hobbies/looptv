@@ -7,7 +7,7 @@ export interface StationBuilderDraft {
   sources: YouTubeSource[];
 }
 
-export interface SourcePreview {
+interface SourcePreview {
   source: YouTubeSource;
   videoCount: number;
   rejectedVideoCount: number;
@@ -165,7 +165,7 @@ export function buildCatalogPreview(
   };
 }
 
-export function createStationConfigSnippet(draft: StationBuilderDraft): string {
+function createStationConfigSnippet(draft: StationBuilderDraft): string {
   return JSON.stringify(draft, null, 2);
 }
 
