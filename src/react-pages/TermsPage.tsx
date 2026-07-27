@@ -1,10 +1,5 @@
 import Link from '@/components/AppLink';
 
-export const metadata = {
-  title: 'Terms — LoopTV',
-  description: "Use of LoopTV is provided as-is. Playback uses YouTube's public IFrame player.",
-};
-
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12 text-zinc-300">

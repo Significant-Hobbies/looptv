@@ -3,8 +3,6 @@ import { join } from 'node:path';
 import Link from '@/components/AppLink';
 import stationsConfig from '../../channels.config';
 
-export const dynamic = 'force-static';
-
 const siteUrl = 'https://tv.significanthobbies.com';
 
 type Video = {
@@ -52,20 +50,6 @@ function formatViews(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
   return String(n);
 }
-
-export const metadata = {
-  title: 'Catalog — 8,760 curated videos across 16 stations',
-  description:
-    'Browse the full LoopTV catalog: 16 stations, 122 YouTube channels, ~8,760 curated videos. Per-station video counts, top videos, and downloadable JSON.',
-  alternates: { canonical: '/catalog' },
-  openGraph: {
-    title: 'LoopTV Catalog — 8,760 curated videos',
-    description:
-      'Browse all 16 stations and 8,760 curated YouTube videos. Download the full catalog as JSON.',
-    url: `${siteUrl}/catalog`,
-    type: 'website',
-  },
-};
 
 export default function CatalogPage() {
   const catalog = loadCatalog();

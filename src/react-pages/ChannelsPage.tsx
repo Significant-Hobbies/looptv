@@ -2,11 +2,6 @@ import Link from '@/components/AppLink';
 
 import stations from '../../channels.config';
 
-export const metadata = {
-  title: 'Channels — LoopTV',
-  description: 'All YouTube channels sourced into LoopTV, grouped by station.',
-};
-
 export default function ChannelsPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-12 text-zinc-300">

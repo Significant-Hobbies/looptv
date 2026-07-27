@@ -1,10 +1,5 @@
 import Link from '@/components/AppLink';
 
-export const metadata = {
-  title: 'Privacy — LoopTV',
-  description: 'LoopTV has no accounts and no backend. The privacy story is short.',
-};
-
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12 text-zinc-300">

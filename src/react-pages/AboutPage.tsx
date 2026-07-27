@@ -3,29 +3,6 @@ import Link from '@/components/AppLink';
 import stations from '../../channels.config';
 import catalogSummary from '../../public/catalog-summary.json';
 
-const siteUrl = 'https://tv.significanthobbies.com';
-
-export const metadata = {
-  title: 'About — LoopTV',
-  description:
-    'LoopTV turns public YouTube channels into TV-style stations that play random clips nonstop. No API keys, no account, no algorithm feed.',
-  alternates: { canonical: `${siteUrl}/about` },
-  openGraph: {
-    title: "LoopTV — channel-surf YouTube like it's TV",
-    description:
-      'Pick a station, hit play, and let random clips run nonstop. Built from public YouTube channels — no API keys, no account.',
-    url: `${siteUrl}/about`,
-    siteName: 'LoopTV',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "LoopTV — channel-surf YouTube like it's TV",
-    description:
-      'Pick a station, hit play, and let random clips run nonstop. No API keys, no account.',
-  },
-};
-
 export default function AboutPage() {
   // Honest, computed numbers — never hardcoded marketing figures.
   const totalSources = stations.reduce((n, s) => n + s.sources.length, 0);

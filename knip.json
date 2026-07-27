@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "entry": ["src/app/layout.tsx"],
-  "project": ["**/*.{ts,tsx,js,jsx,mjs,cjs,mts}"],
+  "entry": ["src/pages/**/*.astro"],
+  "project": ["**/*.{astro,ts,tsx,js,jsx,mjs,cjs,mts}"],
   "ignore": [
     "**/dist/**",
     "**/build/**",

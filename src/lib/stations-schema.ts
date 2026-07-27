@@ -37,6 +37,3 @@ export const StationsConfigSchema = z
   .refine((arr) => new Set(arr.map((s) => s.id)).size === arr.length, {
     message: 'station ids must be unique',
   });
-
-type StationConfigParsed = z.infer<typeof StationConfigSchema>;
-type StationsConfigParsed = z.infer<typeof StationsConfigSchema>;
