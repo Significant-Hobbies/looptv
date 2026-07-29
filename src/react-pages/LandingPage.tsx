@@ -177,6 +177,21 @@ export default function LandingPage() {
           <Link href="/terms" className="hover:text-zinc-300">
             Terms
           </Link>
+          <Link href="/changelog" className="hover:text-zinc-300">
+            Changelog
+          </Link>
+          <a
+            href="https://github.com/Significant-Hobbies/looptv/issues"
+            className="hover:text-zinc-300"
+          >
+            Roadmap
+          </a>
+          <a
+            href="https://github.com/Significant-Hobbies/looptv"
+            className="hover:text-zinc-300"
+          >
+            Source
+          </a>
         </nav>
       </footer>
     </main>

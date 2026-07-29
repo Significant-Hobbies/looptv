@@ -1,6 +1,6 @@
 # LoopTV — PROJECT STATUS
 
-Last updated: 2026-07-25
+Last updated: 2026-07-29
 
 > Detailed feature inventory and timeline live in
 > [docs/product/features.md](docs/product/features.md).
@@ -19,7 +19,9 @@ catalog freshness, and documentation hygiene.
 
 ## Timeline
 
-Historical milestones live in [docs/archive/](docs/archive/).
+- **2026-07-29:** Added an owned `/changelog` with verified release outcomes and
+  direct GitHub Roadmap and Source links.
+- Historical milestones live in [docs/archive/](docs/archive/).
 
 ## Products
 
@@ -27,8 +29,9 @@ Historical milestones live in [docs/archive/](docs/archive/).
 
 ## Features (shipped)
 
-The shipped feature inventory lives in
-[docs/product/features.md](docs/product/features.md).
+- Owned editorial product changelog at `/changelog`.
+- The complete shipped feature inventory lives in
+  [docs/product/features.md](docs/product/features.md).
 
 ## Work queue
 
