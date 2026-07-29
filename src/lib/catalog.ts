@@ -8,7 +8,10 @@ let summaryInflight: Promise<CatalogSummary> | null = null;
 
 const RETRY_DELAYS_MS = [400, 1200];
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const STALE_CATALOG_DAYS = 10;
+// Scheduled refreshes run on the 1st and 15th, so the longest normal gap is
+// 17 days. Leave one full day for the chained build workflow to finish before
+// warning viewers that the deployed catalog is stale.
+const STALE_CATALOG_DAYS = 18;
 
 export type CatalogFreshness = {
   state: 'loading' | 'fresh' | 'stale' | 'incomplete' | 'unknown';
@@ -210,7 +213,10 @@ export function getCatalogFreshness(
   };
 }
 
-export const STALE_SOURCE_DAYS = 14;
+// Source rows may be reused for up to 13 days during a scheduled build. A
+// source can therefore legitimately be older than the generated catalog
+// without indicating that the refresh pipeline failed.
+export const STALE_SOURCE_DAYS = 21;
 
 export type SourceFreshness = {
   state: 'fresh' | 'stale' | 'unknown';

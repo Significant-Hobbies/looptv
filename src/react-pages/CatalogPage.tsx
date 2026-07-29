@@ -114,15 +114,18 @@ export default function CatalogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-zinc-200">
+    <main className="min-h-screen bg-black text-zinc-200">
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static JSON-LD
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
       />
-      <div className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
         <nav className="mb-8 text-sm text-zinc-500">
-          <Link href="/" className="hover:text-zinc-300 underline">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center underline hover:text-zinc-300"
+          >
             LoopTV
           </Link>{' '}
           / <span className="text-zinc-300">catalog</span>
@@ -135,7 +138,7 @@ export default function CatalogPage() {
           catalog is rebuilt weekly via GitHub Action using yt-dlp and committed as static JSON.
         </p>
 
-        <div className="grid grid-cols-3 gap-4 mb-10">
+        <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
             <div className="text-2xl font-bold text-white">{totalVideos.toLocaleString()}</div>
             <div className="text-sm text-zinc-500">Total videos</div>
@@ -152,17 +155,17 @@ export default function CatalogPage() {
           </div>
         </div>
 
-        <div className="mb-10 flex gap-3">
+        <div className="mb-10 flex flex-col gap-3 sm:flex-row">
           <a
             href="/catalog.json"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
             download
           >
             Download catalog.json
           </a>
           <a
             href="/catalog-summary.json"
-            className="inline-flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-4 py-2 rounded-lg text-sm font-medium transition border border-zinc-700"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition hover:bg-zinc-700"
             download
           >
             Download summary
@@ -172,10 +175,13 @@ export default function CatalogPage() {
         <div className="space-y-10">
           {stationData.map((station) => (
             <section key={station.id} id={station.id}>
-              <div className="flex items-baseline justify-between mb-3">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-white">
-                    <Link href={`/${station.id}`} className="hover:text-blue-400">
+                    <Link
+                      href={`/${station.id}`}
+                      className="inline-flex min-h-11 items-center hover:text-blue-400"
+                    >
                       {station.name}
                     </Link>
                   </h2>
@@ -208,12 +214,12 @@ export default function CatalogPage() {
                     <tbody>
                       {station.topVideos.map((v) => (
                         <tr key={v.id} className="border-t border-zinc-800">
-                          <td className="px-3 py-2">
+                          <td className="px-3 py-0">
                             <a
                               href={`https://www.youtube.com/watch?v=${v.id}`}
                               target="_blank"
                               rel="noopener"
-                              className="text-zinc-200 hover:text-blue-400"
+                              className="flex min-h-11 items-center py-2 text-zinc-200 hover:text-blue-400"
                             >
                               {v.title}
                             </a>
@@ -233,7 +239,10 @@ export default function CatalogPage() {
               )}
 
               <div className="mt-3">
-                <Link href={`/${station.id}`} className="text-sm text-blue-400 hover:text-blue-300">
+                <Link
+                  href={`/${station.id}`}
+                  className="inline-flex min-h-11 items-center text-sm text-blue-400 hover:text-blue-300"
+                >
                   Play {station.name} station &rarr;
                 </Link>
               </div>
@@ -254,6 +263,6 @@ export default function CatalogPage() {
           </p>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
