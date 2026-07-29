@@ -25,7 +25,7 @@ export default function BlockedSourcesPage() {
     <main className="mx-auto max-w-3xl px-6 py-12 text-zinc-300">
       <Link
         href="/"
-        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300"
+        className="inline-flex min-h-11 items-center font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300"
       >
         ← LoopTV
       </Link>
@@ -50,7 +50,7 @@ export default function BlockedSourcesPage() {
               <button
                 type="button"
                 onClick={() => unblock(s)}
-                className="text-xs text-zinc-500 hover:text-emerald-400"
+                className="inline-flex min-h-11 items-center px-2 text-xs text-zinc-500 hover:text-emerald-400"
               >
                 unblock
               </button>

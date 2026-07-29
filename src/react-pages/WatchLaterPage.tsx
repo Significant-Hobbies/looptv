@@ -44,7 +44,7 @@ export default function WatchLaterPage() {
     <main className="mx-auto max-w-3xl px-6 py-12 text-zinc-300">
       <Link
         href="/"
-        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300"
+        className="inline-flex min-h-11 items-center font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300"
       >
         ← LoopTV
       </Link>
@@ -62,10 +62,13 @@ export default function WatchLaterPage() {
       {entries && entries.length > 0 && (
         <ul className="mt-6 divide-y divide-zinc-800">
           {entries.map((e) => (
-            <li key={e.video.id} className="flex items-baseline gap-3 py-3 text-sm">
+            <li
+              key={e.video.id}
+              className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-3 text-sm sm:grid-cols-[auto_minmax(0,1fr)_auto]"
+            >
               <Link
                 href={`/${e.stationId}`}
-                className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"
+                className="col-start-1 row-start-2 inline-flex min-h-11 items-center font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline sm:row-start-1"
               >
                 {e.stationId}
               </Link>
@@ -73,21 +76,23 @@ export default function WatchLaterPage() {
                 href={`https://www.youtube.com/watch?v=${e.video.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 truncate text-zinc-300 hover:text-amber-400"
+                className="col-span-2 col-start-1 row-start-1 truncate text-zinc-300 hover:text-amber-400 sm:col-span-1 sm:col-start-2"
               >
                 {e.video.title}
               </a>
-              <span className="font-mono text-xs tabular-nums text-zinc-500">
-                {formatDuration(e.video.duration)}
-              </span>
-              <button
-                type="button"
-                onClick={() => dropOne(e.video.id)}
-                className="text-xs text-zinc-500 hover:text-rose-400"
-                aria-label={`Remove ${e.video.title} from watch later`}
-              >
-                remove
-              </button>
+              <div className="col-start-2 row-start-2 flex items-center justify-end gap-2 sm:col-start-3 sm:row-start-1">
+                <span className="font-mono text-xs tabular-nums text-zinc-500">
+                  {formatDuration(e.video.duration)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => dropOne(e.video.id)}
+                  className="inline-flex min-h-11 items-center justify-end px-2 text-xs text-zinc-500 hover:text-rose-400"
+                  aria-label={`Remove ${e.video.title} from watch later`}
+                >
+                  remove
+                </button>
+              </div>
             </li>
           ))}
         </ul>

@@ -62,11 +62,19 @@ describe('getCatalogFreshness', () => {
     });
   });
 
-  it('reports stale catalog data after the weekly grace period', () => {
+  it('keeps catalog data fresh through the longest normal bi-weekly gap', () => {
     expect(getCatalogFreshness('2026-05-10T12:00:00.000Z', now)).toMatchObject({
-      state: 'stale',
+      state: 'fresh',
       label: 'Catalog updated 14 days ago',
       ageDays: 14,
+    });
+  });
+
+  it('reports stale catalog data after the bi-weekly grace period', () => {
+    expect(getCatalogFreshness('2026-05-05T12:00:00.000Z', now)).toMatchObject({
+      state: 'stale',
+      label: 'Catalog updated 19 days ago',
+      ageDays: 19,
     });
   });
 
@@ -245,6 +253,17 @@ describe('getSourceFreshness', () => {
     expect(result.state).toBe('fresh');
     expect(result.ageDays).toBe(4);
     expect(result.label).toContain('4 days ago');
+  });
+
+  it('keeps cached source data fresh through the scheduled refresh window', () => {
+    const scheduledCache: SourceMeta = {
+      fetchedAt: '2026-05-07T12:00:00.000Z',
+      lastSuccessfulFetch: '2026-05-07T12:00:00.000Z',
+      videoCount: 50,
+    };
+    const result = getSourceFreshness(scheduledCache, now);
+    expect(result.state).toBe('fresh');
+    expect(result.ageDays).toBe(17);
   });
 
   it('reports stale when last successful fetch exceeds the threshold', () => {
