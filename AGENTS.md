@@ -82,7 +82,8 @@ See [docs/development/setup.md](docs/development/setup.md) and
 
 | Want | Go |
 | --- | --- |
-| Current objective / blockers / next steps | [STATUS.md](STATUS.md) |
+| Current/shipped product truth | [PROJECT_STATUS.md](PROJECT_STATUS.md) |
+| Open work and blockers | GitHub Issues |
 | Product purpose, scope, stats | [docs/product/overview.md](docs/product/overview.md) |
 | Shipped features + timeline | [docs/product/features.md](docs/product/features.md) |
 | System shape + data flow | [docs/architecture/overview.md](docs/architecture/overview.md) |
@@ -111,7 +112,7 @@ See [docs/development/setup.md](docs/development/setup.md) and
    from code — link to the code instead. Don't restate a doc in another doc —
    link.
 3. **Mark unknowns explicitly** with `TBD` or an "Unresolved questions" section
-   in [STATUS.md](STATUS.md). Do not invent rationale.
+   in a GitHub issue. Do not invent rationale.
 4. **Preserve git history** when reorganizing — use `git mv`. Prefer
    `docs/archive/<name>.md` over deletion.
 5. **Keep pages focused** — 150–300 lines. Split catch-all pages.
