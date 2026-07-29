@@ -186,10 +186,7 @@ export default function LandingPage() {
           >
             Roadmap
           </a>
-          <a
-            href="https://github.com/Significant-Hobbies/looptv"
-            className="hover:text-zinc-300"
-          >
+          <a href="https://github.com/Significant-Hobbies/looptv" className="hover:text-zinc-300">
             Source
           </a>
         </nav>
