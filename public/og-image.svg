@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">LoopTV</title>
+  <desc id="description">Curated channels, continuous playback</desc>
+  <rect width="1200" height="630" fill="#050505"/>
+  <rect x="70" y="70" width="1060" height="490" rx="30" fill="#111111" stroke="#3f3f46" stroke-width="4"/>
+  <rect x="115" y="130" width="176" height="128" rx="20" fill="#dc2626"/>
+  <path d="M185 164L250 194L185 224Z" fill="#ffffff"/>
+  <text x="335" y="230" fill="#ffffff" font-family="system-ui, sans-serif" font-size="108" font-weight="800">LoopTV</text>
+  <text x="120" y="380" fill="#d4d4d8" font-family="system-ui, sans-serif" font-size="46">Curated channels. Continuous playback.</text>
+  <text x="120" y="465" fill="#71717a" font-family="system-ui, sans-serif" font-size="32">No account · No algorithm feed · No runtime API key</text>
+</svg>

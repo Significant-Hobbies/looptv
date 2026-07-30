@@ -56,9 +56,11 @@ const jsonLd = {
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="LoopTV" />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={`${siteUrl}/og-image.svg`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}/og-image.svg`} />
     <title>{pageTitle}</title>
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
   </head>
