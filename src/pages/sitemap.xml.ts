@@ -1,27 +1,15 @@
 import type { APIRoute } from 'astro';
 import stations from '../../channels.config';
+import { PUBLIC_SURFACES } from '@/lib/public-surfaces';
 
 export const prerender = true;
 
 const siteUrl = 'https://tv.significanthobbies.com';
-const staticPaths = [
-  '/',
-  '/about',
-  '/catalog',
-  '/channels',
-  '/privacy',
-  '/terms',
-  '/blocked',
-  '/history',
-  '/playlist',
-  '/random',
-  '/stats',
-  '/tags',
-  '/watchlater',
-];
-
 export const GET: APIRoute = () => {
-  const paths = [...staticPaths, ...stations.map((station) => `/${station.id}`)];
+  const paths = [
+    ...PUBLIC_SURFACES.map((surface) => surface.path),
+    ...stations.map((station) => `/${station.id}`),
+  ];
   const urls = paths
     .map(
       (path) => `  <url>

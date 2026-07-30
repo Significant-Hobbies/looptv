@@ -17,10 +17,128 @@
       "md": "https://tv.significanthobbies.com/index.md",
       "kind": "static",
       "description": "Product home"
+    },
+    {
+      "id": "about",
+      "url": "https://tv.significanthobbies.com/about",
+      "md": "https://tv.significanthobbies.com/about.md",
+      "kind": "static",
+      "description": "How LoopTV works"
+    },
+    {
+      "id": "catalog",
+      "url": "https://tv.significanthobbies.com/catalog",
+      "md": "https://tv.significanthobbies.com/catalog.md",
+      "kind": "static",
+      "description": "Current curated catalog"
+    },
+    {
+      "id": "channels",
+      "url": "https://tv.significanthobbies.com/channels",
+      "md": "https://tv.significanthobbies.com/channels.md",
+      "kind": "static",
+      "description": "Catalog source channels"
+    },
+    {
+      "id": "privacy",
+      "url": "https://tv.significanthobbies.com/privacy",
+      "md": "https://tv.significanthobbies.com/privacy.md",
+      "kind": "static",
+      "description": "Privacy and local data boundary"
+    },
+    {
+      "id": "terms",
+      "url": "https://tv.significanthobbies.com/terms",
+      "md": "https://tv.significanthobbies.com/terms.md",
+      "kind": "static",
+      "description": "Terms of use"
+    },
+    {
+      "id": "blocked",
+      "url": "https://tv.significanthobbies.com/blocked",
+      "md": "https://tv.significanthobbies.com/blocked.md",
+      "kind": "static",
+      "description": "Blocked-video diagnostics"
+    },
+    {
+      "id": "history",
+      "url": "https://tv.significanthobbies.com/history",
+      "md": "https://tv.significanthobbies.com/history.md",
+      "kind": "static",
+      "description": "Device-local watch history"
+    },
+    {
+      "id": "playlist",
+      "url": "https://tv.significanthobbies.com/playlist",
+      "md": "https://tv.significanthobbies.com/playlist.md",
+      "kind": "static",
+      "description": "Device-local playback queue"
+    },
+    {
+      "id": "random",
+      "url": "https://tv.significanthobbies.com/random",
+      "md": "https://tv.significanthobbies.com/random.md",
+      "kind": "static",
+      "description": "Random station entry"
+    },
+    {
+      "id": "stats",
+      "url": "https://tv.significanthobbies.com/stats",
+      "md": "https://tv.significanthobbies.com/stats.md",
+      "kind": "static",
+      "description": "Catalog statistics and freshness"
+    },
+    {
+      "id": "tags",
+      "url": "https://tv.significanthobbies.com/tags",
+      "md": "https://tv.significanthobbies.com/tags.md",
+      "kind": "static",
+      "description": "Catalog topics"
+    },
+    {
+      "id": "watch-later",
+      "url": "https://tv.significanthobbies.com/watchlater",
+      "md": "https://tv.significanthobbies.com/watchlater.md",
+      "kind": "static",
+      "description": "Device-local saved videos"
+    },
+    {
+      "id": "changelog",
+      "url": "https://tv.significanthobbies.com/changelog",
+      "md": "https://tv.significanthobbies.com/changelog.md",
+      "kind": "static",
+      "description": "Verified playback, catalog, and reliability updates"
+    },
+    {
+      "id": "station",
+      "url": "https://tv.significanthobbies.com/{channel}",
+      "md": "https://tv.significanthobbies.com/{channel}.md",
+      "kind": "static",
+      "description": "A curated LoopTV station"
+    }
+  ],
+  "dataResources": [
+    {
+      "id": "catalog",
+      "url": "https://tv.significanthobbies.com/catalog.json",
+      "kind": "json",
+      "description": "Checked-in public video catalog"
+    },
+    {
+      "id": "stations",
+      "url": "https://tv.significanthobbies.com/stations.json",
+      "kind": "json",
+      "description": "Public station configuration"
+    },
+    {
+      "id": "tags",
+      "url": "https://tv.significanthobbies.com/tags.json",
+      "kind": "json",
+      "description": "Generated public tag summary"
     }
   ],
   "auth": {
     "public": true,
-    "notes": "Auth-walled app routes are not agent-indexed unless listed here."
+    "notes": "LoopTV has no accounts. Device-local history, playlists, and preferences are described but never exposed as public records."
   }
 }
