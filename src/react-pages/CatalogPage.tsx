@@ -172,81 +172,89 @@ export default function CatalogPage() {
           </a>
         </div>
 
-        <div className="space-y-10">
+        <p className="mb-3 text-sm text-zinc-500">
+          Expand a station to preview its most-watched videos and source channels.
+        </p>
+
+        <div className="border-b border-zinc-800">
           {stationData.map((station) => (
-            <section key={station.id} id={station.id}>
-              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+            <details
+              key={station.id}
+              id={station.id}
+              className="group border-t border-zinc-800 py-2"
+            >
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-white">
                 <div>
-                  <h2 className="text-xl font-semibold text-white">
-                    <Link
-                      href={`/${station.id}`}
-                      className="inline-flex min-h-11 items-center hover:text-blue-400"
-                    >
-                      {station.name}
-                    </Link>
-                  </h2>
+                  <h2 className="text-xl font-semibold">{station.name}</h2>
                   <p className="text-sm text-zinc-500 mt-0.5">{station.description}</p>
                 </div>
-                <div className="text-right text-sm">
-                  <span className="text-zinc-300 font-medium">
-                    {station.videoCount.toLocaleString()}
+                <div className="flex shrink-0 items-center gap-3 text-right text-sm">
+                  <span>
+                    <span className="text-zinc-300 font-medium">
+                      {station.videoCount.toLocaleString()}
+                    </span>
+                    <span className="text-zinc-600 ml-1">videos</span>
                   </span>
-                  <span className="text-zinc-600 ml-1">videos</span>
+                  <span aria-hidden="true" className="text-xl text-zinc-500 group-open:rotate-45">
+                    +
+                  </span>
                 </div>
-              </div>
+              </summary>
 
-              <div className="text-xs text-zinc-600 mb-4">
-                {station.sourceCount} channel{station.sourceCount !== 1 ? 's' : ''}:{' '}
-                {station.sources.join(', ')}
-              </div>
+              <div className="pb-6 pt-2">
+                <div className="text-xs text-zinc-600 mb-4">
+                  {station.sourceCount} channel{station.sourceCount !== 1 ? 's' : ''}:{' '}
+                  {station.sources.join(', ')}
+                </div>
 
-              {station.topVideos.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm border border-zinc-800 rounded-lg overflow-hidden">
-                    <thead className="bg-zinc-900 text-zinc-500">
-                      <tr>
-                        <th className="text-left px-3 py-2 font-medium">Title</th>
-                        <th className="text-left px-3 py-2 font-medium">Channel</th>
-                        <th className="text-right px-3 py-2 font-medium">Views</th>
-                        <th className="text-right px-3 py-2 font-medium">Duration</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {station.topVideos.map((v) => (
-                        <tr key={v.id} className="border-t border-zinc-800">
-                          <td className="px-3 py-0">
-                            <a
-                              href={`https://www.youtube.com/watch?v=${v.id}`}
-                              target="_blank"
-                              rel="noopener"
-                              className="flex min-h-11 items-center py-2 text-zinc-200 hover:text-blue-400"
-                            >
-                              {v.title}
-                            </a>
-                          </td>
-                          <td className="px-3 py-2 text-zinc-500">{v.source ?? '—'}</td>
-                          <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">
-                            {v.viewCount ? formatViews(v.viewCount) : '—'}
-                          </td>
-                          <td className="px-3 py-2 text-right text-zinc-500 tabular-nums">
-                            {v.duration > 0 ? formatDuration(v.duration) : '—'}
-                          </td>
+                {station.topVideos.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm border border-zinc-800 rounded-lg overflow-hidden">
+                      <thead className="bg-zinc-900 text-zinc-500">
+                        <tr>
+                          <th className="text-left px-3 py-2 font-medium">Title</th>
+                          <th className="text-left px-3 py-2 font-medium">Channel</th>
+                          <th className="text-right px-3 py-2 font-medium">Views</th>
+                          <th className="text-right px-3 py-2 font-medium">Duration</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody>
+                        {station.topVideos.map((v) => (
+                          <tr key={v.id} className="border-t border-zinc-800">
+                            <td className="px-3 py-0">
+                              <a
+                                href={`https://www.youtube.com/watch?v=${v.id}`}
+                                target="_blank"
+                                rel="noopener"
+                                className="flex min-h-11 items-center py-2 text-zinc-200 hover:text-blue-400"
+                              >
+                                {v.title}
+                              </a>
+                            </td>
+                            <td className="px-3 py-2 text-zinc-500">{v.source ?? '—'}</td>
+                            <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">
+                              {v.viewCount ? formatViews(v.viewCount) : '—'}
+                            </td>
+                            <td className="px-3 py-2 text-right text-zinc-500 tabular-nums">
+                              {v.duration > 0 ? formatDuration(v.duration) : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
 
-              <div className="mt-3">
-                <Link
-                  href={`/${station.id}`}
-                  className="inline-flex min-h-11 items-center text-sm text-blue-400 hover:text-blue-300"
-                >
-                  Play {station.name} station &rarr;
-                </Link>
+                <div className="mt-3">
+                  <Link
+                    href={`/${station.id}`}
+                    className="inline-flex min-h-11 items-center text-sm text-blue-400 hover:text-blue-300"
+                  >
+                    Play {station.name} station &rarr;
+                  </Link>
+                </div>
               </div>
-            </section>
+            </details>
           ))}
         </div>
 
