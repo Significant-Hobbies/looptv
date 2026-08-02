@@ -32,11 +32,11 @@
       }
     ],
     "projectCheck": {
-      "command": "pnpm exec biome check <changed files> && pnpm typecheck && pnpm build && verify dist/changelog/index.html && git diff --check",
+      "command": "pnpm exec biome check src/react-pages/CatalogPage.tsx && pnpm typecheck && pnpm build && test -f dist/changelog/index.html && git diff --check",
       "status": "pass"
     },
     "critique": {
-      "score": 35,
+      "score": 36,
       "maximum": 40
     },
     "audit": {
@@ -51,8 +51,16 @@
       "posture": "advisory",
       "findings": [
         "No deterministic detector findings in the changed surfaces.",
-        "Catalog interactive targets measured 115 undersized before and 0 undersized after."
+        "Catalog interactive targets measured 115 undersized before and 0 undersized after.",
+        "Native station disclosures reduce the default mobile page from 13,975px to 2,940px without removing catalog content from the document."
       ]
+    },
+    "browserReview": {
+      "tool": "Chrome DevTools Protocol against the production preview",
+      "viewports": [390, 768, 1440],
+      "horizontalOverflow": false,
+      "consoleErrors": 0,
+      "note": "All 16 stations start collapsed and open through their native summary control. The smallest summary measured 74px, no failed requests appeared, and reduced-motion review found no animated disclosure transition. Default page height is 2,940px at 390px, 2,192px at 768px, and 2,172px at 1440px."
     }
   },
   "ownerFeedback": {
