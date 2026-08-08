@@ -278,10 +278,11 @@ describe('youtube-data-api', () => {
     expect(result.apiRequests).toBe(1);
   });
 
-  it('retains only the 250 highest-view cached IDs for metadata refresh', async () => {
+  it('preserves a verified cache larger than the recent discovery window', async () => {
     const requestedIds: string[] = [];
-    const cachedRows = Array.from({ length: 300 }, (_, index) => ({
+    const cachedRows = Array.from({ length: 1000 }, (_, index) => ({
       id: `cached-${index}`,
+      duration: 300,
       view_count: index,
     }));
     const result = await fetchYouTubeSource(source, cachedRows, {
@@ -296,10 +297,12 @@ describe('youtube-data-api', () => {
       },
     });
 
-    expect(result.videoRequests).toBe(5);
-    expect(requestedIds).toHaveLength(250);
-    expect(requestedIds).toContain('cached-299');
-    expect(requestedIds).not.toContain('cached-0');
+    expect(result.videoRequests).toBe(0);
+    expect(result.refreshedRows).toHaveLength(0);
+    expect(requestedIds).toHaveLength(0);
+    expect(result.rows).toHaveLength(1000);
+    expect(result.rows.map((row) => row.id)).toContain('cached-0');
+    expect(result.rows.map((row) => row.id)).toContain('cached-999');
   });
 });
 
