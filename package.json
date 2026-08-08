@@ -53,6 +53,7 @@
     "lightningcss": "^1.33.0",
     "tailwindcss": "^4.3.3",
     "typescript": "6.0.3",
+    "ultracite": "7.10.2",
     "vite": "6.4.3",
     "vitest": "4.1.10",
     "wrangler": "4.114.0"
