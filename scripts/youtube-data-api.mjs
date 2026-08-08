@@ -134,12 +134,14 @@ export async function fetchYouTubeSource(
     pageToken = body.nextPageToken;
   }
 
-  const retainedCacheIds = cachedRows
-    .filter((row) => row.id)
+  // Refresh only the bounded recent window. The cache may contain a larger,
+  // verified full-history selection and must not be truncated to `limit`.
+  const incompleteCacheIds = cachedRows
+    .filter((row) => row.id && (!(Number(row.duration) > 0) || typeof row.view_count !== 'number'))
     .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
     .slice(0, limit)
     .map((row) => row.id);
-  const metadataIds = [...new Set([...discoveredIds, ...retainedCacheIds])];
+  const metadataIds = [...new Set([...discoveredIds, ...incompleteCacheIds])];
   const rows = [];
 
   for (const ids of chunkIds(metadataIds)) {
@@ -162,8 +164,15 @@ export async function fetchYouTubeSource(
     );
   }
 
+  const refreshedIds = new Set(rows.map((row) => row.id));
+  const discoveredIdSet = new Set(discoveredIds);
+  const retainedCacheRows = cachedRows.filter(
+    (row) => row.id && (!discoveredIdSet.has(row.id) || refreshedIds.has(row.id))
+  );
+
   return {
-    rows: [...new Map(rows.map((row) => [row.id, row])).values()],
+    rows: [...new Map([...retainedCacheRows, ...rows].map((row) => [row.id, row])).values()],
+    refreshedRows: rows,
     discoveredCount: discoveredIds.length,
     stoppedAtKnown,
     ...metrics,

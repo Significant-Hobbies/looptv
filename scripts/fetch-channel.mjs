@@ -303,6 +303,17 @@ export async function refreshFromYouTubeApi({
     throw error;
   }
 
+  const qualifyingRefreshedRows = filterFlatByDuration(
+    apiResult.refreshedRows,
+    minDur,
+    maxDur
+  ).filter((row) => typeof row.view_count === 'number' && row.view_count >= MIN_VIEW_COUNT);
+  if (qualifyingRefreshedRows.length === 0 && cachedRows.length > 0) {
+    const error = new Error('YouTube Data API produced no qualifying replacement rows');
+    error.apiRequests = apiResult.apiRequests;
+    throw error;
+  }
+
   const selection = selectApiWorkingSet(
     filterFlatByDuration(apiResult.rows, minDur, maxDur),
     source,
