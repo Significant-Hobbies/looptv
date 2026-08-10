@@ -63,3 +63,6 @@ playwright-report/
 .ci-monitor.log
 .ci-monitor.pid
 *.agent.log
+
+# local CodeVetter runtime evidence
+.codevetter/

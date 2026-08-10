@@ -49,6 +49,7 @@ export function pickSmartMixVideo(
   } = {}
 ): SmartMixPick {
   const disliked = new Set(profile.dislikes);
+  const favorites = new Set(profile.favorites);
   const candidates = allCatalogVideos(catalog).filter((video) => {
     if (video.id === options.excludeId) return false;
     if (options.recentIds?.has(video.id)) return false;
@@ -62,7 +63,7 @@ export function pickSmartMixVideo(
     return { video: null, reason: 'No Smart Mix candidates match the current filters.', score: 0 };
 
   const ranked = candidates
-    .map((video) => ({ video, ...scoreVideo(video, profile) }))
+    .map((video) => ({ video, ...scoreVideo(video, profile, favorites) }))
     .sort((a, b) => b.score - a.score || (b.video.viewCount ?? 0) - (a.video.viewCount ?? 0));
 
   const topBand = ranked.slice(0, Math.min(TOP_PICK_BAND_SIZE, ranked.length));
@@ -72,12 +73,13 @@ export function pickSmartMixVideo(
 
 export function scoreVideo(
   video: Video,
-  profile: SmartMixProfile
+  profile: SmartMixProfile,
+  favorites: ReadonlySet<string> = new Set(profile.favorites)
 ): { score: number; reason: string } {
   let score = videoViewWeight(video.viewCount);
   const reasons: string[] = [];
 
-  if (profile.favorites.includes(video.id)) {
+  if (favorites.has(video.id)) {
     score += 20;
     reasons.push('favorited video');
   }
