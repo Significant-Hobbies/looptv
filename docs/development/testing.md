@@ -12,6 +12,7 @@ pnpm test             # vitest run (unit)
 pnpm test:coverage    # vitest with v8 coverage
 pnpm lint             # biome check .
 pnpm typecheck        # tsc --noEmit
+pnpm quality          # complete local/CI code-health gate
 ```
 
 Playwright browser tests exist (`tests/example.spec.ts`, `tests/mobile.spec.ts`,
@@ -25,8 +26,16 @@ Vitest is configured in `vitest.config.ts` and includes:
 - `src/**/*.test.ts`
 - `scripts/__tests__/**/*.test.ts`
 
-Coverage targets `src/lib/**/*.ts` with thresholds
-`lines: 80, functions: 80, branches: 70, statements: 80`.
+Coverage targets the complete `src/lib/**/*.ts` surface, including modules with
+no current tests. The ratchet starts at the coverage the suite proves:
+`lines: 70, functions: 67, branches: 58, statements: 63`. Thresholds may move
+up, never silently down.
+
+`pnpm quality` also prevents regressions in unused code, import cycles,
+complexity, exact duplication, critical/high dependency advisories, suppression
+markers, formatting, documentation, build output, and repository hygiene.
+Existing measurable debt is recorded in GitHub issue #38 and checked as a
+ceiling rather than described as clean.
 
 ## What's tested
 

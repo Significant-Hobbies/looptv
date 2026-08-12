@@ -35,6 +35,7 @@ pnpm lint             # biome check .
 pnpm format           # biome format --write .
 pnpm typecheck        # astro check
 pnpm check            # biome check . (alias of lint)
+pnpm quality          # full code-health gate used by CI
 ```
 
 `pnpm build` prerenders every public route and generated endpoint into `dist/`.
