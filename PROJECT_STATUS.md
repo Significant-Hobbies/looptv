@@ -1,6 +1,6 @@
 # LoopTV — PROJECT STATUS
 
-Last updated: 2026-08-09
+Last updated: 2026-08-12
 
 > Detailed feature inventory and timeline live in
 > [docs/product/features.md](docs/product/features.md).
@@ -22,6 +22,10 @@ catalog freshness, and documentation hygiene.
 
 ## Timeline
 
+- **2026-08-12:** Adopted the Fleet code-health contract with truthful
+  whole-library coverage, unused-code, cycle, complexity, duplication,
+  dependency, suppression, build, docs, and repository-hygiene ratchets in CI;
+  removed three unused public exports and recorded existing debt in GitHub.
 - **2026-08-09:** Adopted the verified Ultracite-backed Biome baseline through
   the existing read-only check, with explicit compatibility exceptions and no
   source rewrite, catalog rebuild, production dependency, playback, or deploy
@@ -43,6 +47,7 @@ catalog freshness, and documentation hygiene.
 - Owned editorial product changelog at `/changelog`.
 - Exact Ultracite-backed Biome presets with explicit local compatibility
   exceptions; `pnpm check` remains non-writing.
+- One `pnpm quality` command reproduces the complete hosted code-health gate.
 - The complete shipped feature inventory lives in
   [docs/product/features.md](docs/product/features.md).
 

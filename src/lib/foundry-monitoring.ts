@@ -15,33 +15,7 @@ function messageFrom(error: unknown) {
   return String(error);
 }
 
-type ErrorBoundaryScope = 'root' | 'global' | 'unknown';
-
-/**
- * Emits an "error_captured" event for an error surfaced by a React error
- * boundary (error.tsx / global-error.tsx). Safe to call from the client —
- * no-ops gracefully if PostHog is not ready and never throws.
- */
-export function captureError(
-  error: unknown,
-  options: { scope?: ErrorBoundaryScope; digest?: string; source?: string } = {}
-) {
-  try {
-    posthog.capture('error_captured', {
-      project_id: PROJECT_SLUG,
-      route: route(),
-      scope: options.scope ?? 'unknown',
-      digest: options.digest,
-      source: options.source ?? 'error_boundary',
-      message: messageFrom(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-  } catch {
-    // Never let monitoring throw inside an error boundary.
-  }
-}
-
-export function capturePageCrash(error: unknown, source: 'window_error' | 'unhandled_rejection') {
+function capturePageCrash(error: unknown, source: 'window_error' | 'unhandled_rejection') {
   posthog.capture('foundry_page_crash', {
     project_id: PROJECT_SLUG,
     route: route(),

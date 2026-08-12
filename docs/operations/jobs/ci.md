@@ -16,17 +16,15 @@ Single job, `ubuntu-latest`, Node 22:
 2. Setup Node 22.
 3. Prepare pnpm (corepack, pinned version from `packageManager`).
 4. `pnpm install --frozen-lockfile`.
-5. `pnpm lint` (Biome check).
-6. `pnpm test` (Vitest run).
-
-No build step — that's covered by [weekly-quality.md](weekly-quality.md) and
-the deploy workflows. CI is the fast feedback gate.
+5. Install the pinned Lizard complexity analyzer.
+6. `pnpm quality`: formatting, lint, types, coverage, unused code, complexity,
+   duplication, cycles, dependency advisories, suppressions, docs, build, and
+   repository hygiene.
 
 ## What's not here
 
 - No catalog rebuild (that's [fetch-catalog-sources.md](fetch-catalog-sources.md)
   + [build-catalog.md](build-catalog.md)).
 - No deploy (that's [deploy.md](deploy.md)).
-- No docs validation in this workflow — `pnpm docs:check` runs as a CI
-  step here, and the dedicated `docs.yml` workflow runs the strict check on
-  docs-only changes. See [../runbooks/](../runbooks/).
+- The dedicated `docs.yml` workflow still runs the strict documentation check
+  on docs-only changes. See [../runbooks/](../runbooks/).
