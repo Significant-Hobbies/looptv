@@ -34,10 +34,6 @@ export function createSmartMixProfile(input?: Partial<SmartMixProfile>): SmartMi
   };
 }
 
-function allCatalogVideos(catalog: Catalog): Video[] {
-  return Object.values(catalog.stations).flatMap((station) => station.videos);
-}
-
 export function pickSmartMixVideo(
   catalog: Catalog,
   profile: SmartMixProfile,
@@ -50,25 +46,36 @@ export function pickSmartMixVideo(
 ): SmartMixPick {
   const disliked = new Set(profile.dislikes);
   const favorites = new Set(profile.favorites);
-  const candidates = allCatalogVideos(catalog).filter((video) => {
-    if (video.id === options.excludeId) return false;
-    if (options.recentIds?.has(video.id)) return false;
-    if (options.watchedIds?.has(video.id)) return false;
-    if (disliked.has(video.id)) return false;
-    if (video.source && options.blockedSources?.has(video.source)) return false;
-    return true;
-  });
+  const topBand: SmartMixPick[] = [];
 
-  if (candidates.length === 0)
+  for (const station of Object.values(catalog.stations)) {
+    for (const video of station.videos) {
+      if (video.id === options.excludeId) continue;
+      if (options.recentIds?.has(video.id)) continue;
+      if (options.watchedIds?.has(video.id)) continue;
+      if (disliked.has(video.id)) continue;
+      if (video.source && options.blockedSources?.has(video.source)) continue;
+
+      const candidate = { video, ...scoreVideo(video, profile, favorites) };
+      const insertAt = topBand.findIndex((ranked) => compareSmartMixPicks(candidate, ranked) < 0);
+      if (insertAt === -1) {
+        if (topBand.length < TOP_PICK_BAND_SIZE) topBand.push(candidate);
+      } else {
+        topBand.splice(insertAt, 0, candidate);
+        if (topBand.length > TOP_PICK_BAND_SIZE) topBand.pop();
+      }
+    }
+  }
+
+  if (topBand.length === 0)
     return { video: null, reason: 'No Smart Mix candidates match the current filters.', score: 0 };
 
-  const ranked = candidates
-    .map((video) => ({ video, ...scoreVideo(video, profile, favorites) }))
-    .sort((a, b) => b.score - a.score || (b.video.viewCount ?? 0) - (a.video.viewCount ?? 0));
-
-  const topBand = ranked.slice(0, Math.min(TOP_PICK_BAND_SIZE, ranked.length));
   const winner = topBand[Math.floor(Math.random() * topBand.length)];
   return winner;
+}
+
+function compareSmartMixPicks(a: SmartMixPick, b: SmartMixPick): number {
+  return b.score - a.score || (b.video?.viewCount ?? 0) - (a.video?.viewCount ?? 0);
 }
 
 export function scoreVideo(
