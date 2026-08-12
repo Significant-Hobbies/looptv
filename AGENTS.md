@@ -43,6 +43,7 @@ pnpm build              # Astro production static build
 pnpm test               # vitest run
 pnpm lint               # biome check .
 pnpm typecheck          # astro check
+pnpm quality            # complete CI code-health gate
 
 # Catalog (CI-only credentials; checked-in catalog needs no key)
 pnpm run build:catalog              # fetch + process (no NER)
