@@ -4,6 +4,13 @@ export interface PublicSurface {
   summary: string;
 }
 
+export const PUBLIC_ORIGIN = 'https://tv.significanthobbies.com';
+
+export function canonicalPublicUrl(path: string): string {
+  const canonicalPath = path === '/' ? '/' : `${path.replace(/\/$/, '')}/`;
+  return new URL(canonicalPath, PUBLIC_ORIGIN).toString();
+}
+
 export const PUBLIC_SURFACES: PublicSurface[] = [
   {
     path: '/',

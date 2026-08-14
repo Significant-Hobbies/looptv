@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 import stations from '../../channels.config';
-import { PUBLIC_SURFACES } from '@/lib/public-surfaces';
+import { canonicalPublicUrl, PUBLIC_SURFACES } from '@/lib/public-surfaces';
 
 export const prerender = true;
 
-const siteUrl = 'https://tv.significanthobbies.com';
 export const GET: APIRoute = () => {
   const paths = [
     ...PUBLIC_SURFACES.map((surface) => surface.path),
@@ -13,7 +12,7 @@ export const GET: APIRoute = () => {
   const urls = paths
     .map(
       (path) => `  <url>
-    <loc>${new URL(path, siteUrl).toString()}</loc>
+    <loc>${canonicalPublicUrl(path)}</loc>
     <changefreq>weekly</changefreq>
     <priority>${path === '/' ? '1.0' : '0.8'}</priority>
   </url>`
