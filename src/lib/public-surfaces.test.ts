@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import stations from '../../channels.config';
-import { PUBLIC_SURFACES } from './public-surfaces';
+import { canonicalPublicUrl, PUBLIC_SURFACES } from './public-surfaces';
 
 describe('public agent surfaces', () => {
   it('keeps every public HTML route unique', () => {
@@ -13,6 +13,10 @@ describe('public agent surfaces', () => {
     ];
     expect(new Set(paths).size).toBe(paths.length);
     expect(paths).toHaveLength(30);
+    expect(paths.map(canonicalPublicUrl)).toEqual([
+      'https://tv.significanthobbies.com/',
+      ...paths.slice(1).map((path) => `https://tv.significanthobbies.com${path}/`),
+    ]);
   });
 
   it('keeps the compact catalog aligned with static routes and the station family', () => {
