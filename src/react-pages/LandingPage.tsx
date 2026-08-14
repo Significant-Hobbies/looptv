@@ -1,4 +1,5 @@
 import Link from '@/components/AppLink';
+import FeaturesSection from '@/components/FeaturesSection';
 
 import stations from '../../channels.config';
 import catalogSummary from '../../public/catalog-summary.json';
@@ -80,19 +81,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features ── */}
-      <section className="mt-20">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          Why LoopTV
-        </h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="rounded-xl border border-white/10 bg-white/5 p-5">
-              <h3 className="text-sm font-semibold text-white">{f.title}</h3>
-              <p className="mt-2 text-xs leading-5 text-zinc-400">{f.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <FeaturesSection features={features} className="mt-20" />
 
       {/* ── Preview ── */}
       <section className="mt-20">

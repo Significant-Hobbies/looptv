@@ -1,4 +1,12 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type { Catalog, CatalogSummary, Video } from '@/lib/types';
 import {
   loadCatalog,
@@ -59,6 +67,26 @@ import bundledCatalogSummary from '../../public/catalog-summary.json';
 
 const SMART_MIX_ID = 'smart-mix';
 const INITIAL_CATALOG_SUMMARY = bundledCatalogSummary as CatalogSummary;
+
+type SetWatchLaterIds = Dispatch<SetStateAction<Set<string>>>;
+
+function toggleWatchLaterId(
+  id: string,
+  watchLaterIds: Set<string>,
+  setWatchLaterIds: SetWatchLaterIds
+) {
+  if (watchLaterIds.has(id)) {
+    removeWatchLater(id);
+    setWatchLaterIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  } else {
+    addWatchLater(id);
+    setWatchLaterIds((prev) => new Set([...prev, id]));
+  }
+}
 
 export default function TVApp({ initialChannel }: { initialChannel?: string }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
@@ -922,19 +950,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
           onClose={() => setSearchOpen(false)}
           visible={searchOpen}
           watchLaterIds={watchLaterIds}
-          onToggleWatchLater={(id) => {
-            if (watchLaterIds.has(id)) {
-              removeWatchLater(id);
-              setWatchLaterIds((prev) => {
-                const n = new Set(prev);
-                n.delete(id);
-                return n;
-              });
-            } else {
-              addWatchLater(id);
-              setWatchLaterIds((prev) => new Set([...prev, id]));
-            }
-          }}
+          onToggleWatchLater={(id) => toggleWatchLaterId(id, watchLaterIds, setWatchLaterIds)}
         />
         <ChannelHealth
           visible={showHealth}
@@ -1034,18 +1050,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         onNext={() => playNext()}
         onSearch={() => setSearchOpen(true)}
         onToggleWatchLater={() => {
-          if (!currentVideo) return;
-          if (watchLaterIds.has(currentVideo.id)) {
-            removeWatchLater(currentVideo.id);
-            setWatchLaterIds((prev) => {
-              const next = new Set(prev);
-              next.delete(currentVideo.id);
-              return next;
-            });
-          } else {
-            addWatchLater(currentVideo.id);
-            setWatchLaterIds((prev) => new Set([...prev, currentVideo.id]));
-          }
+          if (currentVideo) toggleWatchLaterId(currentVideo.id, watchLaterIds, setWatchLaterIds);
         }}
         onToggleGuide={() => setShowGuide((g) => !g)}
         onToggleMute={() => {
@@ -1117,19 +1122,7 @@ export default function TVApp({ initialChannel }: { initialChannel?: string }) {
         onClose={() => setSearchOpen(false)}
         visible={searchOpen}
         watchLaterIds={watchLaterIds}
-        onToggleWatchLater={(id) => {
-          if (watchLaterIds.has(id)) {
-            removeWatchLater(id);
-            setWatchLaterIds((prev) => {
-              const n = new Set(prev);
-              n.delete(id);
-              return n;
-            });
-          } else {
-            addWatchLater(id);
-            setWatchLaterIds((prev) => new Set([...prev, id]));
-          }
-        }}
+        onToggleWatchLater={(id) => toggleWatchLaterId(id, watchLaterIds, setWatchLaterIds)}
       />
 
       {showGuide && (

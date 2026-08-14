@@ -13,8 +13,8 @@ const productionPaths = ['src', 'scripts', 'astro.config.ts', 'vitest.config.ts'
 const sourceExtensions = new Set(['.js', '.jsx', '.mjs', '.mts', '.ts', '.tsx']);
 
 const baselines = {
-  complexity: { violations: 21, maxCcn: 48, maxLength: 665, maxParams: 37 },
-  duplication: { clones: 4, duplicatedLines: 62 },
+  complexity: { violations: 20, maxCcn: 48, maxLength: 665, maxParams: 37 },
+  duplication: { clones: 3, duplicatedLines: 35 },
   unused: {
     files: 0,
     exports: 0,
