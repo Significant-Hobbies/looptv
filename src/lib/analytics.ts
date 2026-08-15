@@ -1,10 +1,10 @@
 /**
- * Owner-facing analytics — the fixed 4-event taxonomy.
+ * Owner-facing analytics — the fixed 5-event taxonomy.
  *
- * Every fleet project emits exactly these four events — `signup`, `activated`,
- * `core_action`, `returned` — so a single PostHog project can build one
- * cross-fleet funnel (signup -> activated -> core_action) and a D1/D7
- * retention insight, with no custom dashboard.
+ * Every fleet project emits exactly these five events — `signup`, `activated`,
+ * `core_action`, `returned`, `page_view` — so a single PostHog project can
+ * build one cross-fleet funnel (signup -> activated -> core_action) and a
+ * D1/D7 retention insight, with no custom dashboard.
  *
  * Every event carries `project_id: "looptv"`.
  *
@@ -15,6 +15,7 @@
  *  - `core_action` — the thing the product exists to do: play a video, or
  *    build a custom station.
  *  - `returned`  — a later session from a viewer who already has watch history.
+ *  - `page_view` — a page load, tracked manually so it carries `project_id`.
  *
  * Browser-only: LoopTV is a static export with no server runtime, so this
  * routes exclusively through `posthog-js` (`track`).
@@ -37,6 +38,8 @@ interface AnalyticsEventMap {
   core_action: { project_id: typeof PROJECT; action: CoreAction };
   /** A return session by a viewer with prior watch activity. */
   returned: { project_id: typeof PROJECT };
+  /** A page load, tracked manually so it carries `project_id`. */
+  page_view: { project_id: typeof PROJECT };
 }
 
 function trackEvent(event: string, properties: Record<string, unknown> = {}): void {
@@ -110,4 +113,10 @@ export function trackReturned(hasPriorActivity: boolean): void {
     // sessionStorage unavailable — fall through, worst case it re-fires.
   }
   emit('returned', {});
+}
+
+/** Fire on every page load. PostHog's autocapture is off, so this is manual. */
+export function trackPageView(): void {
+  if (typeof window === 'undefined') return;
+  emit('page_view', {});
 }

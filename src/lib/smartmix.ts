@@ -121,22 +121,28 @@ export function applyPreference(
 ): SmartMixProfile {
   const next = createSmartMixProfile(profile);
   next.lastUpdated = new Date().toISOString();
+  const isFavorite = preference === 'favorite';
+  const delta = isFavorite ? 1 : -1;
 
-  if (preference === 'favorite') {
-    next.favorites = unique([...next.favorites, video.id]);
-    next.dislikes = next.dislikes.filter((id) => id !== video.id);
-    if (video.source)
-      next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) + 1;
-    for (const tag of video.tags ?? []) next.tagWeights[tag] = (next.tagWeights[tag] ?? 0) + 1;
-  } else {
-    next.dislikes = unique([...next.dislikes, video.id]);
-    next.favorites = next.favorites.filter((id) => id !== video.id);
-    if (video.source)
-      next.sourceWeights[video.source] = (next.sourceWeights[video.source] ?? 0) - 1;
-    for (const tag of video.tags ?? []) next.tagWeights[tag] = (next.tagWeights[tag] ?? 0) - 1;
-  }
+  next.favorites = isFavorite
+    ? unique([...next.favorites, video.id])
+    : next.favorites.filter((id) => id !== video.id);
+  next.dislikes = isFavorite
+    ? next.dislikes.filter((id) => id !== video.id)
+    : unique([...next.dislikes, video.id]);
+
+  adjustWeight(next.sourceWeights, video.source, delta);
+  for (const tag of video.tags ?? []) adjustWeight(next.tagWeights, tag, delta);
 
   return next;
+}
+
+function adjustWeight(
+  weights: Record<string, number>,
+  key: string | undefined,
+  delta: number
+): void {
+  if (key) weights[key] = (weights[key] ?? 0) + delta;
 }
 
 export function serializeSmartMixProfile(profile: SmartMixProfile): string {
