@@ -82,50 +82,66 @@ export default function PlaylistPage() {
         exist for them.
       </p>
 
-      {entries == null && <p className="mt-8 text-sm text-zinc-500">Loading…</p>}
-      {entries && ids.length === 0 && (
-        <p className="mt-8 text-sm text-zinc-400">
-          No <code>?v=</code> query supplied.
-        </p>
-      )}
-      {entries && ids.length > 0 && entries.length === 0 && (
-        <p className="mt-8 text-sm text-rose-300">
-          None of those video IDs are in the catalogue. The links might be stale or the videos got
-          deleted from YouTube.
-        </p>
-      )}
-      {entries && entries.length > 0 && (
-        <>
-          <p className="mt-6 text-sm text-zinc-400">
-            {entries.length} video{entries.length === 1 ? '' : 's'} ·{' '}
-            <span className="tabular-nums">{formatDuration(totalSeconds)}</span> total
-          </p>
-          <ol className="mt-3 divide-y divide-zinc-800">
-            {entries.map((e, i) => (
-              <li key={e.video.id} className="flex items-baseline gap-3 py-3 text-sm">
-                <span className="w-6 text-right tabular-nums text-zinc-500">{i + 1}</span>
-                <Link
-                  href={`/${e.stationId}`}
-                  className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"
-                >
-                  {e.stationId}
-                </Link>
-                <a
-                  href={`https://www.youtube.com/watch?v=${e.video.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 truncate text-zinc-300 hover:text-amber-400"
-                >
-                  {e.video.title}
-                </a>
-                <span className="font-mono text-xs tabular-nums text-zinc-500">
-                  {formatDuration(e.video.duration)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </>
-      )}
+      <PlaylistBody entries={entries} ids={ids} totalSeconds={totalSeconds} />
     </main>
+  );
+}
+
+function PlaylistBody({
+  entries,
+  ids,
+  totalSeconds,
+}: {
+  entries: Entry[] | null;
+  ids: string[];
+  totalSeconds: number;
+}) {
+  if (entries == null) return <p className="mt-8 text-sm text-zinc-500">Loading…</p>;
+  if (ids.length === 0) {
+    return (
+      <p className="mt-8 text-sm text-zinc-400">
+        No <code>?v=</code> query supplied.
+      </p>
+    );
+  }
+  if (entries.length === 0) {
+    return (
+      <p className="mt-8 text-sm text-rose-300">
+        None of those video IDs are in the catalogue. The links might be stale or the videos got
+        deleted from YouTube.
+      </p>
+    );
+  }
+  return (
+    <>
+      <p className="mt-6 text-sm text-zinc-400">
+        {entries.length} video{entries.length === 1 ? '' : 's'} ·{' '}
+        <span className="tabular-nums">{formatDuration(totalSeconds)}</span> total
+      </p>
+      <ol className="mt-3 divide-y divide-zinc-800">
+        {entries.map((e, i) => (
+          <li key={e.video.id} className="flex items-baseline gap-3 py-3 text-sm">
+            <span className="w-6 text-right tabular-nums text-zinc-500">{i + 1}</span>
+            <Link
+              href={`/${e.stationId}`}
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-400 hover:underline"
+            >
+              {e.stationId}
+            </Link>
+            <a
+              href={`https://www.youtube.com/watch?v=${e.video.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 truncate text-zinc-300 hover:text-amber-400"
+            >
+              {e.video.title}
+            </a>
+            <span className="font-mono text-xs tabular-nums text-zinc-500">
+              {formatDuration(e.video.duration)}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </>
   );
 }

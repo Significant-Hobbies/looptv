@@ -99,6 +99,52 @@ export function diffStationVideos(expected, actual) {
  * if added+removed IDs exceed maxVideoChurnPct of the baseline (catches silent
  * swaps with stable counts).
  */
+function checkStationCount(id, exp, counts, thresholds, violations, rows) {
+  const actual = counts[id] ?? 0;
+  const delta = actual - exp;
+  rows.push({ id, expected: exp, actual, delta });
+  if (!(id in counts)) {
+    violations.push(`station "${id}" disappeared from the catalog (baseline ${exp} videos)`);
+    return;
+  }
+  if (actual === 0) {
+    violations.push(`station "${id}" is empty (baseline ${exp} videos)`);
+    return;
+  }
+  const allowedDrop = Math.max(
+    Math.round((exp * thresholds.maxStationDropPct) / 100),
+    thresholds.minStationDropAbs
+  );
+  if (delta < -allowedDrop) {
+    violations.push(
+      `station "${id}" dropped ${-delta} videos (${exp} → ${actual}; allowed drop ${allowedDrop})`
+    );
+  }
+}
+
+function checkVideoChurn(
+  id,
+  exp,
+  expectedVideos,
+  currentVideos,
+  thresholds,
+  violations,
+  videoDiffs
+) {
+  if (!currentVideos || !expectedVideos[id]) return;
+  const diff = diffStationVideos(expectedVideos[id], currentVideos[id] || {});
+  videoDiffs[id] = diff;
+  const churn = 2 * Math.min(diff.added.length, diff.removed.length);
+  if (churn > 0 && exp > 0) {
+    const churnPct = Math.round((churn / exp) * 100);
+    if (churnPct > thresholds.maxVideoChurnPct) {
+      violations.push(
+        `station "${id}" churned ${churn} videos (${churnPct}% of ${exp} baseline; +${diff.added.length} added, -${diff.removed.length} removed; threshold ${thresholds.maxVideoChurnPct}%) — counts stable but video set changed`
+      );
+    }
+  }
+}
+
 export function compareToManifest(counts, manifest, currentVideos) {
   const thresholds = { ...DEFAULT_THRESHOLDS, ...(manifest.thresholds || {}) };
   const expected = manifest.stations || {};
@@ -109,41 +155,8 @@ export function compareToManifest(counts, manifest, currentVideos) {
   const videoDiffs = {};
 
   for (const [id, exp] of Object.entries(expected)) {
-    const actual = counts[id] ?? 0;
-    const delta = actual - exp;
-    rows.push({ id, expected: exp, actual, delta });
-    if (!(id in counts)) {
-      violations.push(`station "${id}" disappeared from the catalog (baseline ${exp} videos)`);
-      continue;
-    }
-    if (actual === 0) {
-      violations.push(`station "${id}" is empty (baseline ${exp} videos)`);
-      continue;
-    }
-    const allowedDrop = Math.max(
-      Math.round((exp * thresholds.maxStationDropPct) / 100),
-      thresholds.minStationDropAbs
-    );
-    if (delta < -allowedDrop) {
-      violations.push(
-        `station "${id}" dropped ${-delta} videos (${exp} → ${actual}; allowed drop ${allowedDrop})`
-      );
-    }
-
-    // Video-level diff — catches silent swaps where counts stay stable.
-    if (currentVideos && expectedVideos[id]) {
-      const diff = diffStationVideos(expectedVideos[id], currentVideos[id] || {});
-      videoDiffs[id] = diff;
-      const churn = 2 * Math.min(diff.added.length, diff.removed.length);
-      if (churn > 0 && exp > 0) {
-        const churnPct = Math.round((churn / exp) * 100);
-        if (churnPct > thresholds.maxVideoChurnPct) {
-          violations.push(
-            `station "${id}" churned ${churn} videos (${churnPct}% of ${exp} baseline; +${diff.added.length} added, -${diff.removed.length} removed; threshold ${thresholds.maxVideoChurnPct}%) — counts stable but video set changed`
-          );
-        }
-      }
-    }
+    checkStationCount(id, exp, counts, thresholds, violations, rows);
+    checkVideoChurn(id, exp, expectedVideos, currentVideos, thresholds, violations, videoDiffs);
   }
 
   for (const [id, actual] of Object.entries(counts)) {

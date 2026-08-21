@@ -250,16 +250,72 @@ async function channelVideoCounts(sources, options) {
   return counts;
 }
 
+function buildCheckpointReport(source, rows) {
+  return {
+    stationId: source.stationId,
+    source: source.name,
+    status: 'checkpoint',
+    publicUploads: Number(rows[0]._looptvPublicUploadCount),
+    candidates: Number(rows[0]._looptvCandidateCount),
+    selected: rows.length,
+    percentile: resolveTopPercentile(source, Number(rows[0]._looptvCandidateCount)),
+    minimumViews: Math.min(...rows.map((row) => row.view_count)),
+    requests: 0,
+    baselineRequests:
+      Number(rows[0]._looptvFullAuditRequests) ||
+      Math.ceil(Number(rows[0]._looptvPublicUploadCount) / YOUTUBE_BATCH_SIZE) * 2,
+  };
+}
+
+async function processPendingSource(source, filePath, { apiKey, fetchImpl, budget, output }) {
+  const startRequests = budget.requests;
+  let lastProgressCount = 0;
+  const result = await fetchFullSource(source, {
+    apiKey,
+    fetchImpl,
+    budget,
+    onProgress: ({ phase, count, requests }) => {
+      if (count - lastProgressCount >= 500) {
+        output(`${source.stationId}/${source.name}: ${phase}=${count} requests=${requests}`);
+        lastProgressCount = count;
+      }
+    },
+  });
+  const sourceRequests = budget.requests - startRequests;
+  const selected = result.selected.map((row) => ({
+    ...row,
+    _looptvFullAuditRequests: sourceRequests,
+  }));
+  writeRows(filePath, selected);
+  const row = {
+    stationId: source.stationId,
+    source: source.name,
+    status: 'fetched',
+    publicUploads: result.publicUploadCount,
+    candidates: result.candidateCount,
+    selected: selected.length,
+    percentile: result.pct,
+    minimumViews: result.selected.at(-1)?.view_count || 0,
+    requests: sourceRequests,
+    baselineRequests: sourceRequests,
+  };
+  output(
+    `${source.stationId}/${source.name}: uploads=${row.publicUploads} candidates=${row.candidates} selected=${row.selected} top=${row.percentile}% floor=${row.minimumViews.toLocaleString()} requests=${row.requests}`
+  );
+  return row;
+}
+
 export async function runFullRebaseline({
   stations,
   dataDir,
   apiKey,
   fetchImpl = globalThis.fetch,
-  maxRequests = DEFAULT_MAX_REQUESTS,
-  requestsPerSecond = DEFAULT_REQUESTS_PER_SECOND,
+  rateLimits = {},
   fresh = false,
   output = console.log,
 }) {
+  const { maxRequests = DEFAULT_MAX_REQUESTS, requestsPerSecond = DEFAULT_REQUESTS_PER_SECOND } =
+    rateLimits;
   if (!apiKey) throw new Error('YOUTUBE_API_KEY is not configured');
   fs.mkdirSync(dataDir, { recursive: true });
   const sources = stations.flatMap((station) =>
@@ -272,20 +328,7 @@ export async function runFullRebaseline({
     const filePath = path.join(dataDir, `${source.handle.replace(/^@/, '')}.jsonl`);
     const rows = readRows(filePath);
     if (!fresh && checkpointQualifies(rows, source)) {
-      report.push({
-        stationId: source.stationId,
-        source: source.name,
-        status: 'checkpoint',
-        publicUploads: Number(rows[0]._looptvPublicUploadCount),
-        candidates: Number(rows[0]._looptvCandidateCount),
-        selected: rows.length,
-        percentile: resolveTopPercentile(source, Number(rows[0]._looptvCandidateCount)),
-        minimumViews: Math.min(...rows.map((row) => row.view_count)),
-        requests: 0,
-        baselineRequests:
-          Number(rows[0]._looptvFullAuditRequests) ||
-          Math.ceil(Number(rows[0]._looptvPublicUploadCount) / YOUTUBE_BATCH_SIZE) * 2,
-      });
+      report.push(buildCheckpointReport(source, rows));
     } else {
       pending.push({ source, filePath });
     }
@@ -308,42 +351,9 @@ export async function runFullRebaseline({
   if (estimate > maxRequests)
     throw new Error(`Estimated full audit requests ${estimate} exceed budget ${maxRequests}`);
 
+  const ctx = { apiKey, fetchImpl, budget, output };
   for (const { source, filePath } of pending) {
-    const startRequests = budget.requests;
-    let lastProgressCount = 0;
-    const result = await fetchFullSource(source, {
-      apiKey,
-      fetchImpl,
-      budget,
-      onProgress: ({ phase, count, requests }) => {
-        if (count - lastProgressCount >= 500) {
-          output(`${source.stationId}/${source.name}: ${phase}=${count} requests=${requests}`);
-          lastProgressCount = count;
-        }
-      },
-    });
-    const sourceRequests = budget.requests - startRequests;
-    const selected = result.selected.map((row) => ({
-      ...row,
-      _looptvFullAuditRequests: sourceRequests,
-    }));
-    writeRows(filePath, selected);
-    const row = {
-      stationId: source.stationId,
-      source: source.name,
-      status: 'fetched',
-      publicUploads: result.publicUploadCount,
-      candidates: result.candidateCount,
-      selected: selected.length,
-      percentile: result.pct,
-      minimumViews: result.selected.at(-1)?.view_count || 0,
-      requests: sourceRequests,
-      baselineRequests: sourceRequests,
-    };
-    report.push(row);
-    output(
-      `${source.stationId}/${source.name}: uploads=${row.publicUploads} candidates=${row.candidates} selected=${row.selected} top=${row.percentile}% floor=${row.minimumViews.toLocaleString()} requests=${row.requests}`
-    );
+    report.push(await processPendingSource(source, filePath, ctx));
   }
   return {
     requests: budget.requests,
@@ -403,8 +413,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     stations,
     dataDir,
     apiKey: process.env.YOUTUBE_API_KEY,
-    maxRequests: Number(argValue('--max-requests', DEFAULT_MAX_REQUESTS)),
-    requestsPerSecond: Number(argValue('--requests-per-second', DEFAULT_REQUESTS_PER_SECOND)),
+    rateLimits: {
+      maxRequests: Number(argValue('--max-requests', DEFAULT_MAX_REQUESTS)),
+      requestsPerSecond: Number(argValue('--requests-per-second', DEFAULT_REQUESTS_PER_SECOND)),
+    },
     fresh: process.argv.includes('--fresh'),
   })
     .then((result) => {

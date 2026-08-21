@@ -2,25 +2,27 @@
 
 import type { PlaybackDiagnostic } from '@/lib/playback-diagnostics';
 
-interface Props {
-  diagnostic: PlaybackDiagnostic;
-  refreshing?: boolean;
-  variant?: 'overlay' | 'inline';
+interface BannerActions {
   onRetryCatalog?: () => void;
   onOpenHealth?: () => void;
   onSearch?: () => void;
   onDismiss?: () => void;
 }
 
+interface Props {
+  diagnostic: PlaybackDiagnostic;
+  refreshing?: boolean;
+  variant?: 'overlay' | 'inline';
+  actions: BannerActions;
+}
+
 export default function PlaybackDiagnosticsBanner({
   diagnostic,
   refreshing = false,
   variant = 'overlay',
-  onRetryCatalog,
-  onOpenHealth,
-  onSearch,
-  onDismiss,
+  actions,
 }: Props) {
+  const { onRetryCatalog, onOpenHealth, onSearch, onDismiss } = actions;
   const action =
     diagnostic.action === 'retry_catalog'
       ? { label: refreshing ? 'Retrying…' : 'Retry', onClick: onRetryCatalog, disabled: refreshing }

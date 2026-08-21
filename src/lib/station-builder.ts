@@ -23,14 +23,17 @@ export interface CatalogPreview {
 
 const DEFAULT_MIN_DURATION = 60;
 const DEFAULT_MAX_DURATION = 1800;
+const QUOTE_RE = /['"]/g;
+const NON_ALNUM_RE = /[^a-z0-9]+/g;
+const EDGE_DASH_RE = /^-+|-+$/g;
 
 export function slugifyStationId(value: string): string {
   return value
     .trim()
     .toLowerCase()
-    .replace(/['"]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+    .replace(QUOTE_RE, '')
+    .replace(NON_ALNUM_RE, '-')
+    .replace(EDGE_DASH_RE, '')
     .slice(0, 48);
 }
 

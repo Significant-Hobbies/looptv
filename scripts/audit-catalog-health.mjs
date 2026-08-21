@@ -22,6 +22,58 @@ function sourceHealth(meta, now, freshSourceDays) {
   return age > freshSourceDays ? 'stale' : 'fresh';
 }
 
+const HEALTH_COUNTERS = {
+  fresh: 'fresh',
+  stale: 'stale',
+  partial: 'partial',
+  fallback: 'fallback',
+  missing: 'missing',
+};
+
+function sourceDefaults(source) {
+  return {
+    minDuration: source.minDuration ?? 60,
+    maxDuration: source.maxDuration ?? 3600,
+    topPercentile: source.topPercentile ?? null,
+    maxVideos: source.maxVideos ?? 200,
+  };
+}
+
+function metaDefaults(meta, now) {
+  const lastFetch = meta?.lastSuccessfulFetch || '';
+  return {
+    refreshState: meta?.refreshState ?? 'unknown',
+    lastSuccessfulFetch: lastFetch,
+    ageDays: ageDays(lastFetch || meta?.fetchedAt, now),
+    candidateCount: meta?.videoCount ?? 0,
+    qualityBaseline: meta?.qualityBaseline ?? 'incremental-only',
+    fullAuditAt: meta?.fullAuditAt || '',
+    publicUploadCount: meta?.publicUploadCount ?? 0,
+  };
+}
+
+function buildSourceReport(source, catalog, counts, now, freshSourceDays, violations, counters) {
+  const handle = source.handle.replace(/^@/, '');
+  const meta = catalog.sourceMeta?.[handle];
+  const health = sourceHealth(meta, now, freshSourceDays);
+  const counterKey = HEALTH_COUNTERS[health] ?? 'missing';
+  counters[counterKey] += 1;
+  const selectedCount = counts.get(source.name) ?? 0;
+  if (meta?.selectedCount != null && meta.selectedCount !== selectedCount) {
+    violations.push(
+      `Source ${source.name} metadata selectedCount ${meta.selectedCount} does not match catalog ${selectedCount}`
+    );
+  }
+  return {
+    name: source.name,
+    handle: source.handle,
+    health,
+    selectedCount,
+    ...sourceDefaults(source),
+    ...metaDefaults(meta, now),
+  };
+}
+
 export function auditCatalogHealth({
   stations,
   catalog,
@@ -76,39 +128,15 @@ export function auditCatalogHealth({
       }
     }
 
-    const sources = station.sources.map((source) => {
-      const handle = source.handle.replace(/^@/, '');
-      const meta = catalog.sourceMeta?.[handle];
-      const health = sourceHealth(meta, now, freshSourceDays);
-      if (health === 'fresh') freshSources += 1;
-      else if (health === 'stale') staleSources += 1;
-      else if (health === 'partial') partialSources += 1;
-      else if (health === 'fallback') fallbackSources += 1;
-      else missingSources += 1;
-      const selectedCount = counts.get(source.name) ?? 0;
-      if (meta?.selectedCount != null && meta.selectedCount !== selectedCount) {
-        violations.push(
-          `Source ${source.name} metadata selectedCount ${meta.selectedCount} does not match catalog ${selectedCount}`
-        );
-      }
-      return {
-        name: source.name,
-        handle: source.handle,
-        health,
-        refreshState: meta?.refreshState ?? 'unknown',
-        lastSuccessfulFetch: meta?.lastSuccessfulFetch || '',
-        ageDays: ageDays(meta?.lastSuccessfulFetch || meta?.fetchedAt, now),
-        candidateCount: meta?.videoCount ?? 0,
-        selectedCount,
-        minDuration: source.minDuration ?? 60,
-        maxDuration: source.maxDuration ?? 3600,
-        topPercentile: source.topPercentile ?? null,
-        maxVideos: source.maxVideos ?? 200,
-        qualityBaseline: meta?.qualityBaseline ?? 'incremental-only',
-        fullAuditAt: meta?.fullAuditAt || '',
-        publicUploadCount: meta?.publicUploadCount ?? 0,
-      };
-    });
+    const counters = { fresh: 0, stale: 0, partial: 0, fallback: 0, missing: 0 };
+    const sources = station.sources.map((source) =>
+      buildSourceReport(source, catalog, counts, now, freshSourceDays, violations, counters)
+    );
+    freshSources += counters.fresh;
+    staleSources += counters.stale;
+    partialSources += counters.partial;
+    fallbackSources += counters.fallback;
+    missingSources += counters.missing;
 
     const sourceTotal = sources.reduce((total, source) => total + source.selectedCount, 0);
     if (sourceTotal !== videos.length) {

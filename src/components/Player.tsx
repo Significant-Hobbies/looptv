@@ -19,14 +19,18 @@ export interface PlayerHandle {
   getWatchProgress: () => number; // 0-1, how far through the video
 }
 
-interface PlayerProps {
-  videoId: string;
-  source?: string; // YouTube channel name for embed-health tracking
+interface PlayerCallbacks {
   onEnded: () => void;
   onError: (code: number) => void;
   onReady: () => void;
   onPlay: () => void;
   onPause: () => void;
+}
+
+interface PlayerProps {
+  videoId: string;
+  source?: string; // YouTube channel name for embed-health tracking
+  callbacks: PlayerCallbacks;
 }
 
 let apiLoaded = false;
@@ -88,32 +92,8 @@ function onApiReady(cb: () => void, onFail?: () => void) {
   loadYTApi();
 }
 
-const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
-  { videoId, source, onEnded, onError, onReady, onPlay, onPause },
-  ref
-) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<YT.Player | null>(null);
-  const currentVideoRef = useRef(videoId);
-  const embedTrackedRef = useRef(false); // one record per video load
-  const [apiUnavailable, setApiUnavailable] = useState(false);
-
-  const onEndedRef = useRef(onEnded);
-  const onErrorRef = useRef(onError);
-  const onReadyRef = useRef(onReady);
-  const onPlayRef = useRef(onPlay);
-  const onPauseRef = useRef(onPause);
-  const sourceRef = useRef(source);
-  useEffect(() => {
-    onEndedRef.current = onEnded;
-    onErrorRef.current = onError;
-    onReadyRef.current = onReady;
-    onPlayRef.current = onPlay;
-    onPauseRef.current = onPause;
-    sourceRef.current = source;
-  });
-
-  useImperativeHandle(ref, () => ({
+function createPlayerHandle(playerRef: React.RefObject<YT.Player | null>): PlayerHandle {
+  return {
     togglePlay() {
       const p = playerRef.current;
       if (!p) return;
@@ -160,52 +140,112 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
       if (!duration || duration <= 0) return 0;
       return p.getCurrentTime() / duration;
     },
-  }));
+  };
+}
+
+interface PlayerRefs {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  playerRef: React.MutableRefObject<YT.Player | null>;
+  currentVideoRef: React.MutableRefObject<string>;
+  embedTrackedRef: React.MutableRefObject<boolean>;
+  onEndedRef: React.MutableRefObject<() => void>;
+  onErrorRef: React.MutableRefObject<(code: number) => void>;
+  onReadyRef: React.MutableRefObject<() => void>;
+  onPlayRef: React.MutableRefObject<() => void>;
+  onPauseRef: React.MutableRefObject<() => void>;
+  sourceRef: React.MutableRefObject<string | undefined>;
+}
+
+function buildPlayerOptions(refs: PlayerRefs) {
+  return {
+    width: '100%',
+    height: '100%',
+    videoId: refs.currentVideoRef.current,
+    playerVars: {
+      autoplay: 1,
+      controls: 1,
+      modestbranding: 1,
+      rel: 0,
+      iv_load_policy: 3,
+      fs: 1,
+      playsinline: 1,
+    },
+    events: {
+      onReady: () => refs.onReadyRef.current(),
+      onStateChange: (e: YT.OnStateChangeEvent) => {
+        switch (e.data) {
+          case window.YT.PlayerState.ENDED:
+            refs.onEndedRef.current();
+            break;
+          case window.YT.PlayerState.PLAYING:
+            if (!refs.embedTrackedRef.current && refs.sourceRef.current) {
+              refs.embedTrackedRef.current = true;
+              recordEmbedAttempt(refs.sourceRef.current, false);
+            }
+            refs.onPlayRef.current();
+            break;
+          case window.YT.PlayerState.PAUSED:
+            refs.onPauseRef.current();
+            break;
+        }
+      },
+      onError: (e: YT.OnErrorEvent) => {
+        if (
+          (e.data === 101 || e.data === 150) &&
+          !refs.embedTrackedRef.current &&
+          refs.sourceRef.current
+        ) {
+          refs.embedTrackedRef.current = true;
+          recordEmbedAttempt(refs.sourceRef.current, true);
+        }
+        refs.onErrorRef.current(e.data);
+      },
+    },
+  };
+}
+
+const Player = forwardRef<PlayerHandle, PlayerProps>(function Player(
+  { videoId, source, callbacks },
+  ref
+) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YT.Player | null>(null);
+  const currentVideoRef = useRef(videoId);
+  const embedTrackedRef = useRef(false);
+  const [apiUnavailable, setApiUnavailable] = useState(false);
+
+  const onEndedRef = useRef(callbacks.onEnded);
+  const onErrorRef = useRef(callbacks.onError);
+  const onReadyRef = useRef(callbacks.onReady);
+  const onPlayRef = useRef(callbacks.onPlay);
+  const onPauseRef = useRef(callbacks.onPause);
+  const sourceRef = useRef(source);
+  useEffect(() => {
+    onEndedRef.current = callbacks.onEnded;
+    onErrorRef.current = callbacks.onError;
+    onReadyRef.current = callbacks.onReady;
+    onPlayRef.current = callbacks.onPlay;
+    onPauseRef.current = callbacks.onPause;
+    sourceRef.current = source;
+  });
+
+  useImperativeHandle(ref, () => createPlayerHandle(playerRef));
 
   const createPlayer = useCallback(() => {
     if (!containerRef.current || playerRef.current) return;
-
-    playerRef.current = new window.YT.Player(containerRef.current, {
-      width: '100%',
-      height: '100%',
-      videoId: currentVideoRef.current,
-      playerVars: {
-        autoplay: 1,
-        controls: 1,
-        modestbranding: 1,
-        rel: 0,
-        iv_load_policy: 3,
-        fs: 1,
-        playsinline: 1,
-      },
-      events: {
-        onReady: () => onReadyRef.current(),
-        onStateChange: (e: YT.OnStateChangeEvent) => {
-          switch (e.data) {
-            case window.YT.PlayerState.ENDED:
-              onEndedRef.current();
-              break;
-            case window.YT.PlayerState.PLAYING:
-              if (!embedTrackedRef.current && sourceRef.current) {
-                embedTrackedRef.current = true;
-                recordEmbedAttempt(sourceRef.current, false);
-              }
-              onPlayRef.current();
-              break;
-            case window.YT.PlayerState.PAUSED:
-              onPauseRef.current();
-              break;
-          }
-        },
-        onError: (e: YT.OnErrorEvent) => {
-          if ((e.data === 101 || e.data === 150) && !embedTrackedRef.current && sourceRef.current) {
-            embedTrackedRef.current = true;
-            recordEmbedAttempt(sourceRef.current, true);
-          }
-          onErrorRef.current(e.data);
-        },
-      },
-    });
+    const refs: PlayerRefs = {
+      containerRef,
+      playerRef,
+      currentVideoRef,
+      embedTrackedRef,
+      onEndedRef,
+      onErrorRef,
+      onReadyRef,
+      onPlayRef,
+      onPauseRef,
+      sourceRef,
+    };
+    playerRef.current = new window.YT.Player(containerRef.current, buildPlayerOptions(refs));
   }, []);
 
   useEffect(() => {

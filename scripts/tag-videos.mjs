@@ -28,6 +28,37 @@ const MODELS = [
   'openrouter-llama-70b-free',
 ];
 const MAX_BATCH_ATTEMPTS = Math.max(2, MODELS.length * 2);
+const JSON_ARRAY_RE = /\[[\s\S]*\]/;
+
+function buildRequestBody(model, systemPrompt, prompt) {
+  return JSON.stringify({
+    model,
+    project_id: PROJECT_ID,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: prompt },
+    ],
+    temperature: 0.1,
+  });
+}
+
+async function fetchAndParse(model, systemPrompt, prompt, videos) {
+  const res = await fetch(GATEWAY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: buildRequestBody(model, systemPrompt, prompt),
+  });
+  if (res.status === 429) return { retry: true };
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  const match = content.match(JSON_ARRAY_RE);
+  if (!match) throw new Error('No JSON array in response');
+  return { tags: normalizeBatchTags(videos, JSON.parse(match[0])) };
+}
 
 async function callModel(model, stationId, videos, retries = 2) {
   const prompt = buildUserPrompt(videos);
@@ -35,37 +66,12 @@ async function callModel(model, stationId, videos, retries = 2) {
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(GATEWAY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-        body: JSON.stringify({
-          model,
-          project_id: PROJECT_ID,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: prompt },
-          ],
-          temperature: 0.1,
-        }),
-      });
-
-      if (res.status === 429) {
+      const result = await fetchAndParse(model, systemPrompt, prompt, videos);
+      if (result.retry) {
         await sleep(3000 + Math.random() * 2000);
         continue;
       }
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`${res.status}: ${text.slice(0, 200)}`);
-      }
-
-      const data = await res.json();
-      const content = data.choices?.[0]?.message?.content || '';
-
-      const match = content.match(/\[[\s\S]*\]/);
-      if (!match) throw new Error('No JSON array in response');
-
-      return normalizeBatchTags(videos, JSON.parse(match[0]));
+      return result.tags;
     } catch {
       if (attempt < retries) {
         await sleep(2000);

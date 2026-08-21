@@ -51,35 +51,115 @@ function formatViews(n: number): string {
   return String(n);
 }
 
-export default function CatalogPage() {
-  const catalog = loadCatalog();
-  const summary = loadSummary();
-  const totalVideos = summary.totalVideos;
+function StationDetails({ station }: { station: StationData }) {
+  return (
+    <details key={station.id} id={station.id} className="group border-t border-zinc-800 py-2">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-white">
+        <div>
+          <h2 className="text-xl font-semibold">{station.name}</h2>
+          <p className="text-sm text-zinc-500 mt-0.5">{station.description}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3 text-right text-sm">
+          <span>
+            <span className="text-zinc-300 font-medium">{station.videoCount.toLocaleString()}</span>
+            <span className="text-zinc-600 ml-1">videos</span>
+          </span>
+          <span aria-hidden="true" className="text-xl text-zinc-500 group-open:rotate-45">
+            +
+          </span>
+        </div>
+      </summary>
 
-  // Build station info with top videos
-  const stationData = stationsConfig.map((station) => {
+      <div className="pb-6 pt-2">
+        <div className="text-xs text-zinc-600 mb-4">
+          {station.sourceCount} channel{station.sourceCount !== 1 ? 's' : ''}:{' '}
+          {station.sources.join(', ')}
+        </div>
+
+        {station.topVideos.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border border-zinc-800 rounded-lg overflow-hidden">
+              <thead className="bg-zinc-900 text-zinc-500">
+                <tr>
+                  <th className="text-left px-3 py-2 font-medium">Title</th>
+                  <th className="text-left px-3 py-2 font-medium">Channel</th>
+                  <th className="text-right px-3 py-2 font-medium">Views</th>
+                  <th className="text-right px-3 py-2 font-medium">Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                {station.topVideos.map((v) => (
+                  <tr key={v.id} className="border-t border-zinc-800">
+                    <td className="px-3 py-0">
+                      <a
+                        href={`https://www.youtube.com/watch?v=${v.id}`}
+                        target="_blank"
+                        rel="noopener"
+                        className="flex min-h-11 items-center py-2 text-zinc-200 hover:text-blue-400"
+                      >
+                        {v.title}
+                      </a>
+                    </td>
+                    <td className="px-3 py-2 text-zinc-500">{v.source ?? '—'}</td>
+                    <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">
+                      {v.viewCount ? formatViews(v.viewCount) : '—'}
+                    </td>
+                    <td className="px-3 py-2 text-right text-zinc-500 tabular-nums">
+                      {v.duration > 0 ? formatDuration(v.duration) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="mt-3">
+          <Link
+            href={`/${station.id}`}
+            className="inline-flex min-h-11 items-center text-sm text-blue-400 hover:text-blue-300"
+          >
+            Play {station.name} station &rarr;
+          </Link>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+type StationData = {
+  id: string;
+  name: string;
+  description: string;
+  videoCount: number;
+  sources: string[];
+  sourceCount: number;
+  topVideos: Video[];
+};
+
+function buildStationData(catalog: CatalogFile): StationData[] {
+  return stationsConfig.map((station) => {
     const stationCat = catalog.stations[station.id];
     const videos = stationCat?.videos ?? [];
     const topVideos = [...videos]
       .sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0))
       .slice(0, 5);
-    const sources = station.sources.map((s) => s.name);
     return {
       id: station.id,
       name: station.name,
       description: station.description,
       videoCount: videos.length,
-      sources,
+      sources: station.sources.map((s) => s.name),
       sourceCount: station.sources.length,
       topVideos,
     };
   });
+}
 
-  // Build VideoObject JSON-LD for top videos across all stations
+function buildJsonLd(stationData: StationData[], totalVideos: number) {
   const allTopVideos = stationData.flatMap((s) =>
     s.topVideos.map((v) => ({ ...v, stationId: s.id, stationName: s.name }))
   );
-
   const videoJsonLd = allTopVideos.map((v) => ({
     '@type': 'VideoObject',
     '@id': `${siteUrl}/catalog#${v.id}`,
@@ -103,8 +183,7 @@ export default function CatalogPage() {
       url: `${siteUrl}/${v.stationId}`,
     },
   }));
-
-  const collectionJsonLd = {
+  return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: 'LoopTV Video Catalog',
@@ -112,6 +191,15 @@ export default function CatalogPage() {
     url: `${siteUrl}/catalog`,
     hasPart: videoJsonLd,
   };
+}
+
+export default function CatalogPage() {
+  const catalog = loadCatalog();
+  const summary = loadSummary();
+  const totalVideos = summary.totalVideos;
+  const stationData = buildStationData(catalog);
+  const collectionJsonLd = buildJsonLd(stationData, totalVideos);
+  const totalChannels = stationsConfig.reduce((n, s) => n + s.sources.length, 0);
 
   return (
     <main className="min-h-screen bg-black text-zinc-200">
@@ -134,8 +222,8 @@ export default function CatalogPage() {
         <h1 className="text-4xl font-bold tracking-tight text-white mb-3">Video Catalog</h1>
         <p className="text-zinc-400 max-w-2xl mb-8">
           {totalVideos.toLocaleString()} curated YouTube videos across {stationsConfig.length}{' '}
-          stations and {stationsConfig.reduce((n, s) => n + s.sources.length, 0)} channels. The
-          catalog is rebuilt weekly via GitHub Action using yt-dlp and committed as static JSON.
+          stations and {totalChannels} channels. The catalog is rebuilt weekly via GitHub Action
+          using yt-dlp and committed as static JSON.
         </p>
 
         <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -148,9 +236,7 @@ export default function CatalogPage() {
             <div className="text-sm text-zinc-500">Stations</div>
           </div>
           <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
-            <div className="text-2xl font-bold text-white">
-              {stationsConfig.reduce((n, s) => n + s.sources.length, 0)}
-            </div>
+            <div className="text-2xl font-bold text-white">{totalChannels}</div>
             <div className="text-sm text-zinc-500">YouTube channels</div>
           </div>
         </div>
@@ -178,83 +264,7 @@ export default function CatalogPage() {
 
         <div className="border-b border-zinc-800">
           {stationData.map((station) => (
-            <details
-              key={station.id}
-              id={station.id}
-              className="group border-t border-zinc-800 py-2"
-            >
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-white">
-                <div>
-                  <h2 className="text-xl font-semibold">{station.name}</h2>
-                  <p className="text-sm text-zinc-500 mt-0.5">{station.description}</p>
-                </div>
-                <div className="flex shrink-0 items-center gap-3 text-right text-sm">
-                  <span>
-                    <span className="text-zinc-300 font-medium">
-                      {station.videoCount.toLocaleString()}
-                    </span>
-                    <span className="text-zinc-600 ml-1">videos</span>
-                  </span>
-                  <span aria-hidden="true" className="text-xl text-zinc-500 group-open:rotate-45">
-                    +
-                  </span>
-                </div>
-              </summary>
-
-              <div className="pb-6 pt-2">
-                <div className="text-xs text-zinc-600 mb-4">
-                  {station.sourceCount} channel{station.sourceCount !== 1 ? 's' : ''}:{' '}
-                  {station.sources.join(', ')}
-                </div>
-
-                {station.topVideos.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm border border-zinc-800 rounded-lg overflow-hidden">
-                      <thead className="bg-zinc-900 text-zinc-500">
-                        <tr>
-                          <th className="text-left px-3 py-2 font-medium">Title</th>
-                          <th className="text-left px-3 py-2 font-medium">Channel</th>
-                          <th className="text-right px-3 py-2 font-medium">Views</th>
-                          <th className="text-right px-3 py-2 font-medium">Duration</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {station.topVideos.map((v) => (
-                          <tr key={v.id} className="border-t border-zinc-800">
-                            <td className="px-3 py-0">
-                              <a
-                                href={`https://www.youtube.com/watch?v=${v.id}`}
-                                target="_blank"
-                                rel="noopener"
-                                className="flex min-h-11 items-center py-2 text-zinc-200 hover:text-blue-400"
-                              >
-                                {v.title}
-                              </a>
-                            </td>
-                            <td className="px-3 py-2 text-zinc-500">{v.source ?? '—'}</td>
-                            <td className="px-3 py-2 text-right text-zinc-400 tabular-nums">
-                              {v.viewCount ? formatViews(v.viewCount) : '—'}
-                            </td>
-                            <td className="px-3 py-2 text-right text-zinc-500 tabular-nums">
-                              {v.duration > 0 ? formatDuration(v.duration) : '—'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                <div className="mt-3">
-                  <Link
-                    href={`/${station.id}`}
-                    className="inline-flex min-h-11 items-center text-sm text-blue-400 hover:text-blue-300"
-                  >
-                    Play {station.name} station &rarr;
-                  </Link>
-                </div>
-              </div>
-            </details>
+            <StationDetails key={station.id} station={station} />
           ))}
         </div>
 
