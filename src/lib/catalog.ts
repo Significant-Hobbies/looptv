@@ -41,15 +41,19 @@ function assertUsableSummary(summary: CatalogSummary): CatalogSummary {
   return summary;
 }
 
-async function fetchCatalogWithRetry(): Promise<Catalog> {
+async function fetchWithRetry<T>(
+  path: string,
+  validate: (raw: unknown) => T,
+  errorMessage: string
+): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
-      const url = shouldBypassCache ? `/catalog.json?v=${Date.now()}` : '/catalog.json';
+      const url = shouldBypassCache ? `/${path}?v=${Date.now()}` : `/${path}`;
       const res = await fetch(url, { cache: shouldBypassCache ? 'no-store' : 'no-cache' });
-      if (!res.ok) throw new Error(`Failed to load catalog: ${res.status}`);
-      return assertUsableCatalog((await res.json()) as Catalog);
+      if (!res.ok) throw new Error(`${errorMessage}: ${res.status}`);
+      return validate(await res.json());
     } catch (err) {
       lastErr = err;
       if (attempt < RETRY_DELAYS_MS.length) {
@@ -57,7 +61,23 @@ async function fetchCatalogWithRetry(): Promise<Catalog> {
       }
     }
   }
-  throw lastErr instanceof Error ? lastErr : new Error('Failed to load catalog');
+  throw lastErr instanceof Error ? lastErr : new Error(errorMessage);
+}
+
+function fetchCatalogWithRetry(): Promise<Catalog> {
+  return fetchWithRetry(
+    'catalog.json',
+    (r) => assertUsableCatalog(r as Catalog),
+    'Failed to load catalog'
+  );
+}
+
+function fetchSummaryWithRetry(): Promise<CatalogSummary> {
+  return fetchWithRetry(
+    'catalog-summary.json',
+    (r) => assertUsableSummary(r as CatalogSummary),
+    'Failed to load catalog summary'
+  );
 }
 
 export async function loadCatalog(): Promise<Catalog> {
@@ -87,29 +107,6 @@ export async function refreshCatalog(): Promise<Catalog> {
       inflight = null;
     });
   return inflight;
-}
-
-async function fetchSummaryWithRetry(): Promise<CatalogSummary> {
-  let lastErr: unknown;
-  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
-    try {
-      const shouldBypassCache = attempt === RETRY_DELAYS_MS.length;
-      const url = shouldBypassCache
-        ? `/catalog-summary.json?v=${Date.now()}`
-        : '/catalog-summary.json';
-      const res = await fetch(url, {
-        cache: shouldBypassCache ? 'no-store' : 'no-cache',
-      });
-      if (!res.ok) throw new Error(`Failed to load catalog summary: ${res.status}`);
-      return assertUsableSummary((await res.json()) as CatalogSummary);
-    } catch (err) {
-      lastErr = err;
-      if (attempt < RETRY_DELAYS_MS.length) {
-        await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
-      }
-    }
-  }
-  throw lastErr instanceof Error ? lastErr : new Error('Failed to load catalog summary');
 }
 
 export async function refreshCatalogSummary(): Promise<CatalogSummary> {

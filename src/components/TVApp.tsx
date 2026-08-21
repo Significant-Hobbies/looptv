@@ -1,39 +1,9 @@
-import type { Catalog, Video } from '@/lib/types';
-import type { EmbedHealthRecord } from '@/lib/watched';
 import { useTVAppState, type TVAppState } from '@/hooks/useTVAppState';
 import type { RailState, RailActions } from './ControlRail';
+import type { BannerActions, SearchProps, HealthProps, PlayerHealthProps } from './shared-types';
 import LobbyView from './LobbyView';
 import PlayerView from './PlayerView';
 import stations from '../../channels.config';
-
-interface BannerActions {
-  onRetryCatalog: () => void;
-  onOpenHealth: () => void;
-  onSearch: () => void;
-  onDismiss: () => void;
-}
-
-interface SearchProps {
-  videos: Video[];
-  onSelect: (v: Video) => void;
-  onQueue: (v: Video) => void;
-  onClose: () => void;
-  visible: boolean;
-  watchLaterIds: Set<string>;
-  onToggleWatchLater: (id: string) => void;
-}
-
-interface HealthProps {
-  visible: boolean;
-  onClose: () => void;
-  stations: typeof import('../../channels.config').default;
-  catalog: Catalog | null;
-  embedHealth: Record<string, EmbedHealthRecord>;
-  blockedSources: Set<string>;
-  quarantinedSources: Set<string>;
-  onToggleBlock: (source: string) => void;
-  onUnquarantine: (source: string) => void;
-}
 
 function buildBannerActions(s: TVAppState): BannerActions {
   return {

@@ -1,10 +1,9 @@
 import type { Catalog, CatalogSummary, Video } from '@/lib/types';
-import type { EmbedHealthRecord } from '@/lib/watched';
 import type { PlayerHandle } from './Player';
 import type { RailState, RailActions } from './ControlRail';
+import type { BannerActions, SearchProps, PlayerHealthProps } from './shared-types';
+import { SearchOverlay, HealthOverlay } from './OverlayPanels';
 import Player from './Player';
-import Search from './Search';
-import ChannelHealth from './ChannelHealth';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
 import ControlRail from './ControlRail';
 import stations from '../../channels.config';
@@ -24,34 +23,6 @@ const SHORTCUTS: [string, string][] = [
   ['?', 'This help'],
   ['Esc', 'Close overlay'],
 ];
-
-interface BannerActions {
-  onRetryCatalog: () => void;
-  onOpenHealth: () => void;
-  onSearch: () => void;
-  onDismiss: () => void;
-}
-
-interface SearchProps {
-  videos: Video[];
-  onSelect: (v: Video) => void;
-  onQueue: (v: Video) => void;
-  onClose: () => void;
-  visible: boolean;
-  watchLaterIds: Set<string>;
-  onToggleWatchLater: (id: string) => void;
-}
-
-interface HealthProps {
-  visible: boolean;
-  onClose: () => void;
-  embedHealth: Record<string, EmbedHealthRecord>;
-  blockedSources: Set<string>;
-  quarantinedSources: Set<string>;
-  onToggleBlock: (source: string) => void;
-  onUnquarantine: (source: string) => void;
-  catalog: Catalog | null;
-}
 
 interface GuideEntry {
   id: string;
@@ -225,7 +196,7 @@ export interface PlayerViewProps {
   controlState: RailState;
   controlActions: RailActions;
   searchProps: SearchProps;
-  healthProps: HealthProps;
+  healthProps: PlayerHealthProps;
   showGuide: boolean;
   setShowGuide: (v: boolean) => void;
   setShowHealth: (v: boolean) => void;
@@ -300,17 +271,7 @@ export default function PlayerView(props: PlayerViewProps) {
 
       <ControlRail state={controlState} actions={controlActions} />
 
-      <Search
-        videos={searchProps.videos}
-        onSelect={searchProps.onSelect}
-        onQueue={searchProps.onQueue}
-        onClose={searchProps.onClose}
-        visible={searchProps.visible}
-        watchLater={{
-          ids: searchProps.watchLaterIds,
-          onToggle: searchProps.onToggleWatchLater,
-        }}
-      />
+      <SearchOverlay searchProps={searchProps} />
 
       <ChannelGuide
         showGuide={showGuide}
@@ -323,21 +284,7 @@ export default function PlayerView(props: PlayerViewProps) {
 
       <ShortcutsHelp showShortcuts={showShortcuts} setShowShortcuts={setShowShortcuts} />
 
-      <ChannelHealth
-        visible={healthProps.visible}
-        onClose={healthProps.onClose}
-        stations={stations}
-        catalog={healthProps.catalog}
-        healthData={{
-          embedHealth: healthProps.embedHealth,
-          blockedSources: healthProps.blockedSources,
-          quarantinedSources: healthProps.quarantinedSources,
-        }}
-        actions={{
-          onToggleBlock: healthProps.onToggleBlock,
-          onUnquarantine: healthProps.onUnquarantine,
-        }}
-      />
+      <HealthOverlay healthProps={healthProps} stations={stations} />
     </div>
   );
 }

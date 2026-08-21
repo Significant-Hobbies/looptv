@@ -49,7 +49,7 @@ interface VideoFilterOptions {
   activeSources: Set<string> | null;
 }
 
-export function filterAvailableVideos(videos: Video[], opts: VideoFilterOptions): Video[] {
+function filterAvailableVideos(videos: Video[], opts: VideoFilterOptions): Video[] {
   return videos.filter(
     (v) =>
       !opts.skippedIds.has(v.id) &&
@@ -80,7 +80,7 @@ export function pickSmartMixCandidate(params: SmartMixPickParams) {
   });
 }
 
-export function collectVideos(
+function collectVideos(
   catalog: Catalog,
   isSmartMix: boolean,
   activeStation: string,
@@ -91,7 +91,7 @@ export function collectVideos(
     : getVideosForStation(catalog, activeStation, category);
 }
 
-export function selectNextVideo(
+function selectNextVideo(
   available: Video[],
   allVideos: Video[],
   smartPick: ReturnType<typeof pickSmartMixCandidate> | null,

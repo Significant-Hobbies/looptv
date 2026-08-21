@@ -1,11 +1,10 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { Catalog, Video } from '@/lib/types';
-import type { EmbedHealthRecord } from '@/lib/watched';
 import { getSourceFreshness } from '@/lib/catalog';
 import { isEmbedUnhealthy, getEmbedBlockRate } from '@/lib/source-health';
 import Link from './AppLink';
-import Search from './Search';
-import ChannelHealth from './ChannelHealth';
+import { SearchOverlay, HealthOverlay } from './OverlayPanels';
+import type { BannerActions, SearchProps, HealthProps } from './shared-types';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
 
 interface StationConfig {
@@ -13,35 +12,6 @@ interface StationConfig {
   name: string;
   description: string;
   sources: { name: string; handle: string }[];
-}
-
-interface BannerActions {
-  onRetryCatalog: () => void;
-  onOpenHealth: () => void;
-  onSearch: () => void;
-  onDismiss: () => void;
-}
-
-interface SearchProps {
-  videos: Video[];
-  onSelect: (v: Video) => void;
-  onQueue: (v: Video) => void;
-  onClose: () => void;
-  visible: boolean;
-  watchLaterIds: Set<string>;
-  onToggleWatchLater: (id: string) => void;
-}
-
-interface HealthProps {
-  visible: boolean;
-  onClose: () => void;
-  stations: typeof import('../../channels.config').default;
-  catalog: Catalog | null;
-  embedHealth: Record<string, EmbedHealthRecord>;
-  blockedSources: Set<string>;
-  quarantinedSources: Set<string>;
-  onToggleBlock: (source: string) => void;
-  onUnquarantine: (source: string) => void;
 }
 
 export interface LobbyViewProps {
@@ -366,32 +336,8 @@ export default function LobbyView(props: LobbyViewProps) {
         setSearchOpen={setSearchOpen}
       />
 
-      <Search
-        videos={searchProps.videos}
-        onSelect={searchProps.onSelect}
-        onQueue={searchProps.onQueue}
-        onClose={searchProps.onClose}
-        visible={searchProps.visible}
-        watchLater={{
-          ids: searchProps.watchLaterIds,
-          onToggle: searchProps.onToggleWatchLater,
-        }}
-      />
-      <ChannelHealth
-        visible={healthProps.visible}
-        onClose={healthProps.onClose}
-        stations={healthProps.stations}
-        catalog={healthProps.catalog}
-        healthData={{
-          embedHealth: healthProps.embedHealth,
-          blockedSources: healthProps.blockedSources,
-          quarantinedSources: healthProps.quarantinedSources,
-        }}
-        actions={{
-          onToggleBlock: healthProps.onToggleBlock,
-          onUnquarantine: healthProps.onUnquarantine,
-        }}
-      />
+      <SearchOverlay searchProps={searchProps} />
+      <HealthOverlay healthProps={healthProps} stations={healthProps.stations} />
     </div>
   );
 }
