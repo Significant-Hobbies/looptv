@@ -40,7 +40,7 @@ function HeroSection({
     <section className="text-center sm:py-12">
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">LoopTV</p>
       <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-medium tracking-tight text-white sm:text-5xl md:text-6xl">
-        Channel-surf YouTube like it&apos;s TV.
+        LoopTV — channel-surf YouTube like it&apos;s TV.
       </h1>
       <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base">
         Pick a station, hit play, and let random clips run nonstop. {totalStations} stations,{' '}

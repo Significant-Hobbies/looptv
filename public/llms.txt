@@ -23,6 +23,24 @@
 - [Homepage markdown](https://tv.significanthobbies.com/index.md): Product brief without JS
 - [This index](https://tv.significanthobbies.com/llms.txt)
 
+## Developer docs
+
+- [OpenAPI specification](https://tv.significanthobbies.com/openapi.json): Full API surface description (OpenAPI 3.1)
+- [Agent catalog](https://tv.significanthobbies.com/api/ai): JSON inventory of public agent surfaces
+
+## CLI
+
+```bash
+# Fetch the agent catalog
+curl -s https://tv.significanthobbies.com/api/ai | jq .
+
+# Get the OpenAPI spec
+curl -s https://tv.significanthobbies.com/openapi.json | jq .
+
+# Fetch the homepage as markdown
+curl -s -H 'Accept: text/markdown' https://tv.significanthobbies.com/
+```
+
 ## Optional
 
 - [Foundry](https://sassmaker.com): Parent fleet showcase
