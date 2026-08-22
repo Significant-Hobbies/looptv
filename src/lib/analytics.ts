@@ -22,7 +22,12 @@
  */
 'use client';
 
-import posthog from 'posthog-js';
+// posthog-js is ~220 KB and is NOT on the LCP-critical path. It is loaded
+// lazily via the shared `getPostHogClient` so the analytics chunk only loads
+// after the page is interactive (events fire from useEffect in
+// <AnalyticsProvider>), instead of being pulled into the eager `client:only`
+// main bundle.
+import { getPostHogClient } from '@/lib/posthog-client';
 
 const PROJECT = 'looptv' as const;
 
@@ -45,7 +50,15 @@ interface AnalyticsEventMap {
 function trackEvent(event: string, properties: Record<string, unknown> = {}): void {
   try {
     if (typeof window === 'undefined') return;
-    posthog.capture(event, { project_id: PROJECT, ...properties });
+    // Fire-and-forget: analytics must never block or break a user flow.
+    void getPostHogClient().then((ph) => {
+      if (!ph) return;
+      try {
+        ph.capture(event, { project_id: PROJECT, ...properties });
+      } catch {
+        // Swallow — analytics must never throw.
+      }
+    });
   } catch {
     // Analytics must NEVER break a user flow. Swallow and move on.
   }
