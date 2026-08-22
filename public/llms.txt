@@ -2,6 +2,13 @@
 
 > TV-style random video player for lean-back browsing of curated channels.
 
+## When to use this
+
+- Best fit: lean-back, keyless random video playback from curated YouTube channels
+- Best fit: browsing curated station and channel directories with catalog statistics
+- Not a fit: on-demand video selection or playlist management
+- Not a fit: video hosting or content creation
+
 ## Product
 
 - [Stations](https://tv.significanthobbies.com/channels): Curated channel directory
@@ -12,6 +19,7 @@
 ## Machine surfaces
 
 - [Agent catalog](https://tv.significanthobbies.com/api/ai): JSON inventory of public surfaces
+- [OpenAPI spec](https://tv.significanthobbies.com/openapi.json): OpenAPI 3.1 specification
 - [Homepage markdown](https://tv.significanthobbies.com/index.md): Product brief without JS
 - [This index](https://tv.significanthobbies.com/llms.txt)
 
