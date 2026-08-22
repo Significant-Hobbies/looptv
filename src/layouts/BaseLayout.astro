@@ -77,7 +77,7 @@ const jsonLd = {
 </head>
   <body class="bg-black">
     <slot />
-    <ClientServices client:only="react" />
+    <ClientServices client:idle="react" />
     <script
       is:inline
       src="https://sassmaker.com/project-strip.js"
