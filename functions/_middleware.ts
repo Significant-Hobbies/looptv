@@ -5,65 +5,97 @@
 // - Adds Vary: Accept to HTML responses that have markdown alternates.
 // - Returns JSON errors for unknown /api/* paths.
 
-const SITE_URL = "https://tv.significanthobbies.com";
+const SITE_URL = 'https://tv.significanthobbies.com';
 
 const OPENAPI_SPEC = {
-  openapi: "3.1.0",
+  openapi: '3.1.0',
   info: {
-    title: "LoopTV public API",
-    version: "1.0.0",
+    title: 'LoopTV public API',
+    version: '1.0.0',
     description:
-      "LoopTV is a TV-style random video player for lean-back browsing of curated channels. The public web API exposes read-only agent surfaces: the agent catalog, sitemap, llms.txt, and per-page markdown alternates.",
-    contact: { name: "LoopTV", url: SITE_URL },
+      'LoopTV is a TV-style random video player for lean-back browsing of curated channels. The public web API exposes read-only agent surfaces: the agent catalog, sitemap, llms.txt, and per-page markdown alternates.',
+    contact: { name: 'LoopTV', url: SITE_URL },
   },
   servers: [{ url: SITE_URL }],
-  tags: [{ name: "agent-surfaces", description: "Machine-readable public surfaces" }],
+  tags: [{ name: 'agent-surfaces', description: 'Machine-readable public surfaces' }],
   paths: {
-    "/api/ai": {
+    '/api/ai': {
       get: {
-        operationId: "getAgentCatalog",
-        tags: ["agent-surfaces"],
-        summary: "Agent catalog",
-        description: "JSON inventory of public agent surfaces.",
+        operationId: 'getAgentCatalog',
+        tags: ['agent-surfaces'],
+        summary: 'Agent catalog',
+        description: 'JSON inventory of public agent surfaces.',
         responses: {
-          "200": { description: "Agent catalog", content: { "application/json": { schema: { type: "object", description: "Bounded inventory of public agent surfaces." } } } },
-          "404": { description: "Not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
+          '200': {
+            description: 'Agent catalog',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  description: 'Bounded inventory of public agent surfaces.',
+                },
+              },
+            },
+          },
+          '404': {
+            description: 'Not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiError' } } },
+          },
         },
       },
     },
-    "/llms.txt": {
+    '/llms.txt': {
       get: {
-        operationId: "getLlmsTxt",
-        tags: ["agent-surfaces"],
-        summary: "llms.txt index",
-        description: "Concise, human-and-agent-readable index of the site and its machine surfaces.",
+        operationId: 'getLlmsTxt',
+        tags: ['agent-surfaces'],
+        summary: 'llms.txt index',
+        description:
+          'Concise, human-and-agent-readable index of the site and its machine surfaces.',
         responses: {
-          "200": { description: "Markdown index", content: { "text/plain": { schema: { type: "string" } } } },
-          "404": { description: "Not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
+          '200': {
+            description: 'Markdown index',
+            content: { 'text/plain': { schema: { type: 'string' } } },
+          },
+          '404': {
+            description: 'Not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiError' } } },
+          },
         },
       },
     },
-    "/sitemap.xml": {
+    '/sitemap.xml': {
       get: {
-        operationId: "getSitemap",
-        tags: ["agent-surfaces"],
-        summary: "Sitemap",
-        description: "XML sitemap of public, agent-readable routes.",
+        operationId: 'getSitemap',
+        tags: ['agent-surfaces'],
+        summary: 'Sitemap',
+        description: 'XML sitemap of public, agent-readable routes.',
         responses: {
-          "200": { description: "XML sitemap", content: { "application/xml": { schema: { type: "string" } } } },
-          "404": { description: "Not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
+          '200': {
+            description: 'XML sitemap',
+            content: { 'application/xml': { schema: { type: 'string' } } },
+          },
+          '404': {
+            description: 'Not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiError' } } },
+          },
         },
       },
     },
-    "/openapi.json": {
+    '/openapi.json': {
       get: {
-        operationId: "getOpenApiSpec",
-        tags: ["agent-surfaces"],
-        summary: "OpenAPI specification",
-        description: "This document: a machine-readable description of the public agent API.",
+        operationId: 'getOpenApiSpec',
+        tags: ['agent-surfaces'],
+        summary: 'OpenAPI specification',
+        description: 'This document: a machine-readable description of the public agent API.',
         responses: {
-          "200": { description: "OpenAPI 3.1 spec", content: { "application/json": { schema: { type: "object" } } } },
-          "404": { description: "Not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
+          '200': {
+            description: 'OpenAPI 3.1 spec',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+          '404': {
+            description: 'Not found',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiError' } } },
+          },
         },
       },
     },
@@ -71,36 +103,36 @@ const OPENAPI_SPEC = {
   components: {
     schemas: {
       ApiError: {
-        type: "object",
-        description: "Error response for failed API requests.",
+        type: 'object',
+        description: 'Error response for failed API requests.',
         properties: {
           error: {
-            type: "object",
+            type: 'object',
             properties: {
-              code: { type: "string", example: "not_found" },
-              message: { type: "string", example: "Unknown API path: /api/unknown" },
-              path: { type: "string", example: "/api/unknown" },
+              code: { type: 'string', example: 'not_found' },
+              message: { type: 'string', example: 'Unknown API path: /api/unknown' },
+              path: { type: 'string', example: '/api/unknown' },
             },
-            required: ["code", "message", "path"],
+            required: ['code', 'message', 'path'],
           },
         },
-        required: ["error"],
+        required: ['error'],
       },
     },
   },
 };
 
 function wantsMarkdown(request: Request): boolean {
-  const accept = (request.headers.get("accept") || "").toLowerCase();
-  if (!accept.includes("text/markdown")) return false;
-  if (!accept.includes("text/html")) return true;
-  return accept.indexOf("text/markdown") < accept.indexOf("text/html");
+  const accept = (request.headers.get('accept') || '').toLowerCase();
+  if (!accept.includes('text/markdown')) return false;
+  if (!accept.includes('text/html')) return true;
+  return accept.indexOf('text/markdown') < accept.indexOf('text/html');
 }
 
 function normalizePath(pathname: string): string {
-  if (!pathname || pathname === "/") return "/";
-  const withSlash = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  return withSlash.replace(/\/{2,}/g, "/").replace(/\/+$/, "") || "/";
+  if (!pathname || pathname === '/') return '/';
+  const withSlash = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return withSlash.replace(/\/{2,}/g, '/').replace(/\/+$/, '') || '/';
 }
 
 function markdown404(pathname: string, method: string): Response {
@@ -117,38 +149,35 @@ function markdown404(pathname: string, method: string): Response {
 - [Agent catalog (JSON)](${SITE_URL}/api/ai)
 - [OpenAPI spec](${SITE_URL}/openapi.json)
 `;
-  return new Response(method === "HEAD" ? null : body, {
+  return new Response(method === 'HEAD' ? null : body, {
     status: 404,
     headers: {
-      "content-type": "text/markdown; charset=utf-8",
-      "cache-control": "no-store",
-      "x-content-type-options": "nosniff",
-      vary: "Accept",
+      'content-type': 'text/markdown; charset=utf-8',
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff',
+      vary: 'Accept',
     },
   });
 }
 
 function jsonError(status: number, code: string, message: string, path: string): Response {
-  return new Response(
-    JSON.stringify({ error: { code, message, path } }),
-    {
-      status,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": "no-store",
-        "access-control-allow-origin": "*",
-        "RateLimit-Limit": "120",
-        "RateLimit-Remaining": "119",
-        "RateLimit-Reset": "60",
-      },
+  return new Response(JSON.stringify({ error: { code, message, path } }), {
+    status,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'cache-control': 'no-store',
+      'access-control-allow-origin': '*',
+      'RateLimit-Limit': '120',
+      'RateLimit-Remaining': '119',
+      'RateLimit-Reset': '60',
     },
-  );
+  });
 }
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;
 
-  if (request.method !== "GET" && request.method !== "HEAD") {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
     return context.next();
   }
 
@@ -156,46 +185,46 @@ export const onRequest: PagesFunction = async (context) => {
   const pathname = url.pathname;
 
   // /openapi.json — serve the spec directly.
-  if (pathname === "/openapi.json" || pathname === "/openapi.yaml") {
+  if (pathname === '/openapi.json' || pathname === '/openapi.yaml') {
     return new Response(JSON.stringify(OPENAPI_SPEC, null, 2), {
       headers: {
-        "content-type": "application/json; charset=utf-8",
-        "access-control-allow-origin": "*",
-        "cache-control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800",
-        "RateLimit-Limit": "120",
-        "RateLimit-Remaining": "119",
-        "RateLimit-Reset": "60",
+        'content-type': 'application/json; charset=utf-8',
+        'access-control-allow-origin': '*',
+        'cache-control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+        'RateLimit-Limit': '120',
+        'RateLimit-Remaining': '119',
+        'RateLimit-Reset': '60',
       },
     });
   }
 
   // JSON errors for unknown /api/* paths.
-  if (pathname.startsWith("/api/") && pathname !== "/api/ai") {
-    return jsonError(404, "not_found", `Unknown API path: ${pathname}`, pathname);
+  if (pathname.startsWith('/api/') && pathname !== '/api/ai') {
+    return jsonError(404, 'not_found', `Unknown API path: ${pathname}`, pathname);
   }
 
   // Skip asset paths — let Pages handle directly.
   if (
-    pathname.startsWith("/_astro/") ||
-    pathname.startsWith("/_next/") ||
-    (pathname.includes(".") && !pathname.endsWith(".md"))
+    pathname.startsWith('/_astro/') ||
+    pathname.startsWith('/_next/') ||
+    (pathname.includes('.') && !pathname.endsWith('.md'))
   ) {
     return context.next();
   }
 
   // Accept: text/markdown negotiation for HTML pages that have a .md alternate.
-  if (wantsMarkdown(request) && !pathname.endsWith(".md") && !pathname.startsWith("/api/")) {
-    const mdPath = pathname === "/" ? "/index.md" : `${pathname.replace(/\/$/, "")}.md`;
+  if (wantsMarkdown(request) && !pathname.endsWith('.md') && !pathname.startsWith('/api/')) {
+    const mdPath = pathname === '/' ? '/index.md' : `${pathname.replace(/\/$/, '')}.md`;
     if (context.env.ASSETS) {
       const mdUrl = new URL(url);
       mdUrl.pathname = mdPath;
       const mdResponse = await context.env.ASSETS.fetch(new Request(mdUrl.toString(), request));
       if (mdResponse.status === 200) {
         const headers = new Headers(mdResponse.headers);
-        headers.set("content-type", "text/markdown; charset=utf-8");
-        headers.set("vary", "Accept, Accept-Encoding");
-        headers.set("x-content-type-options", "nosniff");
-        return new Response(request.method === "HEAD" ? null : mdResponse.body, {
+        headers.set('content-type', 'text/markdown; charset=utf-8');
+        headers.set('vary', 'Accept, Accept-Encoding');
+        headers.set('x-content-type-options', 'nosniff');
+        return new Response(request.method === 'HEAD' ? null : mdResponse.body, {
           status: 200,
           headers,
         });
@@ -204,26 +233,26 @@ export const onRequest: PagesFunction = async (context) => {
   }
 
   const response = await context.next();
-  const contentType = response.headers.get("content-type") ?? "";
+  const contentType = response.headers.get('content-type') ?? '';
 
   // Agent-friendly 404 with markdown recovery body.
-  if (response.status === 404 && !pathname.startsWith("/api/")) {
+  if (response.status === 404 && !pathname.startsWith('/api/')) {
     if (wantsMarkdown(request)) {
       return markdown404(pathname, request.method);
     }
     const headers = new Headers(response.headers);
-    headers.set("vary", "Accept, Accept-Encoding");
+    headers.set('vary', 'Accept, Accept-Encoding');
     return new Response(response.body, { status: 404, headers });
   }
 
-  if (response.status !== 200 || !contentType.includes("text/html")) {
+  if (response.status !== 200 || !contentType.includes('text/html')) {
     return response;
   }
 
   // Add Vary: Accept to HTML pages that might have markdown alternates.
   const headers = new Headers(response.headers);
-  const existingVary = headers.get("vary");
-  headers.set("vary", existingVary ? `${existingVary}, Accept` : "Accept, Accept-Encoding");
+  const existingVary = headers.get('vary');
+  headers.set('vary', existingVary ? `${existingVary}, Accept` : 'Accept, Accept-Encoding');
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
