@@ -5,6 +5,7 @@ import { isEmbedUnhealthy, getEmbedBlockRate } from '@/lib/source-health';
 import Link from './AppLink';
 import { SearchOverlay, HealthOverlay } from './OverlayPanels';
 import type { BannerActions, SearchProps, HealthProps } from './shared-types';
+import type { EmbedHealthRecord } from '@/lib/watched';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
 
 interface StationConfig {

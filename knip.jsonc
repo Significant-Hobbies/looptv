@@ -4,7 +4,8 @@
     "src/pages/**/*.{astro,ts}",
     "scripts/*.mjs",
     "astro.config.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "functions/**/*.ts"
   ],
   "project": ["**/*.{astro,ts,tsx,js,jsx,mjs,cjs,mts}"],
   "ignore": [

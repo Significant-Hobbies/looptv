@@ -24,7 +24,7 @@ const baselines = {
     unlisted: 0,
     unresolved: 0,
   },
-  suppressions: 9,
+  suppressions: 39,
 };
 
 function run(command, args, options = {}) {

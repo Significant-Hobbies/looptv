@@ -1,6 +1,6 @@
 import { useTVAppState, type TVAppState } from '@/hooks/useTVAppState';
 import type { RailState, RailActions } from './ControlRail';
-import type { BannerActions, SearchProps, HealthProps, PlayerHealthProps } from './shared-types';
+import type { BannerActions, SearchProps, HealthProps } from './shared-types';
 import LobbyView from './LobbyView';
 import PlayerView from './PlayerView';
 import stations from '../../channels.config';
