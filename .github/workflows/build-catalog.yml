@@ -135,11 +135,12 @@ jobs:
 
       - name: Count videos needing AI tags
         id: pending-tags-before
+        if: always() && steps.build-catalog.outcome == 'success'
         run: echo "count=$(node scripts/catalog-tag-status.mjs public/catalog.json)" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test AI gateway
         id: gateway-smoke
-        if: steps.pending-tags-before.outputs.count != '0'
+        if: always() && steps.pending-tags-before.outputs.count != '0'
         continue-on-error: true
         env:
           FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
@@ -148,7 +149,7 @@ jobs:
 
       - name: Tag new videos via AI gateway
         id: tag-primary
-        if: steps.gateway-smoke.outcome == 'success' && steps.pending-tags-before.outputs.count != '0'
+        if: always() && steps.gateway-smoke.outcome == 'success' && steps.pending-tags-before.outputs.count != '0'
         continue-on-error: true
         env:
           FAGW_API_KEY: ${{ secrets.FAGW_API_KEY }}
@@ -156,7 +157,7 @@ jobs:
         run: node scripts/tag-videos.mjs
 
       - name: Note unavailable AI tagging
-        if: steps.pending-tags-before.outputs.count != '0' && steps.gateway-smoke.outcome != 'success'
+        if: always() && steps.pending-tags-before.outputs.count != '0' && steps.gateway-smoke.outcome != 'success'
         env:
           GATEWAY_STATUS: ${{ steps.gateway-smoke.outputs.status }}
           PENDING_TAGS: ${{ steps.pending-tags-before.outputs.count }}
