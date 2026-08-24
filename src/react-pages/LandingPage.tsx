@@ -146,7 +146,7 @@ function Footer() {
   return (
     <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-zinc-500">
       <p>The algorithm doesn&apos;t decide. You pick the station.</p>
-      <nav className="flex gap-5">
+      <nav className="flex flex-wrap gap-x-5 gap-y-3">
         <Link href="/about" className="hover:text-zinc-300">
           About
         </Link>
