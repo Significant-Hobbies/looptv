@@ -23,8 +23,6 @@
     "deploy": "pnpm cf:build && wrangler pages deploy dist --project-name=looptv",
     "docs:check": "node scripts/validate-docs.mjs",
     "docs:check:strict": "node scripts/validate-docs.mjs --strict",
-    "docs:build": "blume build",
-    "docs:dev": "blume dev",
     "knip": "knip --no-exit-code --reporter symbols",
     "knip:strict": "knip --reporter symbols",
     "quality:unused": "node scripts/check-code-health.mjs unused",

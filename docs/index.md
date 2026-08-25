@@ -7,8 +7,7 @@ description: Local-first documentation for the LoopTV curated YouTube TV player.
 
 LoopTV is a TV-like web app that plays random YouTube videos from curated
 channels — lean-back, keyless, and static-hosted. This is the canonical,
-committed documentation for the project. Markdown here is the source of truth;
-[Blume](https://useblume.dev) is only the presentation and search layer.
+committed documentation for the project. Markdown here is the source of truth.
 
 ## Start here
 
@@ -30,7 +29,7 @@ committed documentation for the project. Markdown here is the source of truth;
 
 ## Documentation maintenance rules
 
-1. **Markdown is the source of truth.** Blume renders it; it does not own it.
+1. **Markdown is the source of truth.** Keep canonical content in this tree.
 2. **One fact, one home.** If a fact lives in code (e.g. a script's flag list),
    link to the code instead of restating it. If a fact lives in a doc, do not
    duplicate it in another doc — link.

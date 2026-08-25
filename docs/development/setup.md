@@ -7,7 +7,7 @@ description: Get LoopTV running locally for development.
 
 ## Prerequisites
 
-- Node.js 22+ (matches CI; Blume and the catalog scripts assume it).
+- Node.js 22+ (matches CI; the catalog scripts assume it).
 - pnpm 10+ (`corepack enable` will pick up the version pinned in
   `package.json` → `packageManager`).
 - (Optional, for catalog rebuilds) `yt-dlp` and/or a `YOUTUBE_API_KEY`.

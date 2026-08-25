@@ -10,12 +10,11 @@
   "project": ["**/*.{astro,ts,tsx,js,jsx,mjs,cjs,mts}"],
   "ignore": [
     // Optional docs presentation config and the runtime-copied yt-dlp boundary.
-    "blume.config.ts"
   ],
   "ignoreDependencies": [
     // CSS-only dependency and the checker-spawned CLI are not visible in the import graph.
     "jscpd",
     "tailwindcss"
   ],
-  "ignoreBinaries": ["blume", "yt-dlp"]
+  "ignoreBinaries": ["yt-dlp"]
 }

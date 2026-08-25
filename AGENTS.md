@@ -51,9 +51,8 @@ pnpm run fetch:all                  # fetch raw JSONL for all sources
 pnpm audit:catalog:full             # manual full-history rebaseline (rare)
 pnpm run build:ner                  # local BERT NER fallback (not CI)
 
-# Docs (Blume presentation layer — markdown is the source of truth)
+# Docs (markdown is the source of truth)
 pnpm docs:check                     # validate links + structure
-pnpm docs:build                     # build static docs site via Blume (if installed)
 ```
 
 See [docs/development/setup.md](docs/development/setup.md) and
@@ -109,8 +108,7 @@ See [docs/development/setup.md](docs/development/setup.md) and
 
 ## Documentation maintenance rules
 
-1. **Markdown in `docs/` is the source of truth.** Blume is only the
-   presentation and search layer. Code and executable config remain
+1. **Markdown in `docs/` is the source of truth.** Code and executable config remain
    authoritative for implementation details and schedules.
 2. **One fact, one home.** Don't duplicate facts that are easily discoverable
    from code — link to the code instead. Don't restate a doc in another doc —

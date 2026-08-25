@@ -56,9 +56,6 @@ cache.bin
 test-results/
 playwright-report/
 
-# Blume docs presentation layer (markdown in docs/ is the source of truth)
-.blume/
-
 # local agent logs / monitors
 .ci-monitor.log
 .ci-monitor.pid
