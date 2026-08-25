@@ -28,7 +28,7 @@ describe('catalog workflow cost gates', () => {
 
   it('calls free AI only when untagged videos exist', () => {
     expect(buildWorkflow).toMatch(
-      /name: Smoke test AI gateway[\s\S]*?if: steps\.pending-tags-before\.outputs\.count != '0'/
+      /name: Smoke test AI gateway[\s\S]*?if: (?:always\(\) && )?steps\.pending-tags-before\.outputs\.count != '0'/
     );
     expect(buildWorkflow).toMatch(
       /name: Tag new videos via AI gateway[\s\S]*?steps\.pending-tags-before\.outputs\.count != '0'/

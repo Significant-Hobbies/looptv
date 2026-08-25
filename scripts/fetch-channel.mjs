@@ -161,6 +161,11 @@ function priorCatalogCandidateCount(handle) {
 }
 
 export function selectApiWorkingSet(rows, source, cachedRows = [], previousCandidateCount = 0) {
+  const latestSuccessfulFetch = rows
+    .map((row) => row._looptvFetchedAt)
+    .filter((value) => typeof value === 'string' && !Number.isNaN(Date.parse(value)))
+    .sort()
+    .at(-1);
   const qualifying = [
     ...new Map(
       rows
@@ -194,6 +199,11 @@ export function selectApiWorkingSet(rows, source, cachedRows = [], previousCandi
       .slice(0, selectionLimit)
       .map((row) => ({
         ...row,
+        // This timestamp describes the source refresh, not the age of each
+        // individual video row. A bounded API refresh can legitimately keep
+        // older high-ranking videos; leaving their old row timestamps in
+        // place made a successful refresh look stale to the catalog audit.
+        ...(latestSuccessfulFetch ? { _looptvFetchedAt: latestSuccessfulFetch } : {}),
         _looptvPreselected: true,
         _looptvCandidateCount: candidateCount,
         ...(verifiedCheckpoint

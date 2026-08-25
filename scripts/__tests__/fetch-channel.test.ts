@@ -170,6 +170,30 @@ describe('fetch-channel', () => {
     expect(result.rows.every((row) => row._looptvPublicUploadCount === 10_280)).toBe(true);
   });
 
+  it('marks retained top videos with the latest successful source refresh', () => {
+    const result = selectApiWorkingSet(
+      [
+        {
+          id: 'retained-top',
+          view_count: 2_000_000,
+          _looptvFetchedAt: '2026-07-12T00:00:00Z',
+        },
+        {
+          id: 'new-low',
+          view_count: 20_000,
+          _looptvFetchedAt: '2026-08-24T12:00:00Z',
+        },
+      ],
+      { topPercentile: 50, maxVideos: 1 }
+    );
+
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0]).toMatchObject({
+      id: 'retained-top',
+      _looptvFetchedAt: '2026-08-24T12:00:00Z',
+    });
+  });
+
   it('filters flat entries by per-source duration', () => {
     const flat = [
       { id: 'a', duration: 30 },
