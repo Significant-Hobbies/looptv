@@ -1,0 +1,40 @@
+{
+  "$schema": "fleet.landing-audit.v1",
+  "project": "looptv",
+  "priority": "P4",
+  "decision": "Maintenance",
+  "auditedAt": "2026-08-29",
+  "candidateUrl": "https://quarter-quick-variance-rivers.trycloudflare.com/",
+  "productionUrl": "https://tv.significanthobbies.com/",
+  "releaseState": "Local candidate qualified; truthful catalog and Smart Mix copy, concise metadata, complete station agent surfaces, restored OpenAPI source, Ask AI composition, and vitals repair are not deployed by this audit.",
+  "implementationAction": "preserve",
+  "migrationCandidate": false,
+  "gates": {
+    "contentPurpose": {
+      "score": 100,
+      "status": "pass",
+      "evidence": "The candidate directly explains the intended viewing loop: choose one of 16 curated stations and let random clips play from its 122-channel, 8,775-video catalog. It distinguishes normal station shuffle from optional browser-local Smart Mix, states that viewing needs no account or runtime API key, and accurately describes the twice-monthly cache-first catalog refresh with yt-dlp fallback."
+    },
+    "designQuality": {
+      "score": 92,
+      "status": "pass",
+      "evidence": "The restrained black TV-guide treatment is coherent, responsive, and appropriate to a lean-back utility. Purpose, primary action, reasons to trust the loop, real station previews, FAQ, and CTA form a clear hierarchy. Exact 390 and 1440 pixel checks found zero overflow and no resource errors; one project strip and one Ask AI footer are present. No template migration is warranted."
+    },
+    "seo": {
+      "score": 100,
+      "status": "pass",
+      "evidence": "The latest candidate passes all 15 homepage checks with no warnings: concise non-duplicated title, 134-character description, canonical, social metadata, two valid JSON-LD blocks, direct H1, four H2s, approximately 522 server-rendered words, and no broken internal links. Its 30-page sitemap has zero errors, redirects, or orphan candidates."
+    },
+    "geo": {
+      "score": 96,
+      "status": "pass-with-advisory",
+      "evidence": "Production is currently A-tier 90 because one literal {channel} catalog template fails validation. Source replaces it with all 16 real station HTML/Markdown pairs, producing 30 valid catalog surfaces, and restores the advertised OpenAPI document to the checkout. The temporary-host audit reports foreign-canonical advisories by design; the canonical-host source shape qualifies for S-tier after an authorized release."
+    },
+    "performance": {
+      "score": 90,
+      "status": "pass-with-advisory",
+      "evidence": "PSI Swarm completed 4/4 candidate profiles with weighted LCP 1.63 s, CLS 0, and TBT 2 ms. LCP was 4.50 s on slow 3G, 2.42 s on mid mobile, 1.43 s on fast mobile, and 301 ms on desktop. The remaining opportunity is approximately 34 KiB of unused shared JavaScript; dead fallback vitals requests were removed in favor of the existing lazy PostHog client."
+    }
+  },
+  "minimumObserved": 90
+}
