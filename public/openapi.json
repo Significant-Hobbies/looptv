@@ -1,0 +1,101 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LoopTV public API",
+    "version": "1.0.0",
+    "description": "Read-only machine surfaces for LoopTV's public catalog, site index, and documentation.",
+    "contact": {
+      "name": "LoopTV",
+      "url": "https://tv.significanthobbies.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://tv.significanthobbies.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "agent-surfaces",
+      "description": "Machine-readable public surfaces"
+    }
+  ],
+  "paths": {
+    "/api/ai": {
+      "get": {
+        "operationId": "getAgentCatalog",
+        "tags": ["agent-surfaces"],
+        "summary": "Get the public surface catalog",
+        "responses": {
+          "200": {
+            "description": "Bounded inventory of public LoopTV surfaces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "operationId": "getLlmsTxt",
+        "tags": ["agent-surfaces"],
+        "summary": "Get the concise agent index",
+        "responses": {
+          "200": {
+            "description": "Plain-text agent index",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sitemap.xml": {
+      "get": {
+        "operationId": "getSitemap",
+        "tags": ["agent-surfaces"],
+        "summary": "Get the public sitemap",
+        "responses": {
+          "200": {
+            "description": "XML sitemap",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "getOpenApiSpec",
+        "tags": ["agent-surfaces"],
+        "summary": "Get this OpenAPI specification",
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

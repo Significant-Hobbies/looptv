@@ -6,7 +6,7 @@
 
 - Best fit: lean-back, keyless random video playback from curated YouTube channels
 - Best fit: browsing curated station and channel directories with catalog statistics
-- Not a fit: on-demand video selection or playlist management
+- Not a fit: account-synced playlists or cloud watch-history management
 - Not a fit: video hosting or content creation
 
 ## Product

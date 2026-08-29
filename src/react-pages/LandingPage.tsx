@@ -11,7 +11,7 @@ const FAQS = [
   },
   {
     q: 'Where does the catalog come from?',
-    a: 'yt-dlp fetches public metadata from each channel listed in stations.json. A GitHub Action rebuilds the catalog weekly and commits a static catalog.json — no YouTube API key required.',
+    a: 'A twice-monthly GitHub workflow refreshes public channel metadata through a cache-first YouTube Data API path, with yt-dlp as a fallback. It commits a checked-in catalog.json, so watching needs no runtime API key; refresh credentials stay in repository Actions.',
   },
   {
     q: "What happens when a video can't be embedded?",
@@ -45,7 +45,7 @@ function HeroSection({
       <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base">
         Pick a station, hit play, and let random clips run nonstop. {totalStations} stations,{' '}
         {totalSources} channels, {totalVideos.toLocaleString()} videos in today&apos;s catalog. No
-        account, no API keys, no algorithm deciding what&apos;s next.
+        account, no runtime API key, and no platform recommendation feed deciding what&apos;s next.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <Link
@@ -145,7 +145,7 @@ function CtaSection() {
 function Footer() {
   return (
     <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-zinc-500">
-      <p>The algorithm doesn&apos;t decide. You pick the station.</p>
+      <p>You pick the station. LoopTV picks a clip from that curated pool.</p>
       <nav className="flex flex-wrap gap-x-5 gap-y-3">
         <Link href="/about" className="hover:text-zinc-300">
           About
@@ -188,7 +188,7 @@ export default function LandingPage() {
     },
     {
       title: 'Random, nonstop playback',
-      body: 'No autoplay rabbit hole, no recommendation algorithm. Clips shuffle within the station you chose, like flipping to a channel and leaving it on.',
+      body: 'No platform recommendation feed. Normal playback shuffles within your chosen station; optional Smart Mix uses only preference weights stored in this browser.',
     },
     {
       title: 'Yours, on your device',

@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 const siteUrl = PUBLIC_ORIGIN;
 const canonical = canonicalPublicUrl(canonicalPath);
-const pageTitle = title === 'LoopTV' ? title : `${title} | LoopTV`;
+const pageTitle = title.startsWith('LoopTV') ? title : `${title} | LoopTV`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -88,6 +88,7 @@ const jsonLd = {
       is:inline
       src="https://sassmaker.com/ai-chat-footer.js"
       data-name="LoopTV"
+      data-compose="false"
       defer
     ></script>
   </body>

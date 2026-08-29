@@ -32,11 +32,13 @@ describe('public agent surfaces', () => {
         expect.objectContaining({ url, md: expectedMarkdown })
       );
     }
-    expect(catalog.surfaces).toContainEqual(
-      expect.objectContaining({
-        url: `${origin}/{channel}`,
-        md: `${origin}/{channel}.md`,
-      })
-    );
+    for (const station of stations) {
+      expect(catalog.surfaces).toContainEqual(
+        expect.objectContaining({
+          url: `${origin}/${station.id}`,
+          md: `${origin}/${station.id}.md`,
+        })
+      );
+    }
   });
 });

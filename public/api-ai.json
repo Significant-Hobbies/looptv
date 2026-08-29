@@ -111,11 +111,116 @@
       "description": "Verified playback, catalog, and reliability updates"
     },
     {
-      "id": "station",
-      "url": "https://tv.significanthobbies.com/{channel}",
-      "md": "https://tv.significanthobbies.com/{channel}.md",
+      "id": "station-snl",
+      "url": "https://tv.significanthobbies.com/snl",
+      "md": "https://tv.significanthobbies.com/snl.md",
       "kind": "static",
-      "description": "A curated LoopTV station"
+      "description": "Saturday Night Live station"
+    },
+    {
+      "id": "station-science",
+      "url": "https://tv.significanthobbies.com/science",
+      "md": "https://tv.significanthobbies.com/science.md",
+      "kind": "static",
+      "description": "Science station"
+    },
+    {
+      "id": "station-space",
+      "url": "https://tv.significanthobbies.com/space",
+      "md": "https://tv.significanthobbies.com/space.md",
+      "kind": "static",
+      "description": "Space station"
+    },
+    {
+      "id": "station-tech",
+      "url": "https://tv.significanthobbies.com/tech",
+      "md": "https://tv.significanthobbies.com/tech.md",
+      "kind": "static",
+      "description": "Tech station"
+    },
+    {
+      "id": "station-comedy",
+      "url": "https://tv.significanthobbies.com/comedy",
+      "md": "https://tv.significanthobbies.com/comedy.md",
+      "kind": "static",
+      "description": "Comedy station"
+    },
+    {
+      "id": "station-ai",
+      "url": "https://tv.significanthobbies.com/ai",
+      "md": "https://tv.significanthobbies.com/ai.md",
+      "kind": "static",
+      "description": "AI and machine learning station"
+    },
+    {
+      "id": "station-startups",
+      "url": "https://tv.significanthobbies.com/startups",
+      "md": "https://tv.significanthobbies.com/startups.md",
+      "kind": "static",
+      "description": "Startups station"
+    },
+    {
+      "id": "station-finance",
+      "url": "https://tv.significanthobbies.com/finance",
+      "md": "https://tv.significanthobbies.com/finance.md",
+      "kind": "static",
+      "description": "Finance station"
+    },
+    {
+      "id": "station-philosophy",
+      "url": "https://tv.significanthobbies.com/philosophy",
+      "md": "https://tv.significanthobbies.com/philosophy.md",
+      "kind": "static",
+      "description": "Philosophy station"
+    },
+    {
+      "id": "station-mindset",
+      "url": "https://tv.significanthobbies.com/mindset",
+      "md": "https://tv.significanthobbies.com/mindset.md",
+      "kind": "static",
+      "description": "Self-improvement station"
+    },
+    {
+      "id": "station-math",
+      "url": "https://tv.significanthobbies.com/math",
+      "md": "https://tv.significanthobbies.com/math.md",
+      "kind": "static",
+      "description": "Math station"
+    },
+    {
+      "id": "station-fitness",
+      "url": "https://tv.significanthobbies.com/fitness",
+      "md": "https://tv.significanthobbies.com/fitness.md",
+      "kind": "static",
+      "description": "Fitness station"
+    },
+    {
+      "id": "station-talks",
+      "url": "https://tv.significanthobbies.com/talks",
+      "md": "https://tv.significanthobbies.com/talks.md",
+      "kind": "static",
+      "description": "TED Talks station"
+    },
+    {
+      "id": "station-design",
+      "url": "https://tv.significanthobbies.com/design",
+      "md": "https://tv.significanthobbies.com/design.md",
+      "kind": "static",
+      "description": "Design station"
+    },
+    {
+      "id": "station-explainers",
+      "url": "https://tv.significanthobbies.com/explainers",
+      "md": "https://tv.significanthobbies.com/explainers.md",
+      "kind": "static",
+      "description": "Explainers station"
+    },
+    {
+      "id": "station-film",
+      "url": "https://tv.significanthobbies.com/film",
+      "md": "https://tv.significanthobbies.com/film.md",
+      "kind": "static",
+      "description": "Film and video essays station"
     }
   ],
   "dataResources": [
