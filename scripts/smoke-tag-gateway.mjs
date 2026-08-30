@@ -61,7 +61,10 @@ async function main() {
   const content = data.choices?.[0]?.message?.content || '';
   const match = content.match(/\[[\s\S]*\]/);
   if (!match) {
-    fail('transient', `AI provider smoke failed: no JSON array in response: ${content.slice(0, 200)}`);
+    fail(
+      'transient',
+      `AI provider smoke failed: no JSON array in response: ${content.slice(0, 200)}`
+    );
   }
 
   const tags = JSON.parse(match[0]);
