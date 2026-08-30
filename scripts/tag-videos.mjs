@@ -1,6 +1,8 @@
-// Tag videos using free AI gateway with parallel multi-model requests
+// Tag videos through an explicitly configured free-provider/local endpoint.
 // Usage: node scripts/tag-videos.mjs [catalog_path]
 
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { generateText } from 'ai';
 import fs from 'node:fs';
 import { videosNeedingTags } from './catalog-tag-status.mjs';
 import {
@@ -12,49 +14,32 @@ import {
 import { normalizeBatchTags } from './tag-result.mjs';
 
 const CATALOG_PATH = process.argv[2] || 'public/catalog.json';
-const GATEWAY = 'https://ai-gateway.sassmaker.com/v1/chat/completions';
-const API_KEY = process.env.FAGW_API_KEY || 'x';
-const PROJECT_ID = process.env.FAGW_PROJECT_ID || 'looptv';
+const AI_BASE_URL = process.env.AI_BASE_URL?.replace(/\/+$/, '');
+const AI_API_KEY = process.env.AI_API_KEY;
 const BATCH_SIZE = 15;
 const CONCURRENCY_PER_MODEL = 2;
 
-const MODELS = [
-  'gemini-2.5-flash',
-  'groq-llama-70b',
-  'sambanova-llama-70b',
-  'nvidia-llama-70b',
-  'cerebras-gpt-oss-120b',
-  'workers-ai-llama-3.3-70b',
-  'openrouter-llama-70b-free',
-];
+const MODELS = (process.env.AI_MODELS || process.env.AI_MODEL || '')
+  .split(',')
+  .map((model) => model.trim())
+  .filter(Boolean);
 const MAX_BATCH_ATTEMPTS = Math.max(2, MODELS.length * 2);
 const JSON_ARRAY_RE = /\[[\s\S]*\]/;
 
-function buildRequestBody(model, systemPrompt, prompt) {
-  return JSON.stringify({
-    model,
-    project_id: PROJECT_ID,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: prompt },
-    ],
-    temperature: 0.1,
-  });
-}
-
 async function fetchAndParse(model, systemPrompt, prompt, videos) {
-  const res = await fetch(GATEWAY, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: buildRequestBody(model, systemPrompt, prompt),
+  const provider = createOpenAICompatible({
+    name: 'looptv-direct',
+    baseURL: AI_BASE_URL,
+    apiKey: AI_API_KEY,
   });
-  if (res.status === 429) return { retry: true };
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`${res.status}: ${text.slice(0, 200)}`);
-  }
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content || '';
+  const result = await generateText({
+    model: provider.chatModel(model),
+    system: systemPrompt,
+    prompt,
+    temperature: 0.1,
+    maxRetries: 0,
+  });
+  const content = result.text;
   const match = content.match(JSON_ARRAY_RE);
   if (!match) throw new Error('No JSON array in response');
   return { tags: normalizeBatchTags(videos, JSON.parse(match[0])) };
@@ -134,13 +119,16 @@ function summarizeProfiles(items) {
 }
 
 async function main() {
+  if (!AI_BASE_URL || !AI_API_KEY || MODELS.length === 0) {
+    throw new Error('AI_BASE_URL, AI_API_KEY, and AI_MODEL or AI_MODELS are required');
+  }
   const catalog = JSON.parse(fs.readFileSync(CATALOG_PATH, 'utf-8'));
 
   const needsTagging = videosNeedingTags(catalog);
 
   console.log(`Videos needing tags: ${needsTagging.length}`);
   console.log(`Profiles: ${summarizeProfiles(needsTagging)}`);
-  console.log(`Project: ${PROJECT_ID}`);
+  console.log(`Endpoint: ${new URL(AI_BASE_URL).host}`);
   console.log(`Models: ${MODELS.length} (${MODELS.join(', ')})`);
   console.log(
     `Batch size: ${BATCH_SIZE}, Concurrency: ${MODELS.length * CONCURRENCY_PER_MODEL} workers`
