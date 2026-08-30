@@ -26,12 +26,12 @@ describe('catalog workflow cost gates', () => {
     expect(fetchWorkflow).toContain("if: github.ref == 'refs/heads/main'");
   });
 
-  it('calls free AI only when untagged videos exist', () => {
+  it('calls the direct AI provider only when untagged videos exist', () => {
     expect(buildWorkflow).toMatch(
-      /name: Smoke test AI gateway[\s\S]*?if: (?:always\(\) && )?steps\.pending-tags-before\.outputs\.count != '0'/
+      /name: Smoke test direct AI provider[\s\S]*?if: (?:always\(\) && )?steps\.pending-tags-before\.outputs\.count != '0'/
     );
     expect(buildWorkflow).toMatch(
-      /name: Tag new videos via AI gateway[\s\S]*?steps\.pending-tags-before\.outputs\.count != '0'/
+      /name: Tag new videos via direct AI provider[\s\S]*?steps\.pending-tags-before\.outputs\.count != '0'/
     );
   });
 
