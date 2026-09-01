@@ -1,6 +1,6 @@
 # LoopTV — PROJECT STATUS
 
-Last updated: 2026-08-12
+Last updated: 2026-08-31
 
 > Detailed feature inventory and timeline live in
 > [docs/product/features.md](docs/product/features.md).
@@ -22,6 +22,9 @@ catalog freshness, and documentation hygiene.
 
 ## Timeline
 
+- **2026-08-31:** Added source-ready product-owned Microsoft Clarity tracking
+  and updated the privacy surface to disclose both analytics services. No
+  deployment ran.
 - **2026-08-12:** Adopted the Fleet code-health contract with truthful
   whole-library coverage, unused-code, cycle, complexity, duplication,
   dependency, suppression, build, docs, and repository-hygiene ratchets in CI;
