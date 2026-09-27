@@ -7,7 +7,7 @@ import Player from './Player';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
 import ControlRail from './ControlRail';
 import stations from '../../channels.config';
-import { trackCta } from '@/lib/app-health-cta';
+import { trackCta } from './trackCta';
 
 const SMART_MIX_ID = 'smart-mix';
 

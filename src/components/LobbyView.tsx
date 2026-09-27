@@ -7,7 +7,7 @@ import { SearchOverlay, HealthOverlay } from './OverlayPanels';
 import type { BannerActions, SearchProps, HealthProps } from './shared-types';
 import type { EmbedHealthRecord } from '@/lib/watched';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
-import { trackCta } from '@/lib/app-health-cta';
+import { trackCta } from './trackCta';
 
 interface StationConfig {
   id: string;
