@@ -7,6 +7,7 @@ import Player from './Player';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
 import ControlRail from './ControlRail';
 import stations from '../../channels.config';
+import { trackCta } from '@/lib/app-health-cta';
 
 const SMART_MIX_ID = 'smart-mix';
 
@@ -119,7 +120,10 @@ function ChannelGuide(props: ChannelGuideProps) {
               name={entry.name}
               count={entry.count}
               isActive={activeStation === entry.id}
-              onClick={() => switchToStation(entry.id)}
+              onClick={() => {
+                trackCta('looptv.cta.station_selected');
+                switchToStation(entry.id);
+              }}
             />
           ))}
           <div className="h-px bg-white/5 mx-4 my-1" />
@@ -135,7 +139,10 @@ function ChannelGuide(props: ChannelGuideProps) {
                 name={st.name}
                 count={count > 0 ? count : null}
                 isActive={activeStation === st.id}
-                onClick={() => switchToStation(st.id)}
+                onClick={() => {
+                  trackCta('looptv.cta.station_selected');
+                  switchToStation(st.id);
+                }}
               />
             );
           })}

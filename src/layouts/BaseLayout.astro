@@ -87,8 +87,25 @@ const jsonLd = {
   <script is:inline src="/app-health-log.js" defer></script>
 </head>
   <body class="bg-black">
+    <script
+      is:inline
+      defer
+      src="https://health.sassmaker.com/tracker.js"
+      data-key="ahk_pub_86d522d6796f1dfa8d87eed28f9ef1c93b37083cb0d15cdbc30811408eb00390"
+      data-project="app-import-1b0d7392ffccff32742c0135336a1c178561bdd917e74b2623e02a6947d7da10"
+      data-identity="persistent"
+    ></script>
     <slot />
     <ClientServices client:idle />
+    <saas-maker-newsletter-capture
+      product-name="LoopTV"
+      catalog-id="looptv"
+      kind="newsletter"
+      source="footer"
+      privacy-url="https://tv.significanthobbies.com/privacy"
+      theme="dark"
+    ></saas-maker-newsletter-capture>
+    <script is:inline type="module" src="https://sassmaker.com/newsletter-capture.js"></script>
     {showProjectStrip && (
       <script
         is:inline

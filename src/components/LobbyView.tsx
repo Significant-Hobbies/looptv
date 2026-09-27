@@ -7,6 +7,7 @@ import { SearchOverlay, HealthOverlay } from './OverlayPanels';
 import type { BannerActions, SearchProps, HealthProps } from './shared-types';
 import type { EmbedHealthRecord } from '@/lib/watched';
 import PlaybackDiagnosticsBanner from './PlaybackDiagnosticsBanner';
+import { trackCta } from '@/lib/app-health-cta';
 
 interface StationConfig {
   id: string;
@@ -252,7 +253,10 @@ function LobbyActions({
     <>
       <div className="flex items-center gap-4">
         <button
-          onClick={startPlaying}
+          onClick={() => {
+            trackCta('looptv.cta.play');
+            startPlaying();
+          }}
           disabled={allVideos.length === 0}
           className="bg-red-600 hover:bg-red-500 disabled:bg-white/10 disabled:text-white/30 text-white text-lg font-semibold px-8 py-3.5 rounded-xl transition-colors flex items-center gap-3"
         >
@@ -262,7 +266,10 @@ function LobbyActions({
           Play
         </button>
         <button
-          onClick={() => setSearchOpen(true)}
+          onClick={() => {
+            trackCta('looptv.cta.search');
+            setSearchOpen(true);
+          }}
           disabled={allVideos.length === 0}
           className="bg-white/10 hover:bg-white/15 disabled:opacity-30 text-white text-lg px-6 py-3.5 rounded-xl transition-colors flex items-center gap-2"
         >
