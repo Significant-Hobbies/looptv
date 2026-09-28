@@ -87,8 +87,19 @@ const jsonLd = {
   <script is:inline src="/app-health-log.js" defer></script>
 </head>
   <body class="bg-black">
-    <script>
-      import '../scripts/track-landing-cta';
+    <script is:inline>
+      document.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+        const name = event.target.closest('[data-app-health-event]')?.getAttribute('data-app-health-event');
+        if (!name) return;
+        try {
+          const tracker = window.appHealth;
+          tracker?.track?.(name);
+          queueMicrotask(() => void tracker?.flush?.().catch(() => undefined));
+        } catch {
+          // Tracking must not interfere with navigation.
+        }
+      });
     </script>
     <script
       is:inline
