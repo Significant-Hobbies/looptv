@@ -16,7 +16,7 @@ main branch) + `workflow_dispatch` (main only)
 Chained after a successful [Fetch Catalog Sources](fetch-catalog-sources.md)
 run. Downloads the 8 shard artifacts, merges them into `data/sources/`,
 processes a fresh `catalog.json`, runs both audits, tags untagged videos via
-the free-AI gateway, and auto-commits the result.
+the configured AI provider, and auto-commits the result.
 
 ## Manual dispatch inputs
 
@@ -39,9 +39,11 @@ the free-AI gateway, and auto-commits the result.
    per-video churn gates). Respects `override_audit`. Writes a diff file for
    the commit message.
 6. **Count pending tags** — `catalog-tag-status.mjs`.
-7. **Smoke AI gateway** (only if pending ≠ 0) — `smoke-tag-gateway.mjs` with
-   `FAGW_API_KEY`. `continue-on-error: true`.
-8. **Tag** (only if smoke succeeded and pending ≠ 0) — `tag-videos.mjs`.
+7. **Smoke AI provider** (only if pending ≠ 0) — `smoke-tag-gateway.mjs` with
+   `LOOPTV_AI_BASE_URL`, `LOOPTV_AI_API_KEY`, and `LOOPTV_AI_MODEL`.
+   `continue-on-error: true`.
+8. **Tag** (only if smoke succeeded and pending ≠ 0) — `tag-videos.mjs` with
+   the same provider settings.
    `continue-on-error: true`.
 9. **Retry** (only if smoke succeeded and pending still ≠ 0) — one more
    `tag-videos.mjs` pass.
@@ -56,8 +58,10 @@ the free-AI gateway, and auto-commits the result.
 
 ## Secrets
 
-- `FAGW_API_KEY` — only received by this workflow; only called when
-  pending-tags ≠ 0.
+- `LOOPTV_AI_BASE_URL` and `LOOPTV_AI_MODEL` — repository variables consumed
+  by this workflow when pending-tags ≠ 0.
+- `LOOPTV_AI_API_KEY` — repository secret consumed by this workflow only when
+  pending-tags ≠ 0. Never put its value in source, logs, or documentation.
 - `GITHUB_TOKEN` — for `gh api` run validation and the auto-commit.
 
 `YOUTUBE_API_KEY` is **not** received by this workflow — it never re-fetches
@@ -69,5 +73,5 @@ sources, it only processes the artifacts from Fetch Catalog Sources.
 | --- | --- | --- |
 | Source-health audit fails | Coverage <80% or invariant violation | Re-run Fetch Catalog Sources; if intentional, use `override_audit` |
 | Manifest audit fails | Station drop / total drop / churn over threshold | Inspect the per-station diff in the job summary; if intentional, use `override_audit` |
-| Gateway smoke fails | Free-AI gateway down | Workflow continues; catalog is not committed (shipping gate). Retry next cycle. |
+| Provider smoke fails | Provider unavailable or rejects the configured access | Workflow continues; catalog is not committed (shipping gate). Restore CI-only provider access, then rerun Build Catalog. |
 | Pending tags stuck >0 after retry | Gateway rate-limited or parse failures | Re-run Build Catalog with the same `source_run_id` once the gateway recovers |
