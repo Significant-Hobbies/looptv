@@ -1,5 +1,6 @@
 import Link from '@/components/AppLink';
 import FeaturesSection from '@/components/FeaturesSection';
+import { trackCta } from '@/components/trackCta';
 
 import stations from '../../channels.config';
 import catalogSummary from '../../public/catalog-summary.json';
@@ -50,12 +51,14 @@ function HeroSection({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <Link
           href="/random"
+          onClick={() => trackCta('looptv.cta.start_watching')}
           className="inline-flex min-h-11 items-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500"
         >
           Start watching
         </Link>
         <Link
           href="/channels"
+          onClick={() => trackCta('looptv.cta.browse_stations')}
           className="text-sm text-zinc-400 hover:text-zinc-200 underline underline-offset-4"
         >
           Browse stations
