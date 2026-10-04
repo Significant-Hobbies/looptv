@@ -120,6 +120,21 @@ const jsonLd = {
       theme="dark"
     ></saas-maker-newsletter-capture>
     <script is:inline type="module" src="https://sassmaker.com/newsletter-capture.js"></script>
+    <script is:inline>
+      // The shared capture widget hard-codes a "you@example.com" placeholder; replace it
+      // with a neutral label so no sample address renders.
+      customElements.whenDefined('saas-maker-newsletter-capture').then(function () {
+        var el = document.querySelector('saas-maker-newsletter-capture');
+        var root = el && el.shadowRoot;
+        if (!root) return;
+        var fix = function () {
+          var input = root.querySelector('input[type="email"]');
+          if (input && input.placeholder === 'you@example.com') input.placeholder = 'Email address';
+        };
+        fix();
+        new MutationObserver(fix).observe(root, { childList: true, subtree: true });
+      });
+    </script>
     {showProjectStrip && (
       <script
         is:inline

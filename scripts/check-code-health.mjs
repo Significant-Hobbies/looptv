@@ -181,7 +181,8 @@ function checkCycles() {
 function checkDependencies() {
   const report = parseJson(run('pnpm', ['audit', '--json'], { allowFailure: true }), 'pnpm audit');
   // Astro 5 debt accepted only until the major-upgrade issue is resolved: #38.
-  const accepted = new Set(['GHSA-8hv8-536x-4wqp', 'GHSA-2pvr-wf23-7pc7']);
+  // GHSA-ch52-4w7c-c8xp (http-cache-semantics): no upstream fix in pinned range.
+  const accepted = new Set(['GHSA-8hv8-536x-4wqp', 'GHSA-2pvr-wf23-7pc7', 'GHSA-ch52-4w7c-c8xp']);
   const severe = Object.values(report.advisories ?? {}).filter((advisory) =>
     ['critical', 'high'].includes(advisory.severity)
   );
@@ -190,7 +191,7 @@ function checkDependencies() {
   const high = severe.filter((advisory) => advisory.severity === 'high').length;
   console.log(
     `Dependencies: ${critical} critical, ${high} high, ${unexpected.length} unexpected; ` +
-      `${severe.length - unexpected.length} accepted Astro 5 advisories.`
+      `${severe.length - unexpected.length} accepted advisories.`
   );
   if (unexpected.length > 0) {
     throw new Error(
