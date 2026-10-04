@@ -16,6 +16,7 @@ import { normalizeBatchTags } from './tag-result.mjs';
 const CATALOG_PATH = process.argv[2] || 'public/catalog.json';
 const AI_BASE_URL = process.env.AI_BASE_URL?.replace(/\/+$/, '');
 const AI_API_KEY = process.env.AI_API_KEY;
+const AI_PROJECT_ID = process.env.AI_PROJECT_ID || 'looptv';
 const BATCH_SIZE = 15;
 const CONCURRENCY_PER_MODEL = 2;
 
@@ -31,6 +32,7 @@ async function fetchAndParse(model, systemPrompt, prompt, videos) {
     name: 'looptv-direct',
     baseURL: AI_BASE_URL,
     apiKey: AI_API_KEY,
+    headers: { 'X-Gateway-Project-Id': AI_PROJECT_ID },
   });
   const result = await generateText({
     model: provider.chatModel(model),
