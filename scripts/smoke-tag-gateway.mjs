@@ -35,6 +35,7 @@ async function main() {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${API_KEY}`,
+      'X-Gateway-Project-Id': process.env.AI_PROJECT_ID || 'looptv',
     },
     body: JSON.stringify({
       model: MODEL,
