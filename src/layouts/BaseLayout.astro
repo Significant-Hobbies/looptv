@@ -243,4 +243,16 @@ const jsonLd = {
     --fleet-footer-app-art-height: clamp(20rem, 26vw, 28rem);
     --fleet-footer-app-mobile-art-height: 20rem;
   }
+
+  .looptv-precise-footer [slot="navigation"] > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 0.25rem;
+    column-gap: 0.75rem;
+  }
+
+  .looptv-precise-footer [slot="navigation"] [data-fleet-footer-group-label] {
+    flex-basis: 100%;
+  }
 </style>
