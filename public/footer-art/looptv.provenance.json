@@ -1,0 +1,14 @@
+{
+  "product": "LoopTV",
+  "asset": "/footer-art/looptv.webp",
+  "credit": "Original illustration for LoopTV",
+  "description": "A calm lean-back screening nook centers one comfortable chair facing a fictional abstract screen. A simple channel selector, unbranded reels and an empty alternate slot show deliberate simplicity and unavailable content without drama.",
+  "width": 2169,
+  "height": 725,
+  "focalPoint": {
+    "x": 50,
+    "y": 50
+  },
+  "sha256": "647e371670bb62c6e39c8a843a714a9d2ff3f4001876719a9b63a7c380ba8cb5",
+  "catalogSource": "SaaS Maker public catalog, LoopTV footerArt entry"
+}
