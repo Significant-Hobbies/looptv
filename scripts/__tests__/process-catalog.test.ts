@@ -40,6 +40,11 @@ describe('process-catalog', () => {
                 title: 'Known video',
                 duration: 300,
                 tags: ['Known Source', 'science'],
+                taggingEvidence: {
+                  origin: 'model',
+                  format: 'accepted',
+                  semanticGrounding: 'unknown',
+                },
                 source: 'Known Source',
                 viewCount: 42_000,
               },
@@ -86,6 +91,11 @@ describe('process-catalog', () => {
     expect(catalog.stations.science.videos.map((video: { id: string }) => video.id)).toEqual([
       'known-video',
     ]);
+    expect(catalog.stations.science.videos[0].taggingEvidence).toEqual({
+      origin: 'model',
+      format: 'accepted',
+      semanticGrounding: 'unknown',
+    });
   });
 
   it('keeps configured missing sources visible without advancing freshness', () => {

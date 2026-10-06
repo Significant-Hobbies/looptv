@@ -35,6 +35,15 @@ describe('catalog workflow cost gates', () => {
     );
   });
 
+  it('keeps the final pending-tag gate fail-closed', () => {
+    expect(buildWorkflow).toMatch(
+      /name: Enforce AI tagging shipping gate[\s\S]*?pending-tags-final\.outputs\.count != '0'/
+    );
+    expect(buildWorkflow).toMatch(
+      /name: Commit and push[\s\S]*?pending-tags-final\.outputs\.count == '0'/
+    );
+  });
+
   it('chains only a successful source workflow and reports request metrics', () => {
     expect(buildWorkflow).toContain('workflows: [Fetch Catalog Sources]');
     expect(buildWorkflow).toContain("github.event.workflow_run.conclusion == 'success'");
