@@ -1,0 +1,30 @@
+name: Temporary dependency lock repair
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Generate candidate lock without lifecycle scripts
+        run: pnpm install --lockfile-only --ignore-scripts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: looptv59-lock-${{ github.event.pull_request.head.sha }}
+          path: pnpm-lock.yaml
+          retention-days: 1
+          if-no-files-found: error
