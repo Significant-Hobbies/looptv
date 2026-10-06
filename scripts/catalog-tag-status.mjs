@@ -16,8 +16,36 @@ export function videosNeedingTags(catalog) {
   return pending;
 }
 
+export function buildTaggingEvidenceReport(catalog) {
+  const videos = Object.values(catalog.stations || {}).flatMap((station) => station.videos || []);
+  const tagged = videos.filter((video) => Array.isArray(video.tags) && video.tags.length > 1);
+  const modelAccepted = tagged.filter(
+    (video) =>
+      video.taggingEvidence?.origin === 'model' &&
+      video.taggingEvidence?.format === 'accepted'
+  );
+  const legacyUnknown = tagged.filter((video) => !video.taggingEvidence);
+
+  return {
+    totalVideos: videos.length,
+    pendingVideos: videosNeedingTags(catalog).length,
+    formatAcceptedModelVideos: modelAccepted.length,
+    legacyGroundingUnknownVideos: legacyUnknown.length,
+    modelGroundingUnknownVideos: modelAccepted.length,
+    // No semantic-grounding verifier exists; accepted model output remains unknown.
+    semanticGroundingUnknownVideos: tagged.length,
+    semanticGroundingVerifiedVideos: 0,
+  };
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const catalogPath = process.argv[2] || 'public/catalog.json';
+  const args = process.argv.slice(2);
+  const report = args.includes('--report');
+  const catalogPath = args.find((arg) => arg !== '--report') || 'public/catalog.json';
   const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
-  process.stdout.write(String(videosNeedingTags(catalog).length));
+  if (report) {
+    process.stdout.write(JSON.stringify(buildTaggingEvidenceReport(catalog)));
+  } else {
+    process.stdout.write(String(videosNeedingTags(catalog).length));
+  }
 }

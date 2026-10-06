@@ -38,7 +38,7 @@ the configured AI provider, and auto-commits the result.
 5. **Audit manifest** — `validate-catalog-manifest.mjs --update` (count +
    per-video churn gates). Respects `override_audit`. Writes a diff file for
    the commit message.
-6. **Count pending tags** — `catalog-tag-status.mjs`.
+6. **Count pending tags** — `catalog-tag-status.mjs`. Its default output remains the pending count; `--report` emits separate format and grounding evidence counts.
 7. **Smoke AI provider** (only if pending ≠ 0) — `smoke-tag-gateway.mjs` with
    `LOOPTV_AI_BASE_URL`, `LOOPTV_AI_API_KEY`, and `LOOPTV_AI_MODEL`.
    `continue-on-error: true`.
@@ -48,7 +48,9 @@ the configured AI provider, and auto-commits the result.
 9. **Retry** (only if smoke succeeded and pending still ≠ 0) — one more
    `tag-videos.mjs` pass.
 10. **Report** — markdown summary of gateway status + pending counts before /
-    after first pass / final.
+    after first pass / final. The tagger logs format-accepted model outputs and
+    semantic-grounding-unknown legacy/model counts separately; no model tag is
+    called semantically verified without a grounding check.
 11. **Save source cache** — `actions/cache/save` for `data/sources`.
 12. **Shipping gate** — if pending-final ≠ 0, the job exits non-zero. A catalog
     never ships with untagged videos.

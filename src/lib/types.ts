@@ -1,3 +1,9 @@
+export interface TaggingEvidence {
+  origin: 'model';
+  format: 'accepted';
+  semanticGrounding: 'unknown';
+}
+
 export interface Video {
   id: string;
   title: string;
@@ -6,6 +12,8 @@ export interface Video {
   tags: string[];
   source?: string; // YouTube channel name for multi-source stations
   viewCount?: number;
+  /** Missing evidence on legacy rows means their grounding is unknown. */
+  taggingEvidence?: TaggingEvidence;
 }
 
 export interface YouTubeSource {
