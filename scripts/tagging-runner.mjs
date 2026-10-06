@@ -71,13 +71,7 @@ export async function runTagging({
       if (!batch) return;
       batch.attempts = (batch.attempts || 0) + 1;
 
-      const tags = await callBatchWithRetries(
-        batch,
-        model,
-        requestBatch,
-        requestRetries,
-        sleepFn
-      );
+      const tags = await callBatchWithRetries(batch, model, requestBatch, requestRetries, sleepFn);
       if (tags) {
         for (let i = 0; i < batch.videos.length; i++) {
           results.set(batch.videos[i].id, tags[i]);

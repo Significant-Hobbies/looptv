@@ -89,7 +89,7 @@ async function main() {
   const batchCount = createStationBatches(needsTagging, BATCH_SIZE).length;
   console.log(`Batches: ${batchCount}`);
   console.log(
-    `Estimated time: ~${Math.ceil((batchCount / (MODELS.length * CONCURRENCY_PER_MODEL) * 3.5) / 60)} minutes\n`
+    `Estimated time: ~${Math.ceil(((batchCount / (MODELS.length * CONCURRENCY_PER_MODEL)) * 3.5) / 60)} minutes\n`
   );
 
   const startTime = Date.now();

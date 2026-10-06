@@ -21,8 +21,7 @@ export function buildTaggingEvidenceReport(catalog) {
   const tagged = videos.filter((video) => Array.isArray(video.tags) && video.tags.length > 1);
   const modelAccepted = tagged.filter(
     (video) =>
-      video.taggingEvidence?.origin === 'model' &&
-      video.taggingEvidence?.format === 'accepted'
+      video.taggingEvidence?.origin === 'model' && video.taggingEvidence?.format === 'accepted'
   );
   const legacyUnknown = tagged.filter((video) => !video.taggingEvidence);
 

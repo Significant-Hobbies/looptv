@@ -121,7 +121,7 @@ describe('production tagging runner with a fake batch provider', () => {
       ...baseOptions,
       catalog,
       maxBatchAttempts: 1,
-      requestBatch: async ({ videos }) => topicsFor(videos),
+      requestBatch: async ({ videos }: { videos: TestVideo[] }) => topicsFor(videos),
     });
     expect(resumed).toMatchObject({ tagged: 2, failedIds: [], pendingIds: [] });
     expect(catalog.stations.science.videos).toHaveLength(2);
@@ -145,15 +145,15 @@ describe('production tagging runner with a fake batch provider', () => {
       pendingIds: ['c', 'd'],
     });
     expect(videosNeedingTags(catalog).map(({ video }) => video.id)).toEqual(['c', 'd']);
-    expect(catalog.stations.science.videos[0].taggingEvidence.semanticGrounding).toBe('unknown');
+    expect(catalog.stations.science.videos[0].taggingEvidence?.semanticGrounding).toBe('unknown');
     expect(catalog.stations.science.videos[2].description).toBe('Needs a topic tag');
 
-    const resumedIds = [];
+    const resumedIds: string[] = [];
     const second = await runTagging({
       ...baseOptions,
       catalog,
       maxBatchAttempts: 1,
-      requestBatch: async ({ videos }) => {
+      requestBatch: async ({ videos }: { videos: TestVideo[] }) => {
         resumedIds.push(...videos.map((video) => video.id));
         return topicsFor(videos);
       },
