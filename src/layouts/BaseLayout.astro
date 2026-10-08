@@ -111,7 +111,9 @@ const jsonLd = {
     ></script>
     <slot />
     <ClientServices client:idle />
+    <fleet-footer-extension product-name="LoopTV" art-src="https://sassmaker.com/footer-art/looptv.webp" surface="app">
     <saas-maker-newsletter-capture
+      slot="capture"
       product-name="LoopTV"
       catalog-id="looptv"
       kind="newsletter"
@@ -119,6 +121,7 @@ const jsonLd = {
       privacy-url="https://tv.significanthobbies.com/privacy"
       theme="dark"
     ></saas-maker-newsletter-capture>
+    </fleet-footer-extension>
     <script is:inline type="module" src="https://sassmaker.com/newsletter-capture.js"></script>
     {showProjectStrip && (
       <script
