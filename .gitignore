@@ -63,3 +63,6 @@ playwright-report/
 
 # local CodeVetter runtime evidence
 .codevetter/
+
+# local agent evidence (Fleet convention)
+.fleet-local/
