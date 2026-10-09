@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Self-hosted OFL fonts (already shipped for the Precise footer). */
+@font-face {
+  font-family: "LoopTV Sans";
+  src: url("/fonts/fleet-footer-precise-v1/geist.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LoopTV Mono";
+  src: url("/fonts/fleet-footer-precise-v1/geistmono.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
 /* Shared by Astro pages and hydrated React islands. */
 
 :root {
@@ -13,6 +28,8 @@
 }
 
 @theme {
+  --font-display: "LoopTV Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-tube: "LoopTV Mono", ui-monospace, "SFMono-Regular", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -63,4 +80,59 @@ body {
 .player-container {
   overflow: hidden;
   border-radius: 24px;
+}
+
+/* Landing: broadcast-era screen texture, kept faint. */
+.ltv-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.035) 0,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.ltv-screen-glow {
+  background:
+    radial-gradient(
+      120% 90% at 50% 40%,
+      rgba(229, 9, 20, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(80% 70% at 50% 50%, #17130f, #070606 100%);
+}
+
+.ltv-knob-pointer {
+  transform-origin: 50% 50%;
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes ltv-tune {
+  0% {
+    opacity: 0;
+    filter: blur(6px) brightness(1.8);
+    transform: scaleY(0.96);
+  }
+  35% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+.ltv-tuned {
+  animation: ltv-tune 360ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ltv-tuned {
+    animation: none;
+  }
+  .ltv-knob-pointer {
+    transition: none;
+  }
 }
