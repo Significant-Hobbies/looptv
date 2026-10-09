@@ -129,7 +129,7 @@ See [docs/development/setup.md](docs/development/setup.md) and
 ## Fleet Guidance
 
 ### Adding Tasks
-- Track LoopTV work in this repository's GitHub issues or OpenSpec changes.
+- Track LoopTV work in this repository's GitHub issues.
 - Keep reusable cross-project automation in `saas-maker/tooling/` and private
   portfolio metadata in Site Health, not SaaS Maker.
 
