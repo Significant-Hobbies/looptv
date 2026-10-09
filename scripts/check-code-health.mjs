@@ -13,12 +13,7 @@ const productionPaths = ['src', 'scripts', 'astro.config.ts', 'vitest.config.ts'
 const sourceExtensions = new Set(['.js', '.jsx', '.mjs', '.mts', '.ts', '.tsx']);
 
 const baselines = {
-  // maxLength bumped 100 -> 110: lizard misattributes lines appended anywhere
-  // below PreviewSection in src/react-pages/LandingPage.tsx to PreviewSection's
-  // own span (verified: PreviewSection's NLOC is unchanged at 80; only its
-  // reported end line grows by exactly the number of lines this PR's Footer
-  // edit adds elsewhere in the file). Not a real complexity increase.
-  complexity: { violations: 1, maxCcn: 15, maxLength: 110, maxParams: 7 },
+  complexity: { violations: 0, maxCcn: 15, maxLength: 99, maxParams: 7 },
   duplication: { clones: 1, duplicatedLines: 9 },
   unused: {
     files: 0,
