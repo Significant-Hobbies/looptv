@@ -52,5 +52,8 @@ test('Next during iframe startup loads the latest selection when ready', async (
     .toBe(2);
   await expect(page.locator('script[src*="project-strip.js"]')).toHaveCount(0);
   await page.goto('/');
-  await expect(page.locator('script[src*="project-strip.js"]')).toHaveCount(1);
+  await expect(page.locator('script[src*="project-strip.js"]')).toHaveCount(0);
+  await expect(
+    page.locator('footer[data-fleet-footer="studio"][data-catalog-id="looptv"]')
+  ).toHaveCount(1);
 });

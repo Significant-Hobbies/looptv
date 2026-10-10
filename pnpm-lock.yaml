@@ -29,14 +29,14 @@ importers:
         specifier: ^0.2.1
         version: 0.2.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@saas-maker/motion':
-        specifier: github:sass-maker/ui-library#v0.1.14&path:/packages/motion
-        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: github:sass-maker/ui-library#v0.1.17&path:/packages/motion
+        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@saas-maker/templates':
-        specifier: github:sass-maker/ui-library#v0.1.14&path:/packages/templates
-        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/templates(@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3))(astro@7.2.8(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.6.0)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.8)
+        specifier: github:sass-maker/ui-library#v0.1.17&path:/packages/templates
+        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/templates(@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3))(astro@7.2.8(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.6.0)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.8)
       '@saas-maker/ui':
-        specifier: github:sass-maker/ui-library#v0.1.14&path:/packages/ui
-        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)
+        specifier: github:sass-maker/ui-library#v0.1.17&path:/packages/ui
+        version: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)
       ai:
         specifier: 6.0.168
         version: 6.0.168(zod@4.4.3)
@@ -2382,22 +2382,22 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
-  '@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion':
-    resolution: {path: /packages/motion, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89}
-    version: 0.1.14
+  '@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion':
+    resolution: {path: /packages/motion, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36}
+    version: 0.1.17
 
-  '@saas-maker/templates@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/templates':
-    resolution: {path: /packages/templates, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89}
-    version: 0.1.14
+  '@saas-maker/templates@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/templates':
+    resolution: {path: /packages/templates, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36}
+    version: 0.1.17
     peerDependencies:
       '@saas-maker/motion': 0.x
       '@saas-maker/ui': 0.x
       astro: '>=7'
       react: '>=19'
 
-  '@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui':
-    resolution: {path: /packages/ui, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89}
-    version: 0.1.14
+  '@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui':
+    resolution: {path: /packages/ui, tarball: https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36}
+    version: 0.1.17
     peerDependencies:
       react: '>=19'
       react-dom: '>=19'
@@ -6330,22 +6330,22 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
-  '@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       motion: 13.4.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     transitivePeerDependencies:
       - react
       - react-dom
 
-  '@saas-maker/templates@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/templates(@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3))(astro@7.2.8(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.6.0)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.8)':
+  '@saas-maker/templates@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/templates(@saas-maker/motion@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3))(astro@7.2.8(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.6.0)(jiti@2.7.0)(yaml@2.9.0))(react@19.2.8)':
     dependencies:
-      '@saas-maker/motion': https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@saas-maker/ui': https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)
+      '@saas-maker/motion': https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/motion(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@saas-maker/ui': https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)
       astro: 7.2.8(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.6.0)(jiti@2.7.0)(yaml@2.9.0)
       lucide-react: 1.48.0(react@19.2.8)
       react: 19.2.8
 
-  '@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/404a34ef1b1f0ecebe76015d73bd8133bd255c89#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)':
+  '@saas-maker/ui@https://codeload.github.com/sass-maker/ui-library/tar.gz/1c01ca58049ce7534117248e8dbd284bb5269e36#path:/packages/ui(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(tailwindcss@4.3.3)':
     dependencies:
       '@tanstack/react-table': 9.2.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       class-variance-authority: 0.7.1

@@ -1,4 +1,5 @@
 ---
+import StudioFooter from '@/components/StudioFooter.astro';
 import ClientServices from '@/components/ClientServices';
 import { canonicalPublicUrl, PUBLIC_ORIGIN } from '@/lib/public-surfaces';
 import '@/styles/global.css';
@@ -7,16 +8,12 @@ interface Props {
   title?: string;
   description?: string;
   canonicalPath?: string;
-  showProjectStrip?: boolean;
-  showPreciseFooter?: boolean;
 }
 
 const {
   title = 'LoopTV',
   description = 'Pick a station. Random clips from curated YouTube channels play nonstop. No account, no algorithm.',
   canonicalPath = '/',
-  showProjectStrip = true,
-  showPreciseFooter = true,
 } = Astro.props;
 const siteUrl = PUBLIC_ORIGIN;
 const canonical = canonicalPublicUrl(canonicalPath);
@@ -121,146 +118,6 @@ const jsonLd = {
     ></script>
     <slot />
     <ClientServices client:idle />
-    {showPreciseFooter ? (
-      <footer class="looptv-precise-footer" aria-label="LoopTV footer">
-        <fleet-footer-extension
-          data-fleet-footer-project="looptv"
-          product-name="LoopTV"
-          theme="dark"
-          surface="app"
-          signature-font="ui"
-          font-base="/fonts/fleet-footer-precise-v1/"
-          art-src="/footer-art/looptv.webp"
-          art-alt="LoopTV: A calm lean-back screening nook centers one comfortable chair facing a fictional abstract screen. A simple channel selector, unbranded reels and an empty alternate slot show deliberate simplicity and unavailable content without drama."
-          art-width="2169"
-          art-height="725"
-          art-position="50% 50%"
-          art-credit="Original illustration for LoopTV"
-        >
-          <nav slot="navigation" aria-label="LoopTV footer navigation">
-            <div>
-              <h2 data-fleet-footer-group-label>Watch</h2>
-              <a data-fleet-footer-primary href="/">Home</a>
-              <a href="/channels">Browse stations</a>
-            </div>
-            <div>
-              <h2 data-fleet-footer-group-label>LoopTV</h2>
-              <a href="/about">About</a>
-              <a href="/changelog">Changelog</a>
-            </div>
-            <div>
-              <h2 data-fleet-footer-group-label>Legal</h2>
-              <a data-fleet-footer-legal href="/privacy">Privacy</a>
-              <a data-fleet-footer-legal href="/terms">Terms</a>
-            </div>
-          </nav>
-          <saas-maker-newsletter-capture
-            slot="capture"
-            product-name="LoopTV"
-            catalog-id="looptv"
-            kind="newsletter"
-            source="footer"
-            privacy-url="https://tv.significanthobbies.com/privacy"
-            theme="dark"
-            layout="compact"
-            integrated
-          ></saas-maker-newsletter-capture>
-        </fleet-footer-extension>
-        <script is:inline type="module" src="https://sassmaker.com/newsletter-capture.js?v=precise-b0adaa67"></script>
-        {showProjectStrip && (
-          <script
-            is:inline
-            defer
-            src="https://sassmaker.com/project-strip.js?v=precise-b0adaa67"
-            data-project="looptv"
-            data-theme="dark"
-            data-layout="studio"
-            data-host-only="true"
-          ></script>
-        )}
-        <script
-          is:inline
-          defer
-          src="https://sassmaker.com/ai-chat-footer.js?v=precise-b0adaa67"
-          data-name="LoopTV"
-          data-project="looptv"
-          data-theme="dark"
-          data-surface="app"
-          data-layout="question"
-          data-host-only="true"
-          data-capture="false"
-        ></script>
-      </footer>
-    ) : (
-      <>
-        <saas-maker-newsletter-capture
-          product-name="LoopTV"
-          catalog-id="looptv"
-          kind="newsletter"
-          source="footer"
-          privacy-url="https://tv.significanthobbies.com/privacy"
-          theme="dark"
-        ></saas-maker-newsletter-capture>
-        <script is:inline type="module" src="https://sassmaker.com/newsletter-capture.js"></script>
-        {showProjectStrip && (
-          <script
-            is:inline
-            src="https://sassmaker.com/project-strip.js"
-            data-project="looptv"
-            defer
-          ></script>
-        )}
-        <script
-          is:inline
-          src="https://sassmaker.com/ai-chat-footer.js"
-          data-name="LoopTV"
-          defer
-        ></script>
-      </>
-    )}
-    <script is:inline>
-      // The shared capture widget hard-codes a "you@example.com" placeholder; replace it
-      // with a neutral label so no sample address renders.
-      customElements.whenDefined('saas-maker-newsletter-capture').then(function () {
-        var el = document.querySelector('saas-maker-newsletter-capture');
-        var root = el && el.shadowRoot;
-        if (!root) return;
-        var fix = function () {
-          var input = root.querySelector('input[type="email"]');
-          if (input && input.placeholder === 'you@example.com') input.placeholder = 'Email address';
-        };
-        fix();
-        new MutationObserver(fix).observe(root, { childList: true, subtree: true });
-      });
-    </script>
+    <StudioFooter />
   </body>
 </html>
-
-<style is:global>
-  .looptv-precise-footer {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    color: var(--foreground);
-    background: var(--background);
-    font-family: "Montserrat", sans-serif;
-    --fleet-footer-canvas: #0a0a0a;
-    --fleet-footer-lower: #0a0a0a;
-    --fleet-footer-edge: clamp(1.25rem, 4vw, 3rem);
-    --fleet-footer-max-width: 82rem;
-    --fleet-footer-app-art-height: clamp(20rem, 26vw, 28rem);
-    --fleet-footer-app-mobile-art-height: 20rem;
-  }
-
-  .looptv-precise-footer [slot="navigation"] > div {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    row-gap: 0.25rem;
-    column-gap: 0.75rem;
-  }
-
-  .looptv-precise-footer [slot="navigation"] [data-fleet-footer-group-label] {
-    flex-basis: 100%;
-  }
-</style>
