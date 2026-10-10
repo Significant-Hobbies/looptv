@@ -1,11 +1,48 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import LandingPage from '@/react-pages/LandingPage';
+import Base from '@saas-maker/templates/Base.astro';
+import { GalleryPage } from '@saas-maker/templates/gallery-page';
+import { baseProps } from '@saas-maker/templates/page';
+import { galleryContent } from '@saas-maker/templates/schema';
+import { studioFromProjects, studioProjectsFeed } from '@saas-maker/ui/blocks/footer';
+import ClientServices from '@/components/ClientServices';
+import HomeHead from '@/components/HomeHead.astro';
+import json from '@/content/home.json';
+import stations from '../../channels.config';
+import catalogSummary from '../../public/catalog-summary.json';
+
+const counts: Record<string, string> = {
+  stationCount: stations.length.toLocaleString('en-US'),
+  sourceCount: stations.reduce((total, station) => total + station.sources.length, 0).toLocaleString('en-US'),
+  videoCount: catalogSummary.totalVideos.toLocaleString('en-US'),
+};
+const content = galleryContent.parse(JSON.parse(JSON.stringify(json).replace(
+  /\{(stationCount|sourceCount|videoCount)\}/g,
+  (_, key: string) => counts[key]
+)));
+// The checked-in public-feed snapshot keeps offline builds useful. Invalid or
+// empty feed data still selects StudioFooter's default strip.
+const projects = await fetch(studioProjectsFeed, { signal: AbortSignal.timeout(1000) })
+  .then((response) => response.ok ? response.json() : [])
+  .catch(() => json.footer.studio.map(({ id, label, href }) => ({ id, name: label, url: href })));
+if (content.footer) content.footer.studio = studioFromProjects(projects, { current: 'looptv' });
 ---
 
-<BaseLayout
-  title="LoopTV — channel-surf YouTube like it's TV"
-  description="Pick a curated YouTube station and let random clips play nonstop. No account, no runtime API key, and no platform recommendation feed."
->
-  <LandingPage />
-</BaseLayout>
+<Base {...baseProps(content)}>
+  <Fragment slot="head">
+    <HomeHead />
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('main a[href="/random"]').forEach((link) => {
+          link.setAttribute('data-app-health-event', link.closest('#signoff')
+            ? 'looptv.cta.start_watching_signoff'
+            : 'looptv.cta.start_watching');
+        });
+        document.querySelectorAll('main a[href="/channels"]').forEach((link) => {
+          link.setAttribute('data-app-health-event', 'looptv.cta.browse_stations');
+        });
+      });
+    </script>
+  </Fragment>
+  <GalleryPage content={content} />
+  <ClientServices client:idle />
+</Base>
