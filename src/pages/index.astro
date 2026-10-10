@@ -6,6 +6,7 @@ import { galleryContent } from '@saas-maker/templates/schema';
 import { studioFromProjects, studioProjectsFeed } from '@saas-maker/ui/blocks/footer';
 import ClientServices from '@/components/ClientServices';
 import HomeHead from '@/components/HomeHead.astro';
+import ResponsiveHome from '@/components/ResponsiveHome.astro';
 import json from '@/content/home.json';
 import stations from '../../channels.config';
 import catalogSummary from '../../public/catalog-summary.json';
@@ -43,6 +44,6 @@ if (content.footer) content.footer.studio = studioFromProjects(projects, { curre
       });
     </script>
   </Fragment>
-  <GalleryPage content={content} />
+  <ResponsiveHome><GalleryPage content={content} /></ResponsiveHome>
   <ClientServices client:idle />
 </Base>

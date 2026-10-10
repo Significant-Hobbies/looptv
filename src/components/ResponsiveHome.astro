@@ -1,0 +1,15 @@
+---
+// The shared gallery doesn't expose srcset. Enhance its static HTML at build
+// time so its layout, alt text, dimensions and eager/high priority stay intact.
+const sizes = '(max-width: 1032px) calc(100vw - 40px), 992px';
+const variants = [400, 600, 800].map((width) => `/images/home-tv-set-${width}.webp ${width}w`);
+variants.push('/images/home-tv-set.webp 1094w');
+const sourceSet = variants.join(', ');
+const html = (await Astro.slots.render('default'))
+  .replace('href="/images/home-tv-set.webp"',
+    `href="/images/home-tv-set.webp" imagesrcset="${sourceSet}" imagesizes="${sizes}"`)
+  .replace('src="/images/home-tv-set.webp"',
+    `src="/images/home-tv-set.webp" srcset="${sourceSet}" sizes="${sizes}"`);
+---
+
+<Fragment set:html={html} />
