@@ -37,6 +37,9 @@
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.41",
     "@saas-maker/feedback": "^0.2.1",
+    "@saas-maker/motion": "github:sass-maker/ui-library#v0.1.11&path:/packages/motion",
+    "@saas-maker/templates": "github:sass-maker/ui-library#v0.1.11&path:/packages/templates",
+    "@saas-maker/ui": "github:sass-maker/ui-library#v0.1.11&path:/packages/ui",
     "ai": "6.0.168",
     "posthog-js": "^1.407.3",
     "react": "19.2.8",

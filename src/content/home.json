@@ -1,0 +1,211 @@
+{
+  "template": "gallery",
+  "page": {
+    "title": "LoopTV — channel-surf YouTube like it's TV",
+    "description": "Pick a curated YouTube station and let random clips play nonstop. No account, no runtime API key, and no platform recommendation feed.",
+    "theme": "gallery",
+    "mode": "dark",
+    "tokens": {
+      "--brand": "#dc2626",
+      "--brand-foreground": "#ffffff",
+      "--brand-soft": "#2a1012",
+      "--brand-ink": "#ef4444",
+      "--background": "#090909",
+      "--foreground": "#f4f0e8",
+      "--muted-foreground": "#b3aca2"
+    },
+    "canonical": "https://tv.significanthobbies.com/",
+    "robots": "index, follow",
+    "og": {
+      "image": "/og-image.svg",
+      "type": "website",
+      "siteName": "LoopTV",
+      "twitterCard": "summary_large_image"
+    },
+    "jsonLd": {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://sassmaker.com/#org",
+          "name": "SaaS Maker (Foundry)",
+          "url": "https://sassmaker.com",
+          "sameAs": [
+            "https://sassmaker.com",
+            "https://github.com/Significant-Hobbies/looptv"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "sarthakagrawal@agentmail.to",
+            "url": "https://tv.significanthobbies.com"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "US"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tv.significanthobbies.com/#app",
+          "name": "LoopTV",
+          "url": "https://tv.significanthobbies.com",
+          "description": "TV-style random video player for lean-back browsing of curated channels.",
+          "publisher": {
+            "@id": "https://sassmaker.com/#org"
+          }
+        }
+      ]
+    },
+    "motion": false
+  },
+  "product": "LoopTV",
+  "url": "https://tv.significanthobbies.com",
+  "mark": "/favicon.svg",
+  "frame": "none",
+  "nav": [
+    {
+      "label": "stations",
+      "href": "/channels"
+    },
+    {
+      "label": "about",
+      "href": "/about"
+    }
+  ],
+  "hero": {
+    "eyebrow": "lean-back YouTube · no account",
+    "title": "channel-surf youtube like it's *tv*.",
+    "lede": "Pick a station, hit play, and let random clips run nonstop. No account, no runtime API key, and no platform recommendation feed deciding what's next.",
+    "primary": {
+      "label": "start watching",
+      "href": "/random"
+    },
+    "secondary": {
+      "label": "browse stations",
+      "href": "/channels"
+    },
+    "note": "Illustrative set, not a screenshot. Every number on the dial is a real station in today's catalog.",
+    "backdrop": "/images/home-stage.webp",
+    "screen": {
+      "src": "/images/home-tv-set.webp",
+      "alt": "LoopTV’s illustrative television set tuned to CH 02 Science, with a station dial and channel knob.",
+      "width": 1094,
+      "height": 940,
+      "frame": "none"
+    }
+  },
+  "sections": [
+    {
+      "kind": "statement",
+      "id": "how",
+      "eyebrow": "why LoopTV",
+      "title": "you pick the station.\nlooptv picks the clip.",
+      "rows": [
+        {
+          "title": "stations, not a feed",
+          "body": "{stationCount} topic stations group {sourceCount} public YouTube channels — science, comedy, tech, talks, film, and more. Pick one and it plays."
+        },
+        {
+          "title": "random, nonstop playback",
+          "body": "No platform recommendation feed. Normal playback shuffles within your chosen station; optional Smart Mix uses only preference weights stored in this browser."
+        },
+        {
+          "title": "yours, on your device",
+          "body": "Watched history, blocked sources, and Smart Mix preferences live in your browser. No account to create, nothing leaves your device."
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "id": "questions",
+      "title": "a few honest answers.",
+      "items": [
+        {
+          "q": "Do I need a YouTube or Google account?",
+          "a": "No. Playback runs through the public YouTube IFrame player. There's no sign-in anywhere in LoopTV."
+        },
+        {
+          "q": "Where does the catalog come from?",
+          "a": "A twice-monthly GitHub workflow refreshes public channel metadata through a cache-first YouTube Data API path, with yt-dlp as a fallback. It commits a checked-in catalog.json, so watching needs no runtime API key; refresh credentials stay in repository Actions."
+        },
+        {
+          "q": "What happens when a video can't be embedded?",
+          "a": "YouTube returns error 101 or 150 when a channel blocks embedding for a specific clip. The player catches it and immediately picks the next random video — no error toast, no interruption."
+        },
+        {
+          "q": "Where is my watch history stored?",
+          "a": "Entirely in your browser's localStorage. Clearing site data wipes it. There is no server-side account or database."
+        },
+        {
+          "q": "Can I add my own channels?",
+          "a": "Yes — LoopTV is MIT-licensed. Fork the repo, append a station to stations.json, run pnpm run build:catalog (requires yt-dlp), and deploy."
+        }
+      ]
+    }
+  ],
+  "closing": {
+    "id": "signoff",
+    "title": "leave something good on in the background.",
+    "primary": {
+      "label": "start watching",
+      "href": "/random"
+    },
+    "note": "Tune to a random station and let it run.",
+    "image": "/images/home-stage.webp"
+  },
+  "footer": {
+    "catalogId": "looptv",
+    "capture": "newsletter",
+    "privacyUrl": "https://tv.significanthobbies.com/privacy",
+    "summary": "TV-style random video player for lean-back browsing of curated channels.",
+    "legal": "MIT-licensed · Built on the public YouTube player",
+    "links": [
+      {
+        "label": "stations",
+        "href": "/channels"
+      },
+      {
+        "label": "about",
+        "href": "/about"
+      },
+      {
+        "label": "changelog",
+        "href": "/changelog"
+      },
+      {
+        "label": "privacy",
+        "href": "/privacy"
+      },
+      {
+        "label": "terms",
+        "href": "/terms"
+      },
+      {
+        "label": "support",
+        "href": "https://github.com/Significant-Hobbies/looptv/issues"
+      },
+      {
+        "label": "source",
+        "href": "https://github.com/Significant-Hobbies/looptv"
+      }
+    ],
+    "studio": [
+      {
+        "id": "codevetter",
+        "label": "CodeVetter",
+        "href": "https://codevetter.com"
+      },
+      {
+        "id": "pace",
+        "label": "HeyPace",
+        "href": "https://heypace.app"
+      },
+      {
+        "id": "posttrainllm",
+        "label": "PostTrainLLM",
+        "href": "https://posttrainllm.com"
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+---
+import layoutSource from '../layouts/BaseLayout.astro?raw';
+
+// Reuse the tracked layout's literal scripts at build time, without importing
+// its global CSS or mounting its footer. Skip its dynamic JSON-LD (page.jsonLd)
+// and the alternate footer branch; the home keeps the default branch's scripts.
+const scripts = [...layoutSource.matchAll(/<script\b(?![^>]*\/>)[^>]*>[\s\S]*?<\/script>/g)]
+  .map(([script]) => script)
+  .filter((script) => !script.includes('set:html=') && !/src="https:\/\/sassmaker\.com\/[^"?]+"/.test(script))
+  .map((script) => script.replace(/^<script\b[^>]*>/, (tag) => tag.replace(/\s+is:inline\b/, '').replace(/\s+/g, ' ').replace(/\s+>$/, '>')))
+  .join('\n');
+---
+
+<meta name="theme-color" content="#000000" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="alternate" type="text/markdown" href="/index.md" />
+<link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+<Fragment set:html={scripts} />
