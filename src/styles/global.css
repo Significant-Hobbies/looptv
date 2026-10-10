@@ -1,16 +1,17 @@
-@import "tailwindcss";
+@import "@saas-maker/ui/theme.css";
+@import "@saas-maker/ui/source-shell.css";
 
-/* Self-hosted OFL fonts (already shipped for the Precise footer). */
+/* Bundled OFL fonts keep the app typography self-hosted. */
 @font-face {
   font-family: "LoopTV Sans";
-  src: url("/fonts/fleet-footer-precise-v1/geist.woff2") format("woff2");
+  src: url("@saas-maker/ui/fonts/geist-latin-normal.woff2") format("woff2");
   font-weight: 100 900;
   font-display: swap;
 }
 
 @font-face {
   font-family: "LoopTV Mono";
-  src: url("/fonts/fleet-footer-precise-v1/geistmono.woff2") format("woff2");
+  src: url("@saas-maker/ui/fonts/geist-mono-latin-normal.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
@@ -18,6 +19,7 @@
 /* Shared by Astro pages and hydrated React islands. */
 
 :root {
+  --font-display: "LoopTV Sans", ui-sans-serif, system-ui, sans-serif;
   --background: #0a0a0a;
   --foreground: #f5f5f5;
   --primary: #e50914;

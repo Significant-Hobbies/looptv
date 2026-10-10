@@ -3,10 +3,10 @@ import layoutSource from '../layouts/BaseLayout.astro?raw';
 
 // Reuse the tracked layout's literal scripts at build time, without importing
 // its global CSS or mounting its footer. Skip its dynamic JSON-LD (page.jsonLd)
-// and the alternate footer branch; the home keeps the default branch's scripts.
+// and bundled scripts; Base already supplies the home footer behavior.
 const scripts = [...layoutSource.matchAll(/<script\b(?![^>]*\/>)[^>]*>[\s\S]*?<\/script>/g)]
   .map(([script]) => script)
-  .filter((script) => !script.includes('set:html=') && !/src="https:\/\/sassmaker\.com\/[^"?]+"/.test(script))
+  .filter((script) => script.includes('is:inline') && !script.includes('set:html='))
   .map((script) => script.replace(/^<script\b[^>]*>/, (tag) => tag.replace(/\s+is:inline\b/, '').replace(/\s+/g, ' ').replace(/\s+>$/, '>')))
   .join('\n');
 ---

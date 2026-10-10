@@ -3,11 +3,11 @@ import Base from '@saas-maker/templates/Base.astro';
 import { GalleryPage } from '@saas-maker/templates/gallery-page';
 import { baseProps } from '@saas-maker/templates/page';
 import { galleryContent } from '@saas-maker/templates/schema';
-import { studioFromProjects, studioProjectsFeed } from '@saas-maker/ui/blocks/footer';
 import ClientServices from '@/components/ClientServices';
 import HomeHead from '@/components/HomeHead.astro';
 import ResponsiveHome from '@/components/ResponsiveHome.astro';
 import json from '@/content/home.json';
+import { footerContent } from '@/components/studio-footer';
 import stations from '../../channels.config';
 import catalogSummary from '../../public/catalog-summary.json';
 
@@ -20,12 +20,7 @@ const content = galleryContent.parse(JSON.parse(JSON.stringify(json).replace(
   /\{(stationCount|sourceCount|videoCount)\}/g,
   (_, key: string) => counts[key]
 )));
-// The checked-in public-feed snapshot keeps offline builds useful. Invalid or
-// empty feed data still selects StudioFooter's default strip.
-const projects = await fetch(studioProjectsFeed, { signal: AbortSignal.timeout(1000) })
-  .then((response) => response.ok ? response.json() : [])
-  .catch(() => json.footer.studio.map(({ id, label, href }) => ({ id, name: label, url: href })));
-if (content.footer) content.footer.studio = studioFromProjects(projects, { current: 'looptv' });
+if (content.footer) content.footer.studio = footerContent.studio;
 ---
 
 <Base {...baseProps(content)}>

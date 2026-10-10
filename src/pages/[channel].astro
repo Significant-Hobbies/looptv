@@ -17,8 +17,6 @@ const { station } = Astro.props;
   title={station.name}
   description={station.description}
   canonicalPath={`/${station.id}`}
-  showProjectStrip={false}
-  showPreciseFooter={false}
 >
   <TVApp initialChannel={station.id} client:load />
 </BaseLayout>
