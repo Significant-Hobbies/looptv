@@ -26,7 +26,7 @@ it.each(['pointerdown', 'keydown', 'touchstart', 'scroll', 'timer'])(
       },
       removeEventListener: (event: string) => listeners.delete(event),
       setTimeout: (callback: () => void, delay: number) => {
-        expect(delay).toBe(30_000);
+        expect(delay).toBe(90_000);
         timer = callback;
         return 1;
       },
