@@ -11,7 +11,9 @@
   "ignore": [
     // Optional docs presentation config and the runtime-copied yt-dlp boundary.
     // Static asset loaded via a raw <script src> tag (BaseLayout.astro), not an import.
-    "public/app-health-log.js"
+    "public/app-health-log.js",
+    // Reviewed immutable native footer bundle, loaded by StudioFooter.astro.
+    "public/studio-footer/14712fdf/footer.js"
   ],
   "ignoreDependencies": [
     // CSS-only dependency and the checker-spawned CLI are not visible in the import graph.
