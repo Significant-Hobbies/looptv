@@ -174,10 +174,9 @@ function checkCycles() {
 }
 
 function checkDependencies() {
+  run('node', ['--test', 'scripts/http-cache-security.test.mjs']);
   const report = parseJson(run('pnpm', ['audit', '--json'], { allowFailure: true }), 'pnpm audit');
-  // Astro 5 debt accepted only until the major-upgrade issue is resolved: #38.
-  // GHSA-ch52-4w7c-c8xp (http-cache-semantics): no upstream fix in pinned range.
-  const accepted = new Set(['GHSA-ch52-4w7c-c8xp']);
+  const accepted = new Set();
   const severe = Object.values(report.advisories ?? {}).filter((advisory) =>
     ['critical', 'high'].includes(advisory.severity)
   );

@@ -29,7 +29,8 @@
       "!**/src/app/icon.svg",
       "!**/src/app/globals.css",
       "!**/stations.json",
-      "!**/*.astro"
+      "!**/*.astro",
+      "!public/studio-footer/14712fdf/footer.js"
     ]
   },
   "formatter": {
