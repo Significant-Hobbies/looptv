@@ -49,11 +49,6 @@ test.afterEach(async ({ page }, testInfo) => {
   const state = await page.evaluate(() => {
     const fixtureWindow = window as typeof window & {
       __fixtureErrorCallbacks?: number;
-      __fixtureApiExecuted?: boolean;
-      __fixtureReadyCallbackPresent?: boolean;
-      __fixtureReadyCallbackError?: string;
-      __fixturePlayerConstructed?: boolean;
-      __fixturePlayerReady?: boolean;
       __fixturePlayedIds?: string[];
       __fixturePlayerVideoId?: string;
       __videoLoads?: number;
@@ -80,11 +75,6 @@ test.afterEach(async ({ page }, testInfo) => {
         disabled: button instanceof HTMLButtonElement ? button.disabled : null,
       })),
       fixturePlayerVideoId: fixtureWindow.__fixturePlayerVideoId,
-      fixtureApiExecuted: fixtureWindow.__fixtureApiExecuted ?? false,
-      fixtureReadyCallbackPresent: fixtureWindow.__fixtureReadyCallbackPresent ?? false,
-      fixtureReadyCallbackError: fixtureWindow.__fixtureReadyCallbackError ?? null,
-      fixturePlayerConstructed: fixtureWindow.__fixturePlayerConstructed ?? false,
-      fixturePlayerReady: fixtureWindow.__fixturePlayerReady ?? false,
       fixturePlayedIds: fixtureWindow.__fixturePlayedIds ?? [],
       fixtureErrorCallbacks: fixtureWindow.__fixtureErrorCallbacks ?? 0,
       videoLoads: fixtureWindow.__videoLoads ?? 0,
@@ -130,13 +120,10 @@ test('counts a video only after its matching player confirms playback', async ({
     if (url.pathname === '/iframe_api') {
       await route.fulfill({
         contentType: 'application/javascript',
-        body: `window.__fixtureApiExecuted = true;
-        window.__fixtureReadyCallbackPresent = typeof window.onYouTubeIframeAPIReady === 'function';
-        window.YT = {
+        body: `window.YT = {
           PlayerState: { PLAYING: 1, PAUSED: 2, ENDED: 0 },
           Player: function (_container, options) {
             const player = this;
-            window.__fixturePlayerConstructed = true;
             this.videoId = options.videoId;
             window.__fixturePlayerVideoId = this.videoId;
             this.state = 2;
@@ -160,9 +147,8 @@ test('counts a video only after its matching player confirms playback', async ({
             window.__emitPlayerState = (state) => {
               player.state = state;
               if (state === 1) {
-                const fixtureWindow = window as typeof window & { __fixturePlayedIds?: string[] };
-                fixtureWindow.__fixturePlayedIds = fixtureWindow.__fixturePlayedIds || [];
-                fixtureWindow.__fixturePlayedIds.push(player.getVideoData().video_id);
+                window.__fixturePlayedIds = window.__fixturePlayedIds || [];
+                window.__fixturePlayedIds.push(player.getVideoData().video_id);
               }
               options.events.onStateChange({ data: state, target: player });
             };
@@ -170,18 +156,10 @@ test('counts a video only after its matching player confirms playback', async ({
               window.__fixtureErrorCallbacks = (window.__fixtureErrorCallbacks || 0) + 1;
               options.events.onError({ data: code, target: player });
             };
-            setTimeout(() => {
-              window.__fixturePlayerReady = true;
-              options.events.onReady({ target: player });
-            }, 0);
+            setTimeout(() => options.events.onReady({ target: player }), 0);
           }
         };
-        try {
-          window.onYouTubeIframeAPIReady();
-        } catch (error) {
-          window.__fixtureReadyCallbackError = String(error);
-          throw error;
-        }`,
+        window.onYouTubeIframeAPIReady();`,
       });
     } else if (url.pathname === '/catalog.json') {
       observedCatalogRequests.push(`${route.request().method()} ${url.pathname}`);
