@@ -10,7 +10,7 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
     payload = JSON.parse(gunzipSync(body).toString('utf8'));
   } else {
     const text = body.toString('utf8');
-    if (text.startsWith('{')) {
+    if (text.startsWith('{') || text.startsWith('[')) {
       payload = JSON.parse(text);
     } else {
       const encoded = new URLSearchParams(text).get('data');
@@ -31,6 +31,20 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
 test('counts a video only after its matching player confirms playback', async ({ page }) => {
   const playbackEvents: string[] = [];
   const observedPostHogRequests: string[] = [];
+  const syntheticCatalog = {
+    lastUpdated: '2026-10-24T00:00:00.000Z',
+    generatedAt: '2026-10-24T00:00:00.000Z',
+    stations: {
+      science: {
+        videos: [
+          { id: 'fixture-video-a', title: 'Fixture A', duration: 60, date: '', tags: [] },
+          { id: 'fixture-video-b', title: 'Fixture B', duration: 60, date: '', tags: [] },
+          { id: 'fixture-video-c', title: 'Fixture C', duration: 60, date: '', tags: [] },
+        ],
+        categoryVideoIds: {},
+      },
+    },
+  };
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname === '/iframe_api') {
@@ -44,8 +58,13 @@ test('counts a video only after its matching player confirms playback', async ({
             this.state = 2;
             this.destroy = () => {};
             this.getPlayerState = () => this.state;
+            this.playVideo = () => {};
+            this.pauseVideo = () => {};
             this.isMuted = () => false;
+            this.mute = () => {};
+            this.unMute = () => {};
             this.getVolume = () => 100;
+            this.setVolume = () => {};
             this.getDuration = () => 100;
             this.getCurrentTime = () => 0;
             this.getVideoData = () => ({ video_id: this.videoId });
@@ -62,6 +81,21 @@ test('counts a video only after its matching player confirms playback', async ({
           }
         };
         window.onYouTubeIframeAPIReady();`,
+      });
+    } else if (url.pathname === '/catalog.json') {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify(syntheticCatalog),
+      });
+    } else if (url.pathname === '/catalog-summary.json') {
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          lastUpdated: syntheticCatalog.lastUpdated,
+          generatedAt: syntheticCatalog.generatedAt,
+          stations: { science: { videoCount: syntheticCatalog.stations.science.videos.length } },
+          totalVideos: syntheticCatalog.stations.science.videos.length,
+        }),
       });
     } else if (url.hostname === 'us.i.posthog.com') {
       observedPostHogRequests.push(
@@ -87,15 +121,12 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
-  const pageState = await page.evaluate(() => ({
-    url: location.pathname,
-    title: document.title,
-    readyState: document.readyState,
-    buttons: Array.from(document.querySelectorAll('button'))
-      .map((button) => button.getAttribute('aria-label') || button.title)
-      .filter(Boolean),
-  }));
-  console.log('[playback-measurement] initial page controls', JSON.stringify(pageState));
+  await page.waitForFunction(() => {
+    const play = Array.from(document.querySelectorAll('button')).find(
+      (button) => button.textContent?.trim() === 'Play'
+    );
+    return play instanceof HTMLButtonElement && !play.disabled;
+  });
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
