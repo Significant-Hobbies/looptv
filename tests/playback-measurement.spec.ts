@@ -31,6 +31,7 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
 test('counts a video only after its matching player confirms playback', async ({ page }) => {
   const playbackEvents: string[] = [];
   const observedPostHogRequests: string[] = [];
+  const observedCatalogRequests: string[] = [];
   const syntheticCatalog = {
     lastUpdated: '2026-10-24T00:00:00.000Z',
     generatedAt: '2026-10-24T00:00:00.000Z',
@@ -83,11 +84,13 @@ test('counts a video only after its matching player confirms playback', async ({
         window.onYouTubeIframeAPIReady();`,
       });
     } else if (url.pathname === '/catalog.json') {
+      observedCatalogRequests.push(`${route.request().method()} ${url.pathname}`);
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify(syntheticCatalog),
       });
     } else if (url.pathname === '/catalog-summary.json') {
+      observedCatalogRequests.push(`${route.request().method()} ${url.pathname}`);
       await route.fulfill({
         contentType: 'application/json',
         body: JSON.stringify({
@@ -120,13 +123,32 @@ test('counts a video only after its matching player confirms playback', async ({
     }
   });
 
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.goto('/science/');
-  await page.waitForFunction(() => {
-    const play = Array.from(document.querySelectorAll('button')).find(
-      (button) => button.textContent?.trim() === 'Play'
+  try {
+    await page.waitForFunction(
+      () => {
+        const play = Array.from(document.querySelectorAll('button')).find(
+          (button) => button.textContent?.trim() === 'Play'
+        );
+        return play instanceof HTMLButtonElement && !play.disabled;
+      },
+      undefined,
+      { timeout: 8000 }
     );
-    return play instanceof HTMLButtonElement && !play.disabled;
-  });
+  } catch {
+    const state = await page.evaluate(() => ({
+      url: location.pathname,
+      buttons: Array.from(document.querySelectorAll('button')).map((button) => ({
+        label: button.textContent?.trim(),
+        disabled: button instanceof HTMLButtonElement ? button.disabled : null,
+      })),
+    }));
+    throw new Error(
+      `Playback fixture did not load: ${JSON.stringify({ state, observedCatalogRequests, pageErrors })}`
+    );
+  }
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
