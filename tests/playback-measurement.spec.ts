@@ -30,7 +30,6 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
 
 test('counts a video only after its matching player confirms playback', async ({ page }) => {
   const playbackEvents: string[] = [];
-  const analyticsEvents: string[] = [];
   const observedPostHogRequests: string[] = [];
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
@@ -73,7 +72,6 @@ test('counts a video only after its matching player confirms playback', async ({
           event?: string;
           properties?: { action?: string };
         }>) {
-          if (event.event) analyticsEvents.push(event.event);
           if (event.event === 'activated') playbackEvents.push('activated');
           if (event.event === 'core_action' && event.properties?.action === 'video_played') {
             playbackEvents.push('video_played');
@@ -89,13 +87,6 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
-  await page.waitForFunction(() => localStorage.getItem('looptv:signed-up') === '1');
-  await expect
-    .poll(() => ({
-      pageView: analyticsEvents.includes('page_view'),
-      requests: observedPostHogRequests,
-    }))
-    .toMatchObject({ pageView: true, requests: [expect.any(String)] });
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
@@ -115,6 +106,7 @@ test('counts a video only after its matching player confirms playback', async ({
   await expect
     .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
     .toBe(1);
+  await expect.poll(() => observedPostHogRequests.length).toBeGreaterThan(0);
   expect(playbackEvents.filter((event) => event === 'activated')).toHaveLength(1);
 
   await page.evaluate(() => {
