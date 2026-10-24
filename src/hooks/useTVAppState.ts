@@ -38,11 +38,9 @@ import {
   playbackDiagnosticKey as getPlaybackDiagnosticKey,
 } from '@/lib/playback-diagnostics';
 import { ytErrorReason } from '@/lib/yt-errors';
-import { trackActivated, trackCoreAction } from '@/lib/analytics';
 import {
-  reportConfirmedPlayback,
-  selectPlaybackForMeasurement,
-  type PlaybackSelectionMeasurement,
+  reportConfirmedVideoPlayback,
+  usePlaybackSelectionMeasurement,
 } from './playbackMeasurement';
 import { useGlobalKeybindings } from './useGlobalKeybindings';
 import { useCatalogManager } from './useCatalogManager';
@@ -450,15 +448,31 @@ function useSourceCallbacks(
   return { handleToggleBlock, handleUnquarantine, handleError, updateSmartPreference };
 }
 
+function useBackToLobbyCallback(
+  b: BaseState,
+  pb: ReturnType<typeof usePlaybackCore> & ReturnType<typeof usePlaybackActions>
+) {
+  return useCallback(() => {
+    pb.maybeMarkWatched(b.currentVideo);
+    b.setMode('lobby');
+    b.setCurrentVideo(null);
+    b.setEmbedHealth(getEmbedHealth());
+    b.setQuarantinedSources(getQuarantinedSources());
+  }, [
+    b.currentVideo,
+    b.setMode,
+    b.setCurrentVideo,
+    b.setEmbedHealth,
+    b.setQuarantinedSources,
+    pb.maybeMarkWatched,
+  ]);
+}
+
 function useMiscCallbacks(
   b: BaseState,
   pb: ReturnType<typeof usePlaybackCore> & ReturnType<typeof usePlaybackActions>
 ) {
-  const playbackMeasurementRef = useRef<PlaybackSelectionMeasurement<Video>>({
-    video: b.currentVideo,
-    reported: false,
-  });
-  selectPlaybackForMeasurement(playbackMeasurementRef.current, b.currentVideo);
+  const playbackMeasurementRef = usePlaybackSelectionMeasurement(b.currentVideo);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const toggleSavedForPlayback = useCallback(() => {
     if (!b.currentVideo) return;
@@ -487,7 +501,6 @@ function useMiscCallbacks(
     b.setCopied(true);
     setTimeout(() => b.setCopied(false), 2000);
   }, [b.smartMixProfile]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const handleSmartMixImport = useCallback(() => {
     const raw = window.prompt('Paste Smart Mix profile JSON');
     if (!raw) return;
@@ -498,44 +511,30 @@ function useMiscCallbacks(
     } catch {
       b.setStatus('Invalid Smart Mix profile JSON');
     }
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
+  }, [b.setSmartMixProfile, b.setSmartMixProfileRaw, b.setStatus]);
   const handleSmartMixReset = useCallback(() => {
     resetSmartMixProfile();
     b.setSmartMixProfile(createSmartMixProfile());
     b.setSmartMixReason('');
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
-  const handleBackToLobby = useCallback(() => {
-    pb.maybeMarkWatched(b.currentVideo);
-    b.setMode('lobby');
-    b.setCurrentVideo(null);
-    b.setEmbedHealth(getEmbedHealth());
-    b.setQuarantinedSources(getQuarantinedSources());
-  }, [b.currentVideo, pb.maybeMarkWatched]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ref is stable
+  }, [b.setSmartMixProfile, b.setSmartMixReason]);
+  const handleBackToLobby = useBackToLobbyCallback(b, pb);
   const handlePlayPause = useCallback(() => {
     b.playerRef.current?.togglePlay();
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ref is stable
+  }, [b.playerRef]);
   const handleToggleMute = useCallback(() => {
     b.playerRef.current?.toggleMute();
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
+  }, [b.playerRef]);
   const handlePlayerReady = useCallback(() => {
     b.setStatus('');
     b.setPlaybackIssue(null);
-  }, []);
+  }, [b.setStatus, b.setPlaybackIssue]);
   const handlePlayerPlay = useCallback(
     (videoId: string) => {
-      if (!b.currentVideo || b.currentVideo.id !== videoId) return;
-      b.setPlaybackIssue(null);
-      reportConfirmedPlayback(playbackMeasurementRef.current, b.currentVideo, () => {
-        trackActivated();
-        trackCoreAction('video_played');
-      });
+      reportConfirmedVideoPlayback(playbackMeasurementRef.current, b.currentVideo, videoId, () =>
+        b.setPlaybackIssue(null)
+      );
     },
-    [b.currentVideo, b.setPlaybackIssue]
+    [b.currentVideo, b.setPlaybackIssue, playbackMeasurementRef]
   );
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const enqueueVideo = useCallback((v: Video) => {
