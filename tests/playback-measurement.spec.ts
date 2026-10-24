@@ -63,6 +63,7 @@ test('counts a video only after its matching player confirms playback', async ({
           Player: function (_container, options) {
             const player = this;
             this.videoId = options.videoId;
+            window.__fixturePlayerVideoId = this.videoId;
             this.state = 2;
             this.destroy = () => {};
             this.getPlayerState = () => this.state;
@@ -78,6 +79,7 @@ test('counts a video only after its matching player confirms playback', async ({
             this.getVideoData = () => ({ video_id: this.videoId });
             this.loadVideoById = (videoId) => {
               this.videoId = videoId;
+              window.__fixturePlayerVideoId = videoId;
               window.__videoLoads = (window.__videoLoads || 0) + 1;
             };
             window.__emitPlayerState = (state) => {
@@ -89,7 +91,10 @@ test('counts a video only after its matching player confirms playback', async ({
               }
               options.events.onStateChange({ data: state, target: player });
             };
-            window.__emitPlayerError = (code) => options.events.onError({ data: code, target: player });
+            window.__emitPlayerError = (code) => {
+              window.__fixtureErrorCallbacks = (window.__fixtureErrorCallbacks || 0) + 1;
+              options.events.onError({ data: code, target: player });
+            };
             setTimeout(() => options.events.onReady({ target: player }), 0);
           }
         };
@@ -195,14 +200,19 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
+  const firstVideoId = await page.evaluate(
+    () => (window as typeof window & { __fixturePlayerVideoId?: string }).__fixturePlayerVideoId
+  );
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerError: (code: number) => void }).__emitPlayerError(101)
   );
-  await expect
-    .poll(() =>
-      page.evaluate(() => (window as unknown as { __videoLoads?: number }).__videoLoads ?? 0)
-    )
-    .toBeGreaterThan(0);
+  await page.waitForFunction(
+    (previousId) =>
+      (window as typeof window & { __fixturePlayerVideoId?: string }).__fixturePlayerVideoId !==
+      previousId,
+    firstVideoId,
+    { timeout: 10000 }
+  );
   expect(playbackEvents).toEqual([]);
 
   await page.evaluate(() =>
