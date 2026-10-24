@@ -30,8 +30,12 @@ jobs:
       - run: python -m pip install lizard==1.23.0
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
+      - name: Build playback measurement fixture
+        env:
+          PUBLIC_POSTHOG_KEY: measurement-test
+        run: pnpm build
       - name: Verify playback measurement against the iframe callback
         env:
           PUBLIC_POSTHOG_KEY: measurement-test
-        run: pnpm exec playwright test tests/playback-measurement.spec.ts --project=chromium --workers=1
+        run: pnpm exec playwright test --config=playwright.playback.config.ts tests/playback-measurement.spec.ts --project=chromium --workers=1
       - run: pnpm quality
