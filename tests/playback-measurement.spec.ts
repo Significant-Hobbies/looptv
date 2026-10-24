@@ -192,6 +192,11 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
+  const firstPlaybackFlush = page.waitForResponse((response) =>
+    response.url().includes('us.i.posthog.com/e/')
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+  await firstPlaybackFlush;
   try {
     await expect
       .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
@@ -210,14 +215,6 @@ test('counts a video only after its matching player confirms playback', async ({
     emit(2);
     emit(1);
   });
-  const flushResponse = page.waitForResponse((response) =>
-    response.url().includes('us.i.posthog.com/e/')
-  );
-  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
-  await flushResponse;
-  await expect
-    .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
-    .toBe(1);
 
   const loadsBeforeNext = await page.evaluate(
     () => (window as unknown as { __videoLoads?: number }).__videoLoads ?? 0
@@ -235,6 +232,11 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
+  const secondPlaybackFlush = page.waitForResponse((response) =>
+    response.url().includes('us.i.posthog.com/e/')
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+  await secondPlaybackFlush;
   await expect
     .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
     .toBe(2);
