@@ -33,6 +33,38 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
   return [payload];
 }
 
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status === testInfo.expectedStatus) return;
+  const state = await page.evaluate(() => {
+    const fixtureWindow = window as typeof window & {
+      __fixtureErrorCallbacks?: number;
+      __fixturePlayedIds?: string[];
+      __fixturePlayerVideoId?: string;
+      __videoLoads?: number;
+    };
+    return {
+      pathname: location.pathname,
+      islands: Array.from(document.querySelectorAll('astro-island')).map((island) => ({
+        serverRendered: island.hasAttribute('ssr'),
+        componentUrl: island.getAttribute('component-url'),
+      })),
+      buttons: Array.from(document.querySelectorAll('button')).map((button) => ({
+        label: button.textContent?.trim(),
+        disabled: button instanceof HTMLButtonElement ? button.disabled : null,
+      })),
+      fixturePlayerVideoId: fixtureWindow.__fixturePlayerVideoId,
+      fixturePlayedIds: fixtureWindow.__fixturePlayedIds ?? [],
+      fixtureErrorCallbacks: fixtureWindow.__fixtureErrorCallbacks ?? 0,
+      videoLoads: fixtureWindow.__videoLoads ?? 0,
+      activated: localStorage.getItem('looptv:activated') === '1',
+    };
+  });
+  await testInfo.attach('playback-measurement-state.json', {
+    body: Buffer.from(JSON.stringify(state, null, 2)),
+    contentType: 'application/json',
+  });
+});
+
 test('counts a video only after its matching player confirms playback', async ({ page }) => {
   const playbackEvents: string[] = [];
   const observedPostHogRequests: string[] = [];
