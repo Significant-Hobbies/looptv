@@ -82,6 +82,11 @@ test('counts a video only after its matching player confirms playback', async ({
             };
             window.__emitPlayerState = (state) => {
               player.state = state;
+              if (state === 1) {
+                const fixtureWindow = window as typeof window & { __fixturePlayedIds?: string[] };
+                fixtureWindow.__fixturePlayedIds = fixtureWindow.__fixturePlayedIds || [];
+                fixtureWindow.__fixturePlayedIds.push(player.getVideoData().video_id);
+              }
               options.events.onStateChange({ data: state, target: player });
             };
             window.__emitPlayerError = (code) => options.events.onError({ data: code, target: player });
@@ -197,10 +202,22 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
-  const firstPlaybackFlush = page.waitForResponse((response) =>
-    isPostHogEventRequest(response.url())
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('looptv:activated'))).toBe('1');
+  const firstPlaybackFlush = page.waitForResponse(
+    (response) => isPostHogEventRequest(response.url()),
+    { timeout: 10000 }
   );
-  await firstPlaybackFlush;
+  try {
+    await firstPlaybackFlush;
+  } catch (error) {
+    const fixturePlayback = await page.evaluate(() => ({
+      activated: localStorage.getItem('looptv:activated'),
+      playedIds: (window as typeof window & { __fixturePlayedIds?: string[] }).__fixturePlayedIds,
+    }));
+    throw new Error(
+      `${error instanceof Error ? error.message : 'Playback flush failed'}; fixture playback: ${JSON.stringify(fixturePlayback)}; PostHog requests: ${JSON.stringify(observedPostHogRequests)}`
+    );
+  }
   try {
     await expect
       .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
