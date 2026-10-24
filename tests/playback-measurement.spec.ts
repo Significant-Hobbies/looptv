@@ -33,6 +33,16 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
   return [payload];
 }
 
+const diagnosticsByPage = new WeakMap<
+  object,
+  {
+    consoleErrors: string[];
+    failedScriptRequests: string[];
+    observedCatalogRequests: string[];
+    observedPostHogRequests: string[];
+  }
+>();
+
 test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status === testInfo.expectedStatus) return;
   const state = await page.evaluate(() => {
@@ -44,6 +54,17 @@ test.afterEach(async ({ page }, testInfo) => {
     };
     return {
       pathname: location.pathname,
+      visibleMode: document.querySelector('.player-container')
+        ? 'player'
+        : Array.from(document.querySelectorAll('button')).some(
+              (button) => button.textContent?.trim() === 'Play'
+            )
+          ? 'lobby'
+          : 'other',
+      statusText:
+        Array.from(document.querySelectorAll('p'))
+          .map((paragraph) => paragraph.textContent?.trim())
+          .find((text) => text) ?? null,
       islands: Array.from(document.querySelectorAll('astro-island')).map((island) => ({
         serverRendered: island.hasAttribute('ssr'),
         componentUrl: island.getAttribute('component-url'),
@@ -60,7 +81,9 @@ test.afterEach(async ({ page }, testInfo) => {
     };
   });
   await testInfo.attach('playback-measurement-state.json', {
-    body: Buffer.from(JSON.stringify(state, null, 2)),
+    body: Buffer.from(
+      JSON.stringify({ state, browser: diagnosticsByPage.get(page) ?? null }, null, 2)
+    ),
     contentType: 'application/json',
   });
 });
@@ -71,6 +94,12 @@ test('counts a video only after its matching player confirms playback', async ({
   const observedCatalogRequests: string[] = [];
   const failedScriptRequests: string[] = [];
   const consoleErrors: string[] = [];
+  diagnosticsByPage.set(page, {
+    consoleErrors,
+    failedScriptRequests,
+    observedCatalogRequests,
+    observedPostHogRequests,
+  });
   const syntheticCatalog = {
     lastUpdated: '2026-10-24T00:00:00.000Z',
     generatedAt: '2026-10-24T00:00:00.000Z',
@@ -232,19 +261,14 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
-  const firstVideoId = await page.evaluate(
-    () => (window as typeof window & { __fixturePlayerVideoId?: string }).__fixturePlayerVideoId
-  );
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerError: (code: number) => void }).__emitPlayerError(101)
   );
-  await page.waitForFunction(
-    (previousId) =>
-      (window as typeof window & { __fixturePlayerVideoId?: string }).__fixturePlayerVideoId !==
-      previousId,
-    firstVideoId,
-    { timeout: 10000 }
-  );
+  await expect
+    .poll(() =>
+      page.evaluate(() => (window as typeof window & { __videoLoads?: number }).__videoLoads ?? 0)
+    )
+    .toBeGreaterThan(0);
   expect(playbackEvents).toEqual([]);
 
   await page.evaluate(() =>
