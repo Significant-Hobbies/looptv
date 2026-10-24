@@ -87,6 +87,15 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
+  const pageState = await page.evaluate(() => ({
+    url: location.pathname,
+    title: document.title,
+    readyState: document.readyState,
+    buttons: Array.from(document.querySelectorAll('button'))
+      .map((button) => button.getAttribute('aria-label') || button.title)
+      .filter(Boolean),
+  }));
+  console.log('[playback-measurement] initial page controls', JSON.stringify(pageState));
   await page.getByRole('button', { name: 'Play / Pause (Space)', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
