@@ -157,6 +157,12 @@ test('counts a video only after its matching player confirms playback', async ({
       failedScriptRequests.push(`${request.url()}: ${request.failure()?.errorText ?? 'unknown'}`);
     }
   });
+  // PostHog intentionally drops automation UAs. This fixture simulates an
+  // ordinary browser only inside the page; every analytics request stays local.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver', { configurable: true, get: () => false });
+    Object.defineProperty(navigator, 'userAgentData', { configurable: true, get: () => undefined });
+  });
   await page.goto('/science/');
   try {
     await page.waitForFunction(
