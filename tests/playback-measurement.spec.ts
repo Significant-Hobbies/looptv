@@ -31,6 +31,7 @@ function decodePostHogEvents(request: import('@playwright/test').Request) {
 test('counts a video only after its matching player confirms playback', async ({ page }) => {
   const playbackEvents: string[] = [];
   const analyticsEvents: string[] = [];
+  const observedPostHogRequests: string[] = [];
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.pathname === '/iframe_api') {
@@ -64,6 +65,9 @@ test('counts a video only after its matching player confirms playback', async ({
         window.onYouTubeIframeAPIReady();`,
       });
     } else if (url.hostname === 'us.i.posthog.com') {
+      observedPostHogRequests.push(
+        `${route.request().method()} ${url.pathname} ${route.request().headers()['content-type'] ?? ''}`
+      );
       if (url.pathname.includes('/e/') && route.request().postData()) {
         for (const event of decodePostHogEvents(route.request()) as Array<{
           event?: string;
@@ -85,7 +89,12 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
-  await expect.poll(() => analyticsEvents.includes('page_view')).toBe(true);
+  await expect
+    .poll(() => ({
+      pageView: analyticsEvents.includes('page_view'),
+      requests: observedPostHogRequests,
+    }))
+    .toMatchObject({ pageView: true });
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
