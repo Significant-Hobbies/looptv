@@ -37,7 +37,7 @@ jobs:
       - name: Verify playback measurement against the iframe callback
         env:
           PUBLIC_POSTHOG_KEY: measurement-test
-        run: pnpm exec playwright test --config=playwright.playback.config.ts tests/playback-measurement.spec.ts --project=chromium --workers=1
+        run: pnpm test:playback
       - name: Retain synthetic playback regression trace
         if: always()
         uses: actions/upload-artifact@v4
