@@ -32,6 +32,8 @@ test('counts a video only after its matching player confirms playback', async ({
   const playbackEvents: string[] = [];
   const observedPostHogRequests: string[] = [];
   const observedCatalogRequests: string[] = [];
+  const failedScriptRequests: string[] = [];
+  const consoleErrors: string[] = [];
   const syntheticCatalog = {
     lastUpdated: '2026-10-24T00:00:00.000Z',
     generatedAt: '2026-10-24T00:00:00.000Z',
@@ -125,6 +127,14 @@ test('counts a video only after its matching player confirms playback', async ({
 
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  page.on('requestfailed', (request) => {
+    if (request.resourceType() === 'script') {
+      failedScriptRequests.push(`${request.url()}: ${request.failure()?.errorText ?? 'unknown'}`);
+    }
+  });
   await page.goto('/science/');
   try {
     await page.waitForFunction(
@@ -140,13 +150,18 @@ test('counts a video only after its matching player confirms playback', async ({
   } catch {
     const state = await page.evaluate(() => ({
       url: location.pathname,
+      islands: Array.from(document.querySelectorAll('astro-island')).map((island) => ({
+        ssr: island.hasAttribute('ssr'),
+        componentUrl: island.getAttribute('component-url'),
+        rendererUrl: island.getAttribute('renderer-url'),
+      })),
       buttons: Array.from(document.querySelectorAll('button')).map((button) => ({
         label: button.textContent?.trim(),
         disabled: button instanceof HTMLButtonElement ? button.disabled : null,
       })),
     }));
     throw new Error(
-      `Playback fixture did not load: ${JSON.stringify({ state, observedCatalogRequests, pageErrors })}`
+      `Playback fixture did not hydrate: ${JSON.stringify({ state, observedCatalogRequests, pageErrors, consoleErrors, failedScriptRequests })}`
     );
   }
   await page.getByRole('button', { name: 'Play', exact: true }).click();
