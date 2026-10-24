@@ -38,7 +38,7 @@ import {
   playbackDiagnosticKey as getPlaybackDiagnosticKey,
 } from '@/lib/playback-diagnostics';
 import { ytErrorReason } from '@/lib/yt-errors';
-import { trackActivated, trackCoreAction } from '@/lib/analytics';
+import { useConfirmedPlaybackMeasurement } from './playbackMeasurement';
 import { useGlobalKeybindings } from './useGlobalKeybindings';
 import { useCatalogManager } from './useCatalogManager';
 import type { PlayerHandle } from '@/components/Player';
@@ -329,12 +329,6 @@ function usePlaybackEffects(
   useEffect(() => {
     if (b.mode === 'playing' && b.catalog && !b.currentVideo) pb.playNext();
   }, [b.mode, b.catalog, b.currentVideo, pb.playNext]);
-  useEffect(() => {
-    if (b.mode === 'playing' && b.currentVideo) {
-      trackActivated();
-      trackCoreAction('video_played');
-    }
-  }, [b.mode, b.currentVideo]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters and refs are stable
   useEffect(() => {
     if (!b.catalog || !b.currentVideo || b.isSmartMix) {
@@ -455,6 +449,7 @@ function useMiscCallbacks(
   b: BaseState,
   pb: ReturnType<typeof usePlaybackCore> & ReturnType<typeof usePlaybackActions>
 ) {
+  const handlePlayerPlay = useConfirmedPlaybackMeasurement(b.currentVideo, b.setPlaybackIssue);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const toggleSavedForPlayback = useCallback(() => {
     if (!b.currentVideo) return;
@@ -483,7 +478,6 @@ function useMiscCallbacks(
     b.setCopied(true);
     setTimeout(() => b.setCopied(false), 2000);
   }, [b.smartMixProfile]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const handleSmartMixImport = useCallback(() => {
     const raw = window.prompt('Paste Smart Mix profile JSON');
     if (!raw) return;
@@ -494,13 +488,12 @@ function useMiscCallbacks(
     } catch {
       b.setStatus('Invalid Smart Mix profile JSON');
     }
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
+  }, [b.setSmartMixProfile, b.setSmartMixProfileRaw, b.setStatus]);
   const handleSmartMixReset = useCallback(() => {
     resetSmartMixProfile();
     b.setSmartMixProfile(createSmartMixProfile());
     b.setSmartMixReason('');
-  }, []);
+  }, [b.setSmartMixProfile, b.setSmartMixReason]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const handleBackToLobby = useCallback(() => {
     pb.maybeMarkWatched(b.currentVideo);
@@ -509,23 +502,16 @@ function useMiscCallbacks(
     b.setEmbedHealth(getEmbedHealth());
     b.setQuarantinedSources(getQuarantinedSources());
   }, [b.currentVideo, pb.maybeMarkWatched]);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ref is stable
   const handlePlayPause = useCallback(() => {
     b.playerRef.current?.togglePlay();
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: ref is stable
+  }, [b.playerRef]);
   const handleToggleMute = useCallback(() => {
     b.playerRef.current?.toggleMute();
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
+  }, [b.playerRef]);
   const handlePlayerReady = useCallback(() => {
     b.setStatus('');
     b.setPlaybackIssue(null);
-  }, []);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
-  const handlePlayerPlay = useCallback(() => {
-    b.setPlaybackIssue(null);
-  }, []);
+  }, [b.setStatus, b.setPlaybackIssue]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const enqueueVideo = useCallback((v: Video) => {
     b.queueRef.current.push(v);

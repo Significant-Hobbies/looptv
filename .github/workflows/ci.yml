@@ -28,4 +28,22 @@ jobs:
           fi
       - run: pnpm install --frozen-lockfile
       - run: python -m pip install lizard==1.23.0
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Build playback measurement fixture
+        env:
+          PUBLIC_POSTHOG_KEY: measurement-test
+        run: pnpm build
+      - name: Verify playback measurement against the iframe callback
+        env:
+          PUBLIC_POSTHOG_KEY: measurement-test
+        run: pnpm test:playback
+      - name: Retain synthetic playback regression trace
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playback-measurement-trace
+          path: test-results/
+          retention-days: 1
+          if-no-files-found: ignore
       - run: pnpm quality

@@ -23,7 +23,7 @@ interface PlayerCallbacks {
   onEnded: () => void;
   onError: (code: number) => void;
   onReady: () => void;
-  onPlay: () => void;
+  onPlay: (videoId: string) => void;
   onPause: () => void;
 }
 
@@ -151,7 +151,7 @@ interface PlayerRefs {
   onEndedRef: React.MutableRefObject<() => void>;
   onErrorRef: React.MutableRefObject<(code: number) => void>;
   onReadyRef: React.MutableRefObject<() => void>;
-  onPlayRef: React.MutableRefObject<() => void>;
+  onPlayRef: React.MutableRefObject<(videoId: string) => void>;
   onPauseRef: React.MutableRefObject<() => void>;
   sourceRef: React.MutableRefObject<string | undefined>;
 }
@@ -189,7 +189,7 @@ function buildPlayerOptions(refs: PlayerRefs) {
               refs.embedTrackedRef.current = true;
               recordEmbedAttempt(refs.sourceRef.current, false);
             }
-            refs.onPlayRef.current();
+            refs.onPlayRef.current(e.target.getVideoData()?.video_id ?? '');
             break;
           case window.YT.PlayerState.PAUSED:
             refs.onPauseRef.current();

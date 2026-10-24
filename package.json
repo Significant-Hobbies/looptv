@@ -8,6 +8,7 @@
     "start": "wrangler pages dev dist",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:playback": "playwright test --config=playwright.playback.config.ts tests/playback-measurement.spec.ts --project=chromium --workers=1",
     "lint": "biome check .",
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -80,13 +81,15 @@
       "sharp@<0.35.5": "0.35.5",
       "svgo@>=4.0.0 <4.1.0": "4.1.0",
       "smol-toml@<=1.7.0": "1.7.1",
-      "undici@>=7.0.0 <7.29.1": "7.29.1",
+      "undici@>=7.18.0 <7.30.1": "7.30.1",
+      "undici@>=8.0.0 <8.12.2": "8.12.2",
       "brace-expansion@>=5.0.0 <5.0.11": "5.0.11",
       "devalue@>=5.0.0 <5.9.3": "5.9.3",
       "source-map-js": "1.2.2",
       "dompurify@<3.4.17": "3.4.17",
       "vite@>=8.0.0 <8.3.3": "8.3.5",
-      "http-cache-semantics": "4.3.0"
+      "http-cache-semantics": "4.3.0",
+      "zod@>=4.0.0 <4.6.6": "4.6.6"
     },
     "patchedDependencies": {
       "@saas-maker/templates@0.1.17": "patches/saas-maker-templates-footer-retry-0.1.17.patch",
