@@ -87,7 +87,7 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
-  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Play / Pause (Space)', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
   await page.evaluate(() =>
