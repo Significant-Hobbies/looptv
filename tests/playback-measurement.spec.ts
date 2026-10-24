@@ -89,12 +89,13 @@ test('counts a video only after its matching player confirms playback', async ({
   });
 
   await page.goto('/science/');
+  await page.waitForFunction(() => localStorage.getItem('looptv:signed-up') === '1');
   await expect
     .poll(() => ({
       pageView: analyticsEvents.includes('page_view'),
       requests: observedPostHogRequests,
     }))
-    .toMatchObject({ pageView: true });
+    .toMatchObject({ pageView: true, requests: [expect.any(String)] });
   await page.getByRole('button', { name: 'Play', exact: true }).click();
   await page.waitForFunction(() => '__emitPlayerState' in window);
   expect(playbackEvents).toEqual([]);
