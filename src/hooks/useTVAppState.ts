@@ -38,10 +38,7 @@ import {
   playbackDiagnosticKey as getPlaybackDiagnosticKey,
 } from '@/lib/playback-diagnostics';
 import { ytErrorReason } from '@/lib/yt-errors';
-import {
-  reportConfirmedVideoPlayback,
-  usePlaybackSelectionMeasurement,
-} from './playbackMeasurement';
+import { useConfirmedPlaybackMeasurement } from './playbackMeasurement';
 import { useGlobalKeybindings } from './useGlobalKeybindings';
 import { useCatalogManager } from './useCatalogManager';
 import type { PlayerHandle } from '@/components/Player';
@@ -448,31 +445,11 @@ function useSourceCallbacks(
   return { handleToggleBlock, handleUnquarantine, handleError, updateSmartPreference };
 }
 
-function useBackToLobbyCallback(
-  b: BaseState,
-  pb: ReturnType<typeof usePlaybackCore> & ReturnType<typeof usePlaybackActions>
-) {
-  return useCallback(() => {
-    pb.maybeMarkWatched(b.currentVideo);
-    b.setMode('lobby');
-    b.setCurrentVideo(null);
-    b.setEmbedHealth(getEmbedHealth());
-    b.setQuarantinedSources(getQuarantinedSources());
-  }, [
-    b.currentVideo,
-    b.setMode,
-    b.setCurrentVideo,
-    b.setEmbedHealth,
-    b.setQuarantinedSources,
-    pb.maybeMarkWatched,
-  ]);
-}
-
 function useMiscCallbacks(
   b: BaseState,
   pb: ReturnType<typeof usePlaybackCore> & ReturnType<typeof usePlaybackActions>
 ) {
-  const playbackMeasurementRef = usePlaybackSelectionMeasurement(b.currentVideo);
+  const handlePlayerPlay = useConfirmedPlaybackMeasurement(b.currentVideo, b.setPlaybackIssue);
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const toggleSavedForPlayback = useCallback(() => {
     if (!b.currentVideo) return;
@@ -517,7 +494,14 @@ function useMiscCallbacks(
     b.setSmartMixProfile(createSmartMixProfile());
     b.setSmartMixReason('');
   }, [b.setSmartMixProfile, b.setSmartMixReason]);
-  const handleBackToLobby = useBackToLobbyCallback(b, pb);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
+  const handleBackToLobby = useCallback(() => {
+    pb.maybeMarkWatched(b.currentVideo);
+    b.setMode('lobby');
+    b.setCurrentVideo(null);
+    b.setEmbedHealth(getEmbedHealth());
+    b.setQuarantinedSources(getQuarantinedSources());
+  }, [b.currentVideo, pb.maybeMarkWatched]);
   const handlePlayPause = useCallback(() => {
     b.playerRef.current?.togglePlay();
   }, [b.playerRef]);
@@ -528,14 +512,6 @@ function useMiscCallbacks(
     b.setStatus('');
     b.setPlaybackIssue(null);
   }, [b.setStatus, b.setPlaybackIssue]);
-  const handlePlayerPlay = useCallback(
-    (videoId: string) => {
-      reportConfirmedVideoPlayback(playbackMeasurementRef.current, b.currentVideo, videoId, () =>
-        b.setPlaybackIssue(null)
-      );
-    },
-    [b.currentVideo, b.setPlaybackIssue, playbackMeasurementRef]
-  );
   // biome-ignore lint/correctness/useExhaustiveDependencies: b setters are stable
   const enqueueVideo = useCallback((v: Video) => {
     b.queueRef.current.push(v);

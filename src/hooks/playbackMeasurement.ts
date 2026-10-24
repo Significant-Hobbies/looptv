@@ -1,18 +1,12 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { trackActivated, trackCoreAction } from '@/lib/analytics';
 
-export interface PlaybackSelectionMeasurement<T> {
+interface PlaybackSelectionMeasurement<T> {
   video: T | null;
   reported: boolean;
 }
 
-export function usePlaybackSelectionMeasurement<T>(video: T | null) {
-  const state = useRef<PlaybackSelectionMeasurement<T>>({ video, reported: false });
-  selectPlaybackForMeasurement(state.current, video);
-  return state;
-}
-
-export function selectPlaybackForMeasurement<T>(
+function selectPlaybackForMeasurement<T>(
   state: PlaybackSelectionMeasurement<T>,
   video: T | null
 ): void {
@@ -21,7 +15,7 @@ export function selectPlaybackForMeasurement<T>(
   state.reported = false;
 }
 
-export function reportConfirmedPlayback<T>(
+function reportConfirmedPlayback<T>(
   state: PlaybackSelectionMeasurement<T>,
   video: T | null,
   report: () => void
@@ -32,16 +26,21 @@ export function reportConfirmedPlayback<T>(
   return true;
 }
 
-export function reportConfirmedVideoPlayback<T extends { id: string }>(
-  state: PlaybackSelectionMeasurement<T>,
+export function useConfirmedPlaybackMeasurement<T extends { id: string }>(
   video: T | null,
-  videoId: string,
-  clearIssue: () => void
-): void {
-  if (!video || video.id !== videoId) return;
-  clearIssue();
-  reportConfirmedPlayback(state, video, () => {
-    trackActivated();
-    trackCoreAction('video_played');
-  });
+  clearIssue: (issue: null) => void
+) {
+  const state = useRef<PlaybackSelectionMeasurement<T>>({ video, reported: false });
+  selectPlaybackForMeasurement(state.current, video);
+  return useCallback(
+    (videoId: string) => {
+      if (!video || video.id !== videoId) return;
+      clearIssue(null);
+      reportConfirmedPlayback(state.current, video, () => {
+        trackActivated();
+        trackCoreAction('video_played');
+      });
+    },
+    [video, clearIssue]
+  );
 }
