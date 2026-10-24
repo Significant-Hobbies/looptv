@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { gunzipSync } from 'node:zlib';
 
+function isPostHogEventRequest(rawUrl: string) {
+  const url = new URL(rawUrl);
+  return url.hostname === 'us.i.posthog.com' && url.pathname.includes('/e/');
+}
+
 function decodePostHogEvents(request: import('@playwright/test').Request) {
   const body = request.postDataBuffer();
   if (!body) return [];
@@ -104,7 +109,7 @@ test('counts a video only after its matching player confirms playback', async ({
       });
     } else if (url.hostname === 'us.i.posthog.com') {
       const requestSummary = `${route.request().method()} ${url.pathname} ${route.request().headers()['content-type'] ?? ''}`;
-      if (url.pathname.includes('/e/') && route.request().postData()) {
+      if (isPostHogEventRequest(route.request().url()) && route.request().postData()) {
         try {
           const events = decodePostHogEvents(route.request()) as Array<{
             event?: string;
@@ -193,9 +198,8 @@ test('counts a video only after its matching player confirms playback', async ({
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
   const firstPlaybackFlush = page.waitForResponse((response) =>
-    response.url().includes('us.i.posthog.com/e/')
+    isPostHogEventRequest(response.url())
   );
-  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
   await firstPlaybackFlush;
   try {
     await expect
@@ -233,9 +237,8 @@ test('counts a video only after its matching player confirms playback', async ({
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
   const secondPlaybackFlush = page.waitForResponse((response) =>
-    response.url().includes('us.i.posthog.com/e/')
+    isPostHogEventRequest(response.url())
   );
-  await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
   await secondPlaybackFlush;
   await expect
     .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
