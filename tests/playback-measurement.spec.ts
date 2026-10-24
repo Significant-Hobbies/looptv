@@ -95,8 +95,10 @@ test('counts a video only after its matching player confirms playback', async ({
   const observedCatalogRequests: string[] = [];
   const failedScriptRequests: string[] = [];
   const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
   diagnosticsByPage.set(page, {
     consoleErrors,
+    pageErrors,
     failedScriptRequests,
     observedCatalogRequests,
     observedPostHogRequests,
@@ -213,8 +215,6 @@ test('counts a video only after its matching player confirms playback', async ({
     }
   });
 
-  const pageErrors: string[] = [];
-  diagnosticsByPage.get(page)!.pageErrors = pageErrors;
   page.on('pageerror', (error) => pageErrors.push(error.message));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
