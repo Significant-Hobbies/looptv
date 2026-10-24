@@ -29,3 +29,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: python -m pip install lizard==1.23.0
       - run: pnpm quality
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify playback measurement against the iframe callback
+        env:
+          PUBLIC_POSTHOG_KEY: measurement-test
+        run: pnpm exec playwright test tests/playback-measurement.spec.ts --project=chromium --workers=1

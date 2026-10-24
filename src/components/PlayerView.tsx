@@ -190,7 +190,7 @@ export interface PlayerViewProps {
     onEnded: () => void;
     onError: (code: number) => void;
     onReady: () => void;
-    onPlay: () => void;
+    onPlay: (videoId: string) => void;
     onPause: () => void;
   };
   status: string;
