@@ -103,19 +103,31 @@ test('counts a video only after its matching player confirms playback', async ({
         }),
       });
     } else if (url.hostname === 'us.i.posthog.com') {
-      observedPostHogRequests.push(
-        `${route.request().method()} ${url.pathname} ${route.request().headers()['content-type'] ?? ''}`
-      );
+      const requestSummary = `${route.request().method()} ${url.pathname} ${route.request().headers()['content-type'] ?? ''}`;
       if (url.pathname.includes('/e/') && route.request().postData()) {
-        for (const event of decodePostHogEvents(route.request()) as Array<{
-          event?: string;
-          properties?: { action?: string };
-        }>) {
-          if (event.event === 'activated') playbackEvents.push('activated');
-          if (event.event === 'core_action' && event.properties?.action === 'video_played') {
-            playbackEvents.push('video_played');
+        try {
+          const events = decodePostHogEvents(route.request()) as Array<{
+            event?: string;
+            properties?: { action?: string };
+          }>;
+          observedPostHogRequests.push(
+            `${requestSummary} events=${events
+              .map((event) => `${event.event ?? 'unknown'}:${event.properties?.action ?? ''}`)
+              .join(',')}`
+          );
+          for (const event of events) {
+            if (event.event === 'activated') playbackEvents.push('activated');
+            if (event.event === 'core_action' && event.properties?.action === 'video_played') {
+              playbackEvents.push('video_played');
+            }
           }
+        } catch (error) {
+          observedPostHogRequests.push(
+            `${requestSummary} decodeError=${error instanceof Error ? error.message : 'unknown'}`
+          );
         }
+      } else {
+        observedPostHogRequests.push(requestSummary);
       }
       await route.fulfill({ status: 200, contentType: 'application/json', body: '{"status":1}' });
     } else if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
@@ -180,9 +192,15 @@ test('counts a video only after its matching player confirms playback', async ({
   await page.evaluate(() =>
     (window as unknown as { __emitPlayerState: (state: number) => void }).__emitPlayerState(1)
   );
-  await expect
-    .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
-    .toBe(1);
+  try {
+    await expect
+      .poll(() => playbackEvents.filter((event) => event === 'video_played').length)
+      .toBe(1);
+  } catch (error) {
+    throw new Error(
+      `${error instanceof Error ? error.message : 'Playback event assertion failed'}; PostHog requests: ${JSON.stringify(observedPostHogRequests)}`
+    );
+  }
   await expect.poll(() => observedPostHogRequests.length).toBeGreaterThan(0);
   expect(playbackEvents.filter((event) => event === 'activated')).toHaveLength(1);
 
