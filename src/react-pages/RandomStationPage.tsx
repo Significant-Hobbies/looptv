@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import stations from '../../channels.config';
+import { randomStationMessage } from '@/content/public-copy';
 
 /**
  * /random — bounces to a random station. Useful for share links and
@@ -15,7 +16,7 @@ export default function RandomStation() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-950 p-8 text-zinc-300">
-      <p className="font-mono text-sm">Tuning to a random station…</p>
+      <p className="font-mono text-sm">{randomStationMessage}</p>
     </main>
   );
 }

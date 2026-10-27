@@ -13,7 +13,8 @@ fetched client-side and the YouTube IFrame Player API does all playback. A
 separate, CI-only catalog pipeline rebuilds
 `public/catalog.json` on a bi-weekly schedule from `stations.json` using a
 cache-first YouTube Data API path with yt-dlp fallback and incremental free-AI
-tagging. There is no database, no auth, and no server runtime.
+tagging. There is no database or authentication. A small Pages middleware
+negotiates generated public Markdown; product pages and data remain static.
 
 ## Data flow
 
@@ -50,10 +51,11 @@ watched.ts ── localStorage: watched, stats, blocked, watch-later, smart-mix,
 
 ## Boundaries (why this shape)
 
-- **No server runtime.** `astro build` prerenders static `dist/` output for
+- **Static product pages.** `astro build` prerenders static `dist/` output for
   Cloudflare Pages. This is a deliberate choice — see
   [ADR-008](decisions.md#adr-008). Anything requiring an on-request server
-  adapter is out of scope.
+  adapter is out of scope. Public representation middleware serves only
+  build-registered Markdown and discovery assets.
 - **No database.** The "zero API keys for playback/forks" positioning depends
   on a committed static catalog. Watched history lives in `localStorage`. See
   [ADR-003](decisions.md#adr-003).

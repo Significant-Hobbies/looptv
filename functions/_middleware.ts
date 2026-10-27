@@ -1,3 +1,10 @@
+import {
+  createStaticAssetHandler,
+  advertiseMarkdown,
+} from '../src/lib/agent-surfaces/adapters/static-assets.mjs';
+import { wantsMarkdown } from '../src/lib/agent-surfaces/http.mjs';
+const handleMarkdown = createStaticAssetHandler({});
+
 // CF Pages Functions middleware for tv.significanthobbies.com (LoopTV):
 // - Handles Accept: text/markdown negotiation for pages with .md alternates.
 // - Returns agent-friendly markdown 404s for unknown paths.
@@ -122,13 +129,6 @@ const OPENAPI_SPEC = {
   },
 };
 
-function wantsMarkdown(request: Request): boolean {
-  const accept = (request.headers.get('accept') || '').toLowerCase();
-  if (!accept.includes('text/markdown')) return false;
-  if (!accept.includes('text/html')) return true;
-  return accept.indexOf('text/markdown') < accept.indexOf('text/html');
-}
-
 function normalizePath(pathname: string): string {
   if (!pathname || pathname === '/') return '/';
   const withSlash = pathname.startsWith('/') ? pathname : `/${pathname}`;
@@ -156,6 +156,8 @@ function markdown404(pathname: string, method: string): Response {
       'cache-control': 'no-store',
       'x-content-type-options': 'nosniff',
       vary: 'Accept',
+      'X-Robots-Tag': 'noindex, follow',
+      'Access-Control-Allow-Origin': '*',
     },
   });
 }
@@ -176,6 +178,8 @@ function jsonError(status: number, code: string, message: string, path: string):
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;
+  const markdown = await handleMarkdown(request, context.env.ASSETS);
+  if (markdown) return markdown;
 
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return context.next();
@@ -186,7 +190,7 @@ export const onRequest: PagesFunction = async (context) => {
 
   // /openapi.json — serve the spec directly.
   if (pathname === '/openapi.json' || pathname === '/openapi.yaml') {
-    return new Response(JSON.stringify(OPENAPI_SPEC, null, 2), {
+    return new Response(request.method === 'HEAD' ? null : JSON.stringify(OPENAPI_SPEC, null, 2), {
       headers: {
         'content-type': 'application/json; charset=utf-8',
         'access-control-allow-origin': '*',
@@ -212,27 +216,7 @@ export const onRequest: PagesFunction = async (context) => {
     return context.next();
   }
 
-  // Accept: text/markdown negotiation for HTML pages that have a .md alternate.
-  if (wantsMarkdown(request) && !pathname.endsWith('.md') && !pathname.startsWith('/api/')) {
-    const mdPath = pathname === '/' ? '/index.md' : `${pathname.replace(/\/$/, '')}.md`;
-    if (context.env.ASSETS) {
-      const mdUrl = new URL(url);
-      mdUrl.pathname = mdPath;
-      const mdResponse = await context.env.ASSETS.fetch(new Request(mdUrl.toString(), request));
-      if (mdResponse.status === 200) {
-        const headers = new Headers(mdResponse.headers);
-        headers.set('content-type', 'text/markdown; charset=utf-8');
-        headers.set('vary', 'Accept, Accept-Encoding');
-        headers.set('x-content-type-options', 'nosniff');
-        return new Response(request.method === 'HEAD' ? null : mdResponse.body, {
-          status: 200,
-          headers,
-        });
-      }
-    }
-  }
-
-  const response = await context.next();
+  const response = advertiseMarkdown(await context.next(), SITE_URL);
   const contentType = response.headers.get('content-type') ?? '';
 
   // Agent-friendly 404 with markdown recovery body.

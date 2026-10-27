@@ -22,7 +22,13 @@ const STEPS = [
   },
 ];
 
-function AboutHero({ totalSources, totalVideos }: { totalSources: number; totalVideos: number }) {
+export function AboutHero({
+  totalSources,
+  totalVideos,
+}: {
+  totalSources: number;
+  totalVideos: number;
+}) {
   return (
     <section className="mt-6">
       <h1 className="text-3xl font-medium tracking-tight text-white sm:text-4xl">
@@ -51,7 +57,7 @@ function AboutHero({ totalSources, totalVideos }: { totalSources: number; totalV
   );
 }
 
-function HowItWorks() {
+export function HowItWorks() {
   return (
     <section className="mt-12">
       <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
@@ -74,7 +80,7 @@ function HowItWorks() {
   );
 }
 
-function TipsSection() {
+export function TipsSection() {
   return (
     <section className="mt-12 space-y-3 text-sm leading-6">
       <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">Tips</h2>
@@ -97,7 +103,7 @@ function TipsSection() {
   );
 }
 
-function AddYourOwn() {
+export function AddYourOwn() {
   return (
     <section className="mt-12 space-y-3 text-sm leading-6">
       <h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
@@ -112,7 +118,7 @@ function AddYourOwn() {
   );
 }
 
-function ClosingCta() {
+export function ClosingCta() {
   return (
     <section className="mt-12 rounded-xl border border-white/10 bg-white/5 p-6 text-center">
       <p className="text-sm text-zinc-300">Ready to leave something good on in the background?</p>
