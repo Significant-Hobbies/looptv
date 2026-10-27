@@ -60,8 +60,9 @@ See [docs/development/setup.md](docs/development/setup.md) and
 
 ## Critical constraints
 
-- **No server runtime.** Astro prerenders every route and endpoint into
-  `dist/`; do not add an on-request adapter. See
+- **Static product runtime.** Astro prerenders every route and endpoint into
+  `dist/`; do not add an on-request adapter. The public representation
+  middleware may negotiate only generated Markdown assets and discovery metadata. See
   [docs/architecture/decisions.md#adr-008](docs/architecture/decisions.md#adr-008).
 - **No YouTube API key in the browser/build/deploy.** `YOUTUBE_API_KEY` and
   `FAGW_API_KEY` are repository Actions secrets, CI-only, never in the static

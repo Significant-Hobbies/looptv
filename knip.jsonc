@@ -9,6 +9,7 @@
   ],
   "project": ["**/*.{astro,ts,tsx,js,jsx,mjs,cjs,mts}"],
   "ignore": [
+    "src/lib/agent-surfaces/**",
     // Optional docs presentation config and the runtime-copied yt-dlp boundary.
     // Static asset loaded via a raw <script src> tag (BaseLayout.astro), not an import.
     "public/app-health-log.js",

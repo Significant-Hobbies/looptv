@@ -25,6 +25,11 @@ Use Astro for static routing, metadata, and generated text/JSON/XML outputs.
 Keep the existing React player and browser-state surfaces as hydrated islands.
 Cloudflare Pages serves the generated `dist/` directory.
 
+The public representation addition on 2026-10-26 permits a Pages middleware
+that negotiates generated Markdown and discovery assets. It reads only the
+explicit public build registry; local-user routes remain excluded. This does
+not introduce an Astro server adapter, database, or request-time product data.
+
 ### Rationale
 - Matches the product's static hosting boundary directly.
 - Keeps content pages HTML-first while preserving the tested React player.

@@ -51,7 +51,7 @@ function formatViews(n: number): string {
   return String(n);
 }
 
-function StationDetails({ station }: { station: StationData }) {
+export function StationDetails({ station }: { station: StationData }) {
   return (
     <details key={station.id} id={station.id} className="group border-t border-zinc-800 py-2">
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3 text-white">

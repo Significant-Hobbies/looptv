@@ -4,11 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { formatDuration, loadCatalog } from '@/lib/catalog';
 import type { Video } from '@/lib/types';
 
-interface TagSummary {
-  tag: string;
-  total: number;
-  perStation: Record<string, number>;
-}
+import { tagSummaries, type TagSummary } from '@/lib/tag-summary';
+import { tagIntro } from '@/content/public-copy';
 
 interface Match {
   video: Video;
@@ -28,20 +25,7 @@ export default function TagsPage() {
         if (cancelled) return;
 
         setCatalog(cat);
-        const counts = new Map<string, TagSummary>();
-        for (const [stationId, station] of Object.entries(cat.stations)) {
-          for (const v of station.videos) {
-            for (const t of v.tags) {
-              const key = t.toLowerCase();
-              const entry = counts.get(key) ?? { tag: t, total: 0, perStation: {} };
-              entry.total += 1;
-              entry.perStation[stationId] = (entry.perStation[stationId] ?? 0) + 1;
-              counts.set(key, entry);
-            }
-          }
-        }
-        const sorted = [...counts.values()].sort((a, b) => b.total - a.total);
-        setTags(sorted);
+        setTags(tagSummaries(cat));
       })
       .catch(() => {
         if (!cancelled) setTags([]);
@@ -81,10 +65,7 @@ export default function TagsPage() {
         ← LoopTV
       </Link>
       <h1 className="mt-4 text-3xl font-medium tracking-tight text-white">Tags</h1>
-      <p className="mt-3 text-xs text-zinc-500">
-        Topic chips extracted from every video by HuggingFace NER. Tap a tag to see matching videos
-        across all stations.
-      </p>
+      <p className="mt-3 text-xs text-zinc-500">{tagIntro}</p>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <input

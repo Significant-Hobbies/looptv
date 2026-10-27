@@ -47,31 +47,9 @@ export const PUBLIC_SURFACES: PublicSurface[] = [
     summary: 'Terms for using the LoopTV player and its curated public YouTube catalog.',
   },
   {
-    path: '/blocked',
-    title: 'Blocked videos',
-    summary:
-      'A local diagnostic view for videos that YouTube does not permit to play in an embedded player.',
-  },
-  {
-    path: '/history',
-    title: 'Watch history',
-    summary:
-      'The viewer device’s local LoopTV playback history; no account or server sync is used.',
-  },
-  {
-    path: '/playlist',
-    title: 'Playlist',
-    summary: 'The current device’s locally assembled LoopTV playback queue.',
-  },
-  {
     path: '/random',
     title: 'Random station',
     summary: 'Start a random curated LoopTV station for immediate lean-back playback.',
-  },
-  {
-    path: '/stats',
-    title: 'Catalog statistics',
-    summary: 'Public counts and freshness signals for the checked-in LoopTV catalog.',
   },
   {
     path: '/tags',
@@ -79,13 +57,10 @@ export const PUBLIC_SURFACES: PublicSurface[] = [
     summary: 'Browse public catalog topics and the videos associated with each generated tag.',
   },
   {
-    path: '/watchlater',
-    title: 'Watch later',
-    summary: 'The current device’s local list of LoopTV videos saved for later playback.',
-  },
-  {
     path: '/changelog',
     title: 'Changelog',
     summary: 'Verified LoopTV playback, catalog quality, and reliability improvements.',
   },
 ];
+
+export const LOCAL_USER_PATHS = ['/blocked', '/history', '/playlist', '/stats', '/watchlater'];

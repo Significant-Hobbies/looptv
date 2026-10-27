@@ -6,7 +6,11 @@
     "ultracite/biome/astro",
     "ultracite/biome/vitest"
   ],
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "ignoreUnknown": true,
     "includes": [
@@ -30,7 +34,8 @@
       "!**/src/app/globals.css",
       "!**/stations.json",
       "!**/*.astro",
-      "!public/studio-footer/14712fdf/footer.js"
+      "!public/studio-footer/14712fdf/footer.js",
+      "!src/lib/agent-surfaces"
     ]
   },
   "formatter": {
@@ -53,8 +58,16 @@
       "tailwindDirectives": true
     }
   },
-  "html": { "formatter": { "enabled": false } },
-  "json": { "formatter": { "enabled": false } },
+  "html": {
+    "formatter": {
+      "enabled": false
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": false
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -88,7 +101,9 @@
         "noVoid": "off",
         "useSimplifiedLogicExpression": "off"
       },
-      "nursery": { "useSortedClasses": "off" },
+      "nursery": {
+        "useSortedClasses": "off"
+      },
       "performance": {
         "noAwaitInLoops": "off",
         "noDelete": "off",
