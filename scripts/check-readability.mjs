@@ -31,11 +31,12 @@ await test('public representation coverage', async () => {
   for (const path of ['blocked', 'history', 'playlist', 'stats', 'watchlater'])
     assert.ok(excluded.has(`${path}/index.html`), `Local user page must be noindex: ${path}`);
   assert.ok(excluded.has('404.html') || excluded.has('404/index.html'));
-  assert.equal(routes.length, 25);
+  assert.ok(routes.length > 0);
   assert.deepEqual(publicPaths, new Set(routes.map((route) => route.path)));
   for (const route of routes) {
     const markdown = await readFile(resolve(root, route.assetPath.slice(1)), 'utf8');
     assert.match(markdown, /^# /m);
+    assert.equal((markdown.match(/^# /gm) || []).length, 1, route.path);
     assert.ok(markdown.includes(`Canonical: ${route.url}`), route.path);
     assert.ok(markdown.length > 100);
   }

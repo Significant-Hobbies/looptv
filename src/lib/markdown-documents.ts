@@ -50,15 +50,58 @@ export const markdownIdentity = {
 const manifest = createAgentSurfaceManifest({
   ...markdownIdentity,
   sitemap: `${PUBLIC_ORIGIN}/sitemap.xml`,
+  auth: {
+    public: true,
+    notes:
+      'LoopTV has no accounts. Device-local history, playlists, and preferences are never exposed as public records.',
+  },
+  surfaces: publicPages.map((page) => ({
+    id:
+      page.path === '/'
+        ? 'home'
+        : stations.some((station) => page.path === `/${station.id}`)
+          ? `station-${page.path.slice(1)}`
+          : page.path.slice(1).replaceAll('/', '-'),
+    url: canonicalPublicUrl(page.path),
+    md: `${PUBLIC_ORIGIN}${page.path === '/' ? '/index.md' : `${page.path}.md`}`,
+    kind: 'static',
+    description: page.summary,
+  })),
   pages: Object.fromEntries(
     publicPages.map((page) => {
       const url = canonicalPublicUrl(page.path);
-      const title = page.body.match(/^# (.+)$/m)?.[1] ?? page.title;
-      const content = page.body.replace(/^# .+\n*/, '');
+      const title = page.title;
+      const content = page.body.replace(/^# (.+)$/m, (_heading, text) =>
+        text === title ? '' : `## ${text}`
+      );
       const markdown = `# ${title}\n\n> ${page.summary}\n\nCanonical: ${url}\n\n${content}\n`;
       return [new URL(url).pathname, absoluteMarkdownLinks(markdown, url)];
     })
   ),
+});
+Object.assign(manifest.catalog, {
+  robots: `${PUBLIC_ORIGIN}/robots.txt`,
+  openapi: markdownIdentity.openapi,
+  dataResources: [
+    {
+      id: 'catalog',
+      url: `${PUBLIC_ORIGIN}/catalog.json`,
+      kind: 'json',
+      description: 'Checked-in public video catalog',
+    },
+    {
+      id: 'stations',
+      url: `${PUBLIC_ORIGIN}/stations.json`,
+      kind: 'json',
+      description: 'Public station configuration',
+    },
+    {
+      id: 'tags',
+      url: `${PUBLIC_ORIGIN}/tags.json`,
+      kind: 'json',
+      description: 'Generated public tag summary',
+    },
+  ],
 });
 export const markdownRoutes = listMarkdownRoutes(manifest).map((route) => ({
   ...route,

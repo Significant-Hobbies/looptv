@@ -233,13 +233,5 @@ export const onRequest: PagesFunction = async (context) => {
     return response;
   }
 
-  // Add Vary: Accept to HTML pages that might have markdown alternates.
-  const headers = new Headers(response.headers);
-  const existingVary = headers.get('vary');
-  headers.set('vary', existingVary ? `${existingVary}, Accept` : 'Accept, Accept-Encoding');
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  return response;
 };
