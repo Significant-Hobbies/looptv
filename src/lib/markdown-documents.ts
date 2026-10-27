@@ -45,7 +45,7 @@ export const markdownIdentity = {
   summary: home.page.description,
   contact: 'https://github.com/Significant-Hobbies/looptv/issues',
   trainingAllowed: true,
-  excludedPaths: [...LOCAL_USER_PATHS, '/api', '/admin', '/auth', '/dashboard'],
+  excludedPaths: [...LOCAL_USER_PATHS, '/api/', '/admin', '/auth', '/dashboard'],
 };
 const manifest = createAgentSurfaceManifest({
   ...markdownIdentity,
