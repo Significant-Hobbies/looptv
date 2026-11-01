@@ -1,30 +1,30 @@
 {
   "$comment": "Catalog audit baselines. Auto-rebaselined by CI after each passing audit (validate-catalog-manifest.mjs --update). See docs/catalog-auditability.md for thresholds and overrides.",
-  "generatedAt": "2026-10-15T10:46:31.557Z",
+  "generatedAt": "2026-11-01T12:34:39.510Z",
   "thresholds": {
     "maxStationDropPct": 30,
     "minStationDropAbs": 5,
     "maxTotalDropPct": 20,
     "maxVideoChurnPct": 50
   },
-  "totalVideos": 8786,
+  "totalVideos": 8792,
   "stations": {
     "ai": 443,
     "comedy": 764,
     "design": 308,
     "explainers": 712,
     "film": 141,
-    "finance": 221,
+    "finance": 223,
     "fitness": 267,
-    "math": 355,
+    "math": 356,
     "mindset": 360,
     "philosophy": 455,
-    "science": 1009,
+    "science": 1010,
     "snl": 1000,
     "space": 471,
     "startups": 570,
     "talks": 200,
-    "tech": 1510
+    "tech": 1512
   },
   "videos": {
     "ai": {
@@ -35,6 +35,10 @@
       "_9aN1-0T8hg": {
         "t": "[ML News] AI models that write code (Copilot, CodeWhisperer, Pangu-Coder, etc.)",
         "d": 1277
+      },
+      "_mi3alkqy4s": {
+        "t": "The Death of the Code Review: What the Data Actually Says — Laurie Voss, Arize AI",
+        "d": 1481
       },
       "_nSmkyDNulk": {
         "t": "Math problems with GPT-4o",
@@ -108,9 +112,9 @@
         "t": "NVIDIA’s Face Generator AI: This Is The Next Level! 👩‍🔬",
         "d": 368
       },
-      "15Q6OR0MWVk": {
-        "t": "How ControlNet v1.1 Is Revolutionizing AI Art Even Further",
-        "d": 554
+      "1BZB4c792-0": {
+        "t": "Xiaomi Just Showed Us What Million-Dollar RL Training Looks Like",
+        "d": 896
       },
       "1jn_RpbPbEc": {
         "t": "Introduction to ChatGPT agent",
@@ -320,6 +324,10 @@
         "t": "V-JEPA: Revisiting Feature Prediction for Learning Visual Representations from Video (Explained)",
         "d": 3003
       },
+      "7Y4sbZgBdnc": {
+        "t": "Is the Agent Harness Dead? — Jediah Katz, SpaceXAI",
+        "d": 1095
+      },
       "86QU7_SF16Q": {
         "t": "Remove This! ✂️ AI-Based Video Completion is Amazing!",
         "d": 393
@@ -379,6 +387,10 @@
       "9XxTrNoWQzE": {
         "t": "How Did Llama-3 Beat Models x200 Its Size?",
         "d": 834
+      },
+      "abw_m-DRi1k": {
+        "t": "The Lethal Trifecta Is Already on Your Laptops — Michael Patterson, Coder",
+        "d": 1244
       },
       "Ae9q7KsRbuI": {
         "t": "Minecraft Was Missing One Brilliant Idea",
@@ -468,17 +480,13 @@
         "t": "Introducing GPT-6 Astra for developers",
         "d": 204
       },
-      "bSG9wUYaHWU": {
-        "t": "Context Is the New Code — Patrick Debois, Tessl",
-        "d": 1633
+      "bU5gDVyu_28": {
+        "t": "Does Code Quality Still Matter? It Depends on This — Max Kanat-Alexander, Capital One",
+        "d": 983
       },
       "BufUW7h9TB8": {
         "t": "DeepMind’s New AI Beats Billion Dollar Systems - For Free!",
         "d": 440
-      },
-      "bVNNvWq6dKo": {
-        "t": "How Windsurf writes 90% of your code with an Agentic IDE - Kevin Hou, Windsurf",
-        "d": 1250
       },
       "bVxS9RXt2q8": {
         "t": "NVIDIA’s New AI: Beautiful Simulations, Cheaper! 💨",
@@ -548,6 +556,10 @@
         "t": "This AI Learned To Animate Humanoids!🚶",
         "d": 353
       },
+      "CWdTBLsbaQs": {
+        "t": "OpenAI Claims It Just Did The Impossible",
+        "d": 442
+      },
       "d5EltXhbcfA": {
         "t": "Building and evaluating AI Agents — Sayash Kapoor, AI Snake Oil",
         "d": 1200
@@ -563,10 +575,6 @@
       "DB9mjd-65gw": {
         "t": "Sam Altman on AGI, GPT-5, and what’s next — the OpenAI Podcast Ep. 1",
         "d": 2424
-      },
-      "Dc3qOA9WOnE": {
-        "t": "Vibes won't cut it — Chris Kelly, Augment Code",
-        "d": 934
       },
       "ddG2fM9i4Kk": {
         "t": "OpenAssistant RELEASED! The world's best open-source Chat AI!",
@@ -740,14 +748,6 @@
         "t": "[ML News] Google introduces Pathways | OpenAI solves Math Problems | Meta goes First Person",
         "d": 2206
       },
-      "G7ryb91BDG8": {
-        "t": "What If We Remove Tokenization In LLMs?",
-        "d": 574
-      },
-      "GAf0KHM4fnk": {
-        "t": "Create on-brand visuals with image generation",
-        "d": 131
-      },
       "gC76aeibdFA": {
         "t": "How Did DeepSeek Make V4 So Cheap?",
         "d": 1273
@@ -864,6 +864,10 @@
         "t": "Attention Is All You Need",
         "d": 1627
       },
+      "iH_wV8BbS24": {
+        "t": "Sandboxes Aren't Optional: 4 Ways to Isolate Coding Agents — Robert Brennan, OpenHands",
+        "d": 863
+      },
       "ILXlcfHq3WM": {
         "t": "Text Generated Videos Are So Goofy Yet Mind-blowing",
         "d": 476
@@ -871,10 +875,6 @@
       "imuarn1A6p8": {
         "t": "NVIDIA’s Ray Tracer: Wow, They Nailed It Again! 🤯",
         "d": 492
-      },
-      "Io_GqmbNBbY": {
-        "t": "DeepMind’s New AI Just Changed Science Forever",
-        "d": 608
       },
       "ITr_brgwoQ4": {
         "t": "Claude Code: 5 Ways It Beats AI Code Editors",
@@ -928,10 +928,6 @@
         "t": "JEPA - A Path Towards Autonomous Machine Intelligence (Paper Explained)",
         "d": 3578
       },
-      "JSNE_PIG1UQ": {
-        "t": "7 Years of Progress In Snow Simulation! ❄️",
-        "d": 361
-      },
       "jtlrWblOyP4": {
         "t": "DeepMind’s AlphaStar: A Grandmaster Level StarCraft 2 AI!",
         "d": 514
@@ -955,10 +951,6 @@
       "kA-P9ood-cE": {
         "t": "GPT 4.1 in the API",
         "d": 1392
-      },
-      "kBFMsY5ZP0o": {
-        "t": "This AI Senses Humans Through Walls 👀",
-        "d": 218
       },
       "kCc8FmEb1nY": {
         "t": "Let's build GPT: from scratch, in code, spelled out.",
@@ -987,6 +979,10 @@
       "KRE4QZAXYu4": {
         "t": "IRL to Anime With Cartoonization AI",
         "d": 229
+      },
+      "kspZP5BgkEU": {
+        "t": "AI Writes the Code. So What's Left for Engineers? - Laurie Voss, Arize AI",
+        "d": 1629
       },
       "KTGIab4mBZA": {
         "t": "AI Generated Videos Are Getting Out of Hand",
@@ -1047,6 +1043,10 @@
       "Lue8K2jqfKk": {
         "t": "Claude Code & the evolution of agentic coding — Boris Cherny, Anthropic",
         "d": 1092
+      },
+      "LWxX6vvHfrc": {
+        "t": "Gemini 4 Argon Is Not What I Expected",
+        "d": 409
       },
       "Lx5Hy9YfZLs": {
         "t": "These TikTokers Are AI Generated [SD Multi-Frame Rendering]",
@@ -1136,10 +1136,6 @@
         "t": "Live demo of GPT-4o coding assistant and desktop app",
         "d": 217
       },
-      "n97BCfyFIvw": {
-        "t": "\"The engineer of the future is the person who is able to choose what is worth doing.\" — Addy Osmani",
-        "d": 1106
-      },
       "nAMSfmHuMOQ": {
         "t": "NVIDIA’s New AI Trained For 5,000,000,000 Steps!",
         "d": 397
@@ -1191,10 +1187,6 @@
       "ooZ9rUYOFI4": {
         "t": "Simulating Dragons Under Cloth Sheets! 🐲",
         "d": 353
-      },
-      "OqM67QG_Ikk": {
-        "t": "From fork() to Fleet: Designing an Agent Sandbox Cloud — Abhishek Bhardwaj, OpenAI",
-        "d": 2674
       },
       "outcGtbnMuQ": {
         "t": "GPT-4 Developer Livestream",
@@ -1396,10 +1388,6 @@
         "t": "Ubisoft’s New AI Predicts the Future of Virtual Characters! 🐺",
         "d": 337
       },
-      "SZStlIhyTCY": {
-        "t": "Moving away from Agile: What's Next – Martin Harrysson & Natasha Maniar, McKinsey & Company",
-        "d": 1315
-      },
       "T1vvokFnsbU": {
         "t": "Best AI Motion Capture 2021 - OpenPose vs DeepMotion",
         "d": 636
@@ -1548,6 +1536,10 @@
         "t": "Kernel Size and Why Everyone Loves 3x3 - Neural Network Convolution",
         "d": 354
       },
+      "VAQHsKS9fxY": {
+        "t": "Muon: The Most Underrated Breakthrough in LLMs",
+        "d": 1170
+      },
       "vfJz7WlRNk4": {
         "t": "Near-Perfect Virtual Hands For Virtual Reality! 👐",
         "d": 296
@@ -1672,6 +1664,10 @@
         "t": "The Chinese AI Iceberg",
         "d": 1627
       },
+      "xIEzjwReF2s": {
+        "t": "Germany: This is the new ChatGPT Voice, powered by GPT Live",
+        "d": 194
+      },
       "xJrKIPwVwGM": {
         "t": "Rethinking Attention with Performers (Paper Explained)",
         "d": 3279
@@ -1747,6 +1743,10 @@
       "z_7CLMYKwGs": {
         "t": "How to Prompt Cursor, Windsurf & Copilot to Get Reliable Output",
         "d": 1032
+      },
+      "z_sXLlLVUls": {
+        "t": "OpenAI’s New AI Is Doing Things We Barely Understand",
+        "d": 529
       },
       "Z-c11pV_uvU": {
         "t": "Anthropic's CCA Exam as a Field-Guide for Agentic Engineering — Frank Coyle, UC Berkeley",
@@ -3314,6 +3314,10 @@
         "t": "Should The Government Stop Dumping Money Into A Giant Hole?",
         "d": 125
       },
+      "jp-20h78PqE": {
+        "t": "If Morning TV Wasn't Hosted By Morning People",
+        "d": 286
+      },
       "jpFqzpTiBTI": {
         "t": "When the game you're playing is way too hard.",
         "d": 58
@@ -4009,10 +4013,6 @@
       "R0nnU71ggro": {
         "t": "Ex-Pedophile Shares Tips On How To Make Your Kids Less Attractive",
         "d": 136
-      },
-      "R9PG7evXFrs": {
-        "t": "First Day As A Sports Coach",
-        "d": 320
       },
       "ra1sBRLRFtc": {
         "t": "How The Avengers: Age of Ultron Teaser Should Have Ended",
@@ -5440,10 +5440,6 @@
         "t": "UX Portfolios: What Hiring Managers Look For",
         "d": 265
       },
-      "KlnOS_Blig4": {
-        "t": "How did you start your design business? AMA w/ Chris Do",
-        "d": 1709
-      },
       "kT0ZqwdPYRM": {
         "t": "User Need Statements in Design Thinking",
         "d": 187
@@ -5655,6 +5651,10 @@
       "pOdBeS43W0A": {
         "t": "Beer Brewery Makeover – Building A Brand, Ep. 11",
         "d": 1452
+      },
+      "POnPkjjT6Pw": {
+        "t": "The Only Content You Need to Post if YOU Want Clients",
+        "d": 899
       },
       "pR7tMnKghDs": {
         "t": "IDENTITY DESIGN: BRANDING",
@@ -6746,10 +6746,6 @@
         "t": "How to Create a Country",
         "d": 423
       },
-      "Bh8GqfgIjjI": {
-        "t": "Can you guess the surprise 'ending'?",
-        "d": 468
-      },
       "bLIgeKNAYUQ": {
         "t": "How do you cut crime with fish hooks?",
         "d": 596
@@ -7182,6 +7178,10 @@
         "t": "The real reason Boeing's new plane crashed twice",
         "d": 360
       },
+      "h8eAmS8y6OY": {
+        "t": "India's traffic signal that backfired",
+        "d": 487
+      },
       "h97fXhDN5qE": {
         "t": "Elon Musk's Basic Economics",
         "d": 622
@@ -7201,10 +7201,6 @@
       "Hcq9_Tw2eTE": {
         "t": "The Biggest Mapping Mistake of 𝗔𝗟𝗟 𝗧𝗜𝗠𝗘",
         "d": 1469
-      },
-      "HCuq19Ge1FA": {
-        "t": "What did the 'Ministry of Supply' supply?",
-        "d": 418
       },
       "HdsWYOZ8iqM": {
         "t": "The lost neighborhood under New York's Central Park",
@@ -8410,6 +8406,10 @@
         "t": "Europe’s plan to checkmate Russia",
         "d": 863
       },
+      "TuAc-hsH8XM": {
+        "t": "The keyboard with 1-2-N-4-5",
+        "d": 351
+      },
       "TVCEvx8JCTQ": {
         "t": "Why So Many Chinese Students Come to America",
         "d": 798
@@ -9546,6 +9546,10 @@
         "t": "Twitter is on the Brink of Bankruptcy",
         "d": 1154
       },
+      "1lOxNhRwFIA": {
+        "t": "Tesla Mocks Roadster Pay Pigs With Clown Car Performance",
+        "d": 672
+      },
       "1Mhk4UHJsRc": {
         "t": "What are Futures?",
         "d": 638
@@ -9649,6 +9653,10 @@
       "6VDPmDPombs": {
         "t": "The Evergrande Crisis Explained - Today's The Deadline, Why The World Is Worried",
         "d": 743
+      },
+      "6ZrgRjdJs3o": {
+        "t": "The Numbers Behind Anthropic",
+        "d": 1070
       },
       "7HE8MdsBLrw": {
         "t": "Why Does Saudi Arabia Keep Bailing Out Lucid?",
@@ -9762,10 +9770,6 @@
         "t": "Shocking New Evidence In Musk-OpenAI Lawsuit",
         "d": 1494
       },
-      "d-SagPpEz80": {
-        "t": "The Risk the War in Iran Poses to the Global Economy",
-        "d": 886
-      },
       "ddWr9dPGqDA": {
         "t": "The 2022 Market Crash - Why is Everything Down?",
         "d": 856
@@ -9797,6 +9801,10 @@
       "EvnqLARno-Y": {
         "t": "VinFast Has An $86B Market Cap, But It's Probably Worth Nothing",
         "d": 692
+      },
+      "evSNgSNMP4E": {
+        "t": "SpaceX Mobile Is Never Going To Happen",
+        "d": 967
       },
       "f8kUx5_1cWc": {
         "t": "China Will Create A Historic Memory Glut",
@@ -10034,9 +10042,9 @@
         "t": "Investment Analyst Reacts to Finance TikToks - Doomsday Doomscrolling",
         "d": 1389
       },
-      "n1TG_3lNLls": {
-        "t": "Elon Musk's xAI Is Failing",
-        "d": 832
+      "N4WCPG5A7Ao": {
+        "t": "An Inside Look at Jane Street's Hong Kong Internship Program 2024",
+        "d": 149
       },
       "nKHzfQd4lOo": {
         "t": "Investment Analyst Reacts to Finance TikToks - Holiday Special 2024",
@@ -10129,10 +10137,6 @@
       "QJmquOPEeoY": {
         "t": "Why Candidates FAIL Quant Interviews",
         "d": 294
-      },
-      "QLSkyrea2mA": {
-        "t": "SuperMicro Computer Accused of Massive Fraud",
-        "d": 831
       },
       "qqILuggyfkA": {
         "t": "An Overview of the Jane Street Trading Interview Process",
@@ -10241,6 +10245,10 @@
       "V8DGdPkBBxg": {
         "t": "A Jane Street Software Engineering Mock Interview with Grace and Nolen",
         "d": 2244
+      },
+      "V9jJlFfZtOQ": {
+        "t": "Optiver Interview Question | Monster Escape II",
+        "d": 222
       },
       "VAqzPw1CO_8": {
         "t": "PayPal Is In Crisis",
@@ -12178,6 +12186,10 @@
         "t": "69! - Numberphile",
         "d": 212
       },
+      "KxHKrbfnmTU": {
+        "t": "Did Hannah Fry crack The Traitors?",
+        "d": 1674
+      },
       "kYB8IZa5AuE": {
         "t": "Linear transformations and matrices | Chapter 3, Essence of linear algebra",
         "d": 658
@@ -12225,6 +12237,10 @@
       "ltLUadnCyi0": {
         "t": "A tale of two problem solvers | Average cube shadow area",
         "d": 2406
+      },
+      "ly4S0oi3Yz8": {
+        "t": "But what is a partial differential equation?  | DE2",
+        "d": 1059
       },
       "LyGKycYT2v0": {
         "t": "Dot products and duality | Chapter 9, Essence of linear algebra",
@@ -12301,10 +12317,6 @@
       "NGMRB4O922I": {
         "t": "The Mandelbrot Set - Numberphile",
         "d": 551
-      },
-      "nP1elMR5qjc": {
-        "t": "Rolling Shutter Explained on the Cheap",
-        "d": 530
       },
       "NPoj8lk9Fo4": {
         "t": "Pi is Beautiful - Numberphile",
@@ -12980,10 +12992,6 @@
         "t": "The 60-Second Trick To Stop Social Anxiety Fast",
         "d": 585
       },
-      "2Zc4fP9daV4": {
-        "t": "What Causes Stuttering & Treatment for Stutter | Dr. Erich Jarvis & Dr. Andrew Huberman",
-        "d": 318
-      },
       "35lS7gJVTyA": {
         "t": "Improve Your Baseline Dopamine for Motivation & Drive | Dr. Andrew Huberman",
         "d": 484
@@ -13004,13 +13012,13 @@
         "t": "3 Ways To DEAL With That FEELING Of EMPTINESS",
         "d": 322
       },
-      "411yMnGP5Og": {
-        "t": "Why You Feel So Stuck in Life",
-        "d": 844
-      },
       "48jlHaxZnig": {
         "t": "How to Stop Procrastination & Increase Motivation | Dr. Andrew Huberman",
         "d": 426
+      },
+      "4DFx3NjgZLE": {
+        "t": "How to Improve Memory & Accelerate Learning | Dr. Andrew Huberman",
+        "d": 770
       },
       "4eDHdcoxtuw": {
         "t": "How To Tell If A Girl Likes You - The 3 Golden Signs",
@@ -13244,6 +13252,10 @@
         "t": "How to Sprint Better & Faster | Stuart McMillan & Dr. Andrew Huberman",
         "d": 1490
       },
+      "aK7fLo9QB3s": {
+        "t": "How & Why to Do a Caffeine Fast | Michael Pollan & Dr. Andrew Huberman",
+        "d": 405
+      },
       "AUAHkhOldx8": {
         "t": "How You Can Use ChatGPT to Change Your Life",
         "d": 1270
@@ -13436,6 +13448,10 @@
         "t": "Simple Tool to Make Better Food Choices | Jeff Cavaliere & Dr. Andrew Huberman",
         "d": 644
       },
+      "ef9vDCxlUhs": {
+        "t": "Finger Length & Sexual Orientation: What the Data Shows | Dr. Marc Breedlove & Dr. Andrew Huberman",
+        "d": 677
+      },
       "eUSBKj5ZQpo": {
         "t": "How to Successfully Delete Social Media | Dr. Cal Newport & Dr. Andrew Huberman",
         "d": 342
@@ -13503,10 +13519,6 @@
       "GFphNr0FK-0": {
         "t": "How To Command Respect Without Being A Jerk",
         "d": 687
-      },
-      "GR9umRoSzmw": {
-        "t": "How to Breathe & Train for Core Strength | Pavel Tsatsouline & Dr. Andrew Huberman",
-        "d": 827
       },
       "grB2adrX__g": {
         "t": "The One Thing That Will Make Everyone Like You",
@@ -14064,10 +14076,6 @@
         "t": "Why Stupid People Think They're Smart [The Dunning-Kruger Effect]",
         "d": 658
       },
-      "TVUibwoVXZc": {
-        "t": "How Your Phone Affects the Brain & Motivation | Dr. Andrew Huberman",
-        "d": 484
-      },
       "u4j2d7iLWsw": {
         "t": "NOFAP - SCIENTIFIC EVIDENCE THAT IT WORKS",
         "d": 308
@@ -14143,6 +14151,10 @@
       "Vi0_7idqcFI": {
         "t": "5-Minute Breathing Exercise / Meditation for Improving HRV | Rick Rubin & Dr. Andrew Huberman",
         "d": 502
+      },
+      "Vjo1aobrCtc": {
+        "t": "The Ensh*ttification of Everything",
+        "d": 1261
       },
       "vl-44jDYDJQ": {
         "t": "How To GET Your Life Back Together - Dopamine Fast",
@@ -18620,6 +18632,10 @@
         "t": "Why Super Glue Is Perfect For Gluing Skin",
         "d": 1580
       },
+      "NiCgcUTL9_Q": {
+        "t": "The Insane Engineering of Fiber Optics",
+        "d": 2072
+      },
       "NIH1iGtDvJY": {
         "t": "How does Bluetooth Even Exist???",
         "d": 230
@@ -18776,6 +18792,10 @@
         "t": "How to Replace a Power Outlet",
         "d": 301
       },
+      "onr80iOoEXs": {
+        "t": "The Nobel prize has a dark history...",
+        "d": 2769
+      },
       "ONVpFtiD-fo": {
         "t": "The Surprising Map of Plants",
         "d": 1194
@@ -18847,10 +18867,6 @@
       "p_8yK2kmxoo": {
         "t": "The Most Dangerous Stuff in the Universe - Strange Stars Explained",
         "d": 429
-      },
-      "P_fHJIYENdI": {
-        "t": "AlphaFold - The Most Useful Thing AI Has Ever Done",
-        "d": 1491
       },
       "p_o4aY7xkXg": {
         "t": "Minute Physics: What is Gravity?",
@@ -20032,6 +20048,10 @@
         "t": "Can a New Law of Physics Explain a Black Hole Paradox?",
         "d": 787
       },
+      "YOKPo-I6cgs": {
+        "t": "Why Computer Vision Is a Hard Problem for AI",
+        "d": 519
+      },
       "YpDsA7SE-3c": {
         "t": "2020's Biggest Breakthroughs in Biology",
         "d": 501
@@ -20171,10 +20191,6 @@
       "Zuj_NnymqMg": {
         "t": "Can a Solar Still Generate Enough Fresh Water for Survival? | MythBusters",
         "d": 294
-      },
-      "zUyH3XhpLTo": {
-        "t": "How to Understand What Black Holes Look Like",
-        "d": 558
       },
       "ZwhPy6Kgyxs": {
         "t": "The Fastest Animals Are Way Faster Than You Think",
@@ -20869,10 +20885,6 @@
       "9PJb4cFWOfY": {
         "t": "Dating Show - SNL",
         "d": 252
-      },
-      "9q3QBnCnJbQ": {
-        "t": "Trump Argentina Cold Open - SNL",
-        "d": 413
       },
       "9qYM6bKl57A": {
         "t": "Black Jeopardy – SNL50",
@@ -21862,6 +21874,10 @@
         "t": "Jack Sparrow - SNL Digital Short",
         "d": 224
       },
+      "hqqoo1IgIrU": {
+        "t": "Upfront Heating & Air Conditioning - SNL",
+        "d": 192
+      },
       "HTR-dS4lptc": {
         "t": "Weekend Update: Lana Del Rey - SNL",
         "d": 225
@@ -22102,6 +22118,10 @@
         "t": "Japanese Game Show - Saturday Night Live",
         "d": 474
       },
+      "JMlO4UiSIhI": {
+        "t": "Hegseth USS Lincoln Cold Open - SNL",
+        "d": 331
+      },
       "JmTwSOlQz8g": {
         "t": "Republican Midterm Ads Cold Open - SNL",
         "d": 427
@@ -22333,10 +22353,6 @@
       "lHyY1QsMC3Q": {
         "t": "Poetry Class with Drake - SNL",
         "d": 332
-      },
-      "lk7jW7qRZYM": {
-        "t": "Loco ft. Bad Bunny - SNL",
-        "d": 138
       },
       "LLKJwP1wdqA": {
         "t": "Domingo: Vow Renewal – SNL50",
@@ -23358,6 +23374,10 @@
         "t": "Your Mom Talks to Megan Fox - SNL",
         "d": 251
       },
+      "Tf3FBxy6TK8": {
+        "t": "this went well",
+        "d": 167
+      },
       "TfE93xON8jk": {
         "t": "Debbie Downer: Disney World - SNL",
         "d": 393
@@ -23393,10 +23413,6 @@
       "Tw3M1x5m7h8": {
         "t": "Trump Rally Cold Open - SNL",
         "d": 542
-      },
-      "TyALfHsS5pc": {
-        "t": "The Lawrence Welk Show: Dorian Permes - SNL",
-        "d": 335
       },
       "TybjwLS1VtA": {
         "t": "House of the Dragon - SNL",
@@ -24712,6 +24728,10 @@
         "t": "Why the Earth exists because of Saturn | Migration of Planets",
         "d": 1111
       },
+      "CsyQa8_9tlw": {
+        "t": "How The CIA Hacked Russia",
+        "d": 566
+      },
       "CT7SiRiqK-Q": {
         "t": "Does Consciousness Influence Quantum Mechanics?",
         "d": 1036
@@ -24876,6 +24896,10 @@
         "t": "JWST shows the early Universe is DIFFERENT than we thought (that's a good thing!)",
         "d": 1007
       },
+      "FMdrD_jcYgE": {
+        "t": "We Found Galaxies Too Old for the Universe",
+        "d": 1220
+      },
       "FOdoNQXQYv8": {
         "t": "Why it took 5  years for the Falcon Heavy to fly",
         "d": 1109
@@ -25035,10 +25059,6 @@
       "i5AA7HWlvdk": {
         "t": "The Horizon Problem | The Universe's biggest UNSOLVED mystery",
         "d": 815
-      },
-      "I8p1yqnuk8Y": {
-        "t": "Does the Universe Create Itself?",
-        "d": 1124
       },
       "IEtPy0o8i0M": {
         "t": "If the Universe is expanding, where is the centre?",
@@ -25224,6 +25244,10 @@
         "t": "The Strangest Idea in Science: Quantum Immortality",
         "d": 2187
       },
+      "KnDy6WCe0Ao": {
+        "t": "Black hole at the centre of every galaxy? #shorts",
+        "d": 153
+      },
       "KrRvJUZaswo": {
         "t": "What Supernova Distance Would Trigger Mass Extinction?",
         "d": 995
@@ -25380,10 +25404,6 @@
         "t": "Watch SpaceX ACTUALLY hop Starship SN-5 150m!!!",
         "d": 3286
       },
-      "NLKvK_S5StE": {
-        "t": "The Mysterious Return Of NASA's Centaur Rocket",
-        "d": 516
-      },
       "NmHOj8VQvNE": {
         "t": "NASA's Unexpected Discoveries on Jupiter | Juno",
         "d": 473
@@ -25519,6 +25539,10 @@
       "pwTYfI9JUl8": {
         "t": "Are Alien \"Lurkers\" Watching You?",
         "d": 1668
+      },
+      "PxJSOWyYWkc": {
+        "t": "What Is It Like on the Surface of a Black Hole Planet?",
+        "d": 1645
       },
       "q7AT3XHguxU": {
         "t": "What Satellites Can See From Space Is Troubling",
@@ -25748,10 +25772,6 @@
         "t": "NASA Cassini's Final Images of Saturn Stunned Me",
         "d": 623
       },
-      "u2HEWS3zBNk": {
-        "t": "Why is this KILONOVA SPHERICAL (and not donut shaped)?!",
-        "d": 868
-      },
       "u4RNGRyzt10": {
         "t": "Strange Stars | Space Time | PBS Digital Studios",
         "d": 825
@@ -25811,6 +25831,10 @@
       "uZRDONE4zng": {
         "t": "Why Don't We Live Around a Red Dwarf?",
         "d": 1059
+      },
+      "v-5QemL9948": {
+        "t": "This New Type of Black Hole Is Actually the Most Terrifying",
+        "d": 1043
       },
       "v5mkZIy-TI4": {
         "t": "Why This Building Makes So Much Money",
@@ -25891,10 +25915,6 @@
       "WlQH3MHhm0Y": {
         "t": "The Biggest BOOMS in Rocket History",
         "d": 2026
-      },
-      "WSOuJSZ0yPU": {
-        "t": "What the News Should've Told You About China's Space Program",
-        "d": 1166
       },
       "Wu8xNx4njoM": {
         "t": "We Thought Black Holes Ended in Singularities. They Might End In a Frozen Big Bang.",
@@ -26043,10 +26063,6 @@
       "ZIaDWCK2Bmk": {
         "t": "How Rocket Lab will catch a rocket with a helicopter!",
         "d": 1647
-      },
-      "znnh49XGx2w": {
-        "t": "Gaia's Final Images Saw Something MASSIVE Inside Our Milky Way",
-        "d": 1094
       },
       "zouFjgkE_4Y": {
         "t": "The Discovery of King Richard III",
@@ -29290,10 +29306,6 @@
         "t": "This free Chinese AI just crushed OpenAI's $200 o1 model...",
         "d": 281
       },
-      "-3-hoJGFNaU": {
-        "t": "600 Rejections  Finding A Job In Tech | Prime Reacts",
-        "d": 2938
-      },
       "-3l4kMj9p0Y": {
         "t": "Samsung Galaxy Note 3 vs Sony Xperia Z Ultra: Quick Look",
         "d": 238
@@ -29301,6 +29313,10 @@
       "-79uIRQiAFM": {
         "t": "How BIG is Google?",
         "d": 759
+      },
+      "-arYx_oVIj8": {
+        "t": "Designing and building a 1-bit register - 8 bit register - Part 3",
+        "d": 1207
       },
       "-D1gf3omRnw": {
         "t": "researchers find unfixable bug in apple computers",
@@ -29550,10 +29566,6 @@
         "t": "The Truth About Bun",
         "d": 815
       },
-      "2_PS4opc5zo": {
-        "t": "they installed linux. thats the hack.",
-        "d": 475
-      },
       "20BEJouWBgY": {
         "t": "The FTX Disaster is Deeper Than you Think",
         "d": 1780
@@ -29713,10 +29725,6 @@
       "3HfJj5S_tbk": {
         "t": "this virtual box escape exploit is absolutely nuts",
         "d": 458
-      },
-      "3JW732GrMdg": {
-        "t": "I replaced my entire tech stack with Postgres...",
-        "d": 493
       },
       "3kfO61Mensg": {
         "t": "REAL LIFE example!! (TCP/IP and OSI layers) // FREE CCNA // EP 4",
@@ -29878,10 +29886,6 @@
         "t": "Rust in 100 Seconds",
         "d": 149
       },
-      "5ChkQKUzDCs": {
-        "t": "Big projects are ditching TypeScript… why?",
-        "d": 218
-      },
       "5DP0az1q_8M": {
         "t": "we're so back",
         "d": 649
@@ -29986,6 +29990,10 @@
         "t": "How to ACTUALLY learn to code... 7 Roadmaps for 2023",
         "d": 542
       },
+      "67sfZfreOrU": {
+        "t": "Virtual Coachella",
+        "d": 200
+      },
       "6Afpey7Eldo": {
         "t": "How BIG is Samsung? (They Have a Military Department!)",
         "d": 682
@@ -30074,10 +30082,6 @@
         "t": "Samsung Galaxy S5 vs Galaxy S4 - Quick Look!",
         "d": 226
       },
-      "769VqNup21Q": {
-        "t": "why rust libraries may never exist.",
-        "d": 446
-      },
       "78k5-LZwLBo": {
         "t": "50 BILLION MESSAGES PER DAY WITH 32 ENGINEERS | Prime Reacts",
         "d": 898
@@ -30101,6 +30105,10 @@
       "7DCO-IISBnc": {
         "t": "Should you learn C++?? | Prime Reacts",
         "d": 1229
+      },
+      "7h7FYGF7tuQ": {
+        "t": "Reverse Engineering Proves What We Suspected All Along..",
+        "d": 719
       },
       "7IEZmPo6eEw": {
         "t": "Blue Screens of Death Explained",
@@ -30326,6 +30334,10 @@
         "t": "Everything you SHOULD know about your Computer but don't!",
         "d": 1199
       },
+      "9OahTki4cPA": {
+        "t": "OpenCode got hacked",
+        "d": 772
+      },
       "9PPrrSyubG0": {
         "t": "Programming my 8-bit breadboard computer",
         "d": 922
@@ -30409,6 +30421,10 @@
       "aB2wZET_SKs": {
         "t": "Samsung Galaxy S4 vs iPhone 5 Drop Test!",
         "d": 271
+      },
+      "aB5LGrHISqY": {
+        "t": "I spent 3 days at MIT... the robot hype is worse than you think",
+        "d": 422
       },
       "Ab6zJBlKmM0": {
         "t": "Samsung Galaxy A8 Review!",
@@ -30558,10 +30574,6 @@
         "t": "this might be the biggest bug of the year",
         "d": 556
       },
-      "b0XI-cbel1U": {
-        "t": "Is Elon’s Grok 3 the new AI king?",
-        "d": 245
-      },
       "B0yAy2j-9V0": {
         "t": "Obsidian.md: The Good Parts [Part 2]",
         "d": 647
@@ -30573,6 +30585,10 @@
       "B1t4Fjlomi8": {
         "t": "Why do computers use RGB for colors, and not RBY?",
         "d": 44
+      },
+      "b2tjnxX8IHU": {
+        "t": "Did Google just dethrone OpenAI and Anthropic?",
+        "d": 393
       },
       "B2V_8M9cjYw": {
         "t": "Block ALL ads with this…(and speed up your internet)",
@@ -31258,10 +31274,6 @@
         "t": "Getting the most out of Opus 5.5",
         "d": 1722
       },
-      "Ek5gYvaSrkI": {
-        "t": "I Miss Square Checkboxes",
-        "d": 478
-      },
       "elXvN83xADE": {
         "t": "The Amazing Marble Race (Part 2)",
         "d": 349
@@ -31474,10 +31486,6 @@
         "t": "\"AI Can’t Replace Juniors\" - AWS CEO",
         "d": 563
       },
-      "fQlQQSsC47g": {
-        "t": "Life-like Gaming is Now Possible (Thanks to A.I.)",
-        "d": 681
-      },
       "FQPlEnKav48": {
         "t": "I built 10 web apps... with 10 different languages",
         "d": 862
@@ -31529,6 +31537,10 @@
       "fZeZ75gM9p4": {
         "t": "How to make Music for your Game - BOSCA CEOIL",
         "d": 680
+      },
+      "G_em1hHPnXY": {
+        "t": "China just dropped a new frontier model... and nobody can explain how",
+        "d": 386
       },
       "g_i1alH5TrA": {
         "t": "Why Meta Dropped 70%",
@@ -32266,6 +32278,10 @@
         "t": "Samsung Galaxy S3 vs. iPhone 4S Drop Test",
         "d": 245
       },
+      "Ka0p5tUUmgg": {
+        "t": "This is Crazy",
+        "d": 688
+      },
       "KdZvxxLsN3E": {
         "t": "find social media accounts with Sherlock (in 5 MIN)",
         "d": 300
@@ -32834,13 +32850,13 @@
         "t": "Samsung Galaxy Note 7 Hands-On",
         "d": 446
       },
-      "ndM369oJ0tk": {
-        "t": "did they really find a backdoor in 1 billion devices? (esp32 drama)",
-        "d": 611
-      },
       "nDQurcep4lI": {
         "t": "Oppo N3 Review!",
         "d": 706
+      },
+      "nEaJMdM1djM": {
+        "t": "Did the AI bubble just pop?",
+        "d": 325
       },
       "NF210WeR9C8": {
         "t": "Why is Windows Display Scaling So Bad?",
@@ -32997,10 +33013,6 @@
       "O94ESaJtHtM": {
         "t": "Next.js Server Actions...  5 awesome things you can do",
         "d": 470
-      },
-      "O9QD9an-0jU": {
-        "t": "well this isn't great...",
-        "d": 475
       },
       "oaVDRY1R0kc": {
         "t": "Windows XP Gaming PC Brought Back to Life",
@@ -33186,9 +33198,9 @@
         "t": "Rust & Wasm",
         "d": 578
       },
-      "p572p-irRaU": {
-        "t": "We're on the brink of another world browser war",
-        "d": 269
+      "P8CVqDKeOKk": {
+        "t": "Bill Gates’ Daughter is in Trouble",
+        "d": 1068
       },
       "P8KaTrGpGg0": {
         "t": "Videochat",
@@ -33430,6 +33442,10 @@
         "t": "Senior Manager",
         "d": 197
       },
+      "qFEuYUfauNY": {
+        "t": "I Tested The Viral Reverse Engineering Repo",
+        "d": 981
+      },
       "qFnHWMxlOBc": {
         "t": "Carmack Doesn't Like Vim | Prime Reacts",
         "d": 1612
@@ -33502,6 +33518,10 @@
         "t": "Serverless was a big mistake... says Amazon",
         "d": 228
       },
+      "QRABrn606LE": {
+        "t": "php situation is insane",
+        "d": 750
+      },
       "QS4-mcaIdu0": {
         "t": "How to print from your Android phone or tablet",
         "d": 406
@@ -33558,10 +33578,6 @@
         "t": "I Made a Pen Plotter to Draw Maps of the Moon",
         "d": 1855
       },
-      "QYVucud3ptc": {
-        "t": "Wake up babe, a dangerous new open-source AI model is here",
-        "d": 285
-      },
       "Qz0KTGYJtUk": {
         "t": "Coding Adventure: Ray Tracing",
         "d": 2278
@@ -33569,6 +33585,10 @@
       "qZuR-772cks": {
         "t": "Microscopes can See Video on a LaserDisc - Andonstar AD246S-P",
         "d": 1800
+      },
+      "QZVzuq28eFw": {
+        "t": "OpenAI’s lead engineer was secretly a spy...",
+        "d": 306
       },
       "QZwneRb-zqA": {
         "t": "Exploring How Computers Work",
@@ -33714,10 +33734,6 @@
         "t": "Air. Earth. Fire. Water. ...and 27,221 others. (Elemental 3 data visualization)",
         "d": 1084
       },
-      "rrB13utjYV4": {
-        "t": "Linux in 100 Seconds",
-        "d": 162
-      },
       "rRnOtKlg4jA": {
         "t": "Coding Adventure: Additive Synthesis",
         "d": 2130
@@ -33761,6 +33777,10 @@
       "RzHp_IBbYYY": {
         "t": "What SSD To Buy As Fast As Possible",
         "d": 398
+      },
+      "RznOLqu9_Jc": {
+        "t": "What Would Happen?",
+        "d": 942
       },
       "S-E6vRfnijw": {
         "t": "3D Printshow London 2012",
@@ -33861,6 +33881,10 @@
       "sLqXFF8mlEU": {
         "t": "I Tried Creating a Game Using Real-World Geographic Data",
         "d": 1897
+      },
+      "SMGg7iisHmc": {
+        "t": "The most vulnerable week in internet history...",
+        "d": 364
       },
       "SMl-w8VhrYw": {
         "t": "Learning Binary Exploitation in 2021?",
@@ -34074,10 +34098,6 @@
         "t": "React in 100 Seconds",
         "d": 128
       },
-      "TNhaISOUy6Q": {
-        "t": "10 React Hooks Explained // Plus Build your own from Scratch",
-        "d": 795
-      },
       "TnUYcTuZJpM": {
         "t": "Google's Deep Mind Explained! - Self Learning A.I.",
         "d": 824
@@ -34090,10 +34110,6 @@
         "t": "Blender Character Creation: Rigging 2/2",
         "d": 887
       },
-      "TpZcGhYp4rw": {
-        "t": "Elon wants GPT-5 stopped NOW… 5 reasons AI kinda sucks",
-        "d": 398
-      },
       "TQDHGswF67Q": {
         "t": "coding in c until I go completely insane",
         "d": 74
@@ -34101,10 +34117,6 @@
       "tSC0u9T8ZL0": {
         "t": "LG G5 Camera Module Demonstration",
         "d": 377
-      },
-      "TT_RLWmIsbY": {
-        "t": "Solid Programming - No Thanks",
-        "d": 1920
       },
       "tu1amrfflb8": {
         "t": "NEW Raspberry Pi AI Hat Is a Massive Upgrade",
@@ -34254,6 +34266,10 @@
         "t": "Making a Multiplayer FPS in Unity (EP. 1) - uNet Tutorial",
         "d": 1197
       },
+      "Ukt2gVz25PQ": {
+        "t": "10 open source tools that feel illegal...",
+        "d": 604
+      },
       "UMiB5Z7n6Y8": {
         "t": "Google Drive hates developers now",
         "d": 1436
@@ -34297,6 +34313,10 @@
       "uRlxN0_zVHo": {
         "t": "Understanding the Linux Backdoor:  Implications for Open Source [When Penguins Cry]",
         "d": 606
+      },
+      "USeyDcWyVCc": {
+        "t": "Even The NSA Got Involved",
+        "d": 1763
       },
       "uTAaFExLgwQ": {
         "t": "the hacker’s roadmap (how to get started in IT in 2023)",
@@ -34510,6 +34530,10 @@
         "t": "7 Database Paradigms",
         "d": 593
       },
+      "W5DT8jpcBCk": {
+        "t": "Did AI Really Reverse Engineer Every Adobe App?",
+        "d": 449
+      },
       "W6xQgFBM2kI": {
         "t": "LG G Watch R Review!",
         "d": 558
@@ -34650,6 +34674,10 @@
         "t": "How One Powerful Family Destroyed A Country",
         "d": 945
       },
+      "WrCjAAl9okA": {
+        "t": "A $6.3 billion open-weight model just got embarrassed by the French...",
+        "d": 370
+      },
       "ws1o-N024es": {
         "t": "How BIG is Honda? (They Make Jets!)",
         "d": 1025
@@ -34762,10 +34790,6 @@
         "t": "What is a stack and how does it work? — 6502 part 5",
         "d": 1464
       },
-      "XBrUI3PRTeo": {
-        "t": "Surviving a Week Without Power:  Ultimate Home Backup Solution!",
-        "d": 900
-      },
       "xbZHRzpqnn0": {
         "t": "The Amazing Marble Race - Season 3, Leg 7",
         "d": 783
@@ -34829,10 +34853,6 @@
       "Xs5bOyNTPLw": {
         "t": "What Killed MySpace? (It Wasn't Facebook)",
         "d": 912
-      },
-      "xT8oP0wy-A0": {
-        "t": "Kotlin in 100 Seconds",
-        "d": 142
       },
       "xubbVvKbUfY": {
         "t": "MAKRO | Microsoft Excel Stream Highlights 3/19",
@@ -35189,6 +35209,10 @@
       "ztZphO13iIY": {
         "t": "Stop Being A JR Software Engineer | Prime Reacts",
         "d": 1324
+      },
+      "zv6B6PQOuHE": {
+        "t": "The last real programmers are dying out...",
+        "d": 356
       },
       "ZWzE8XbJ7BA": {
         "t": "Apple iPhone 5 vs Samsung Galaxy Note 2",
