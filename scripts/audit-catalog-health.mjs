@@ -97,11 +97,29 @@ export function auditCatalogHealth({
     if (!stationCatalog) violations.push(`Station ${station.id} is missing from catalog`);
     const sourceByName = new Map(station.sources.map((source) => [source.name, source]));
     const counts = new Map(station.sources.map((source) => [source.name, 0]));
+    const curatedById = new Map((station.curatedVideos || []).map((video) => [video.id, video]));
+    const presentIds = new Set(videos.map((video) => video.id));
+    for (const id of curatedById.keys()) {
+      if (!presentIds.has(id))
+        violations.push(`Station ${station.id} is missing curated video ${id}`);
+    }
+    let curatedCount = 0;
 
     for (const video of videos) {
       selectedVideos += 1;
       const source = sourceByName.get(video.source);
-      if (!source) {
+      const curated = curatedById.get(video.id);
+      const isCurated = Boolean(
+        curated && video.source === curated.source && video.provenanceUrl === curated.provenanceUrl
+      );
+      if (isCurated) {
+        curatedCount++;
+        if (video.duration !== curated.duration || video.duration <= 0) {
+          violations.push(
+            `Station ${station.id} curated video ${video.id} duration does not match config`
+          );
+        }
+      } else if (!source || video.provenanceUrl) {
         violations.push(
           `Station ${station.id} video ${video.id} references unknown source ${video.source || '(none)'}`
         );
@@ -139,15 +157,16 @@ export function auditCatalogHealth({
     missingSources += counters.missing;
 
     const sourceTotal = sources.reduce((total, source) => total + source.selectedCount, 0);
-    if (sourceTotal !== videos.length) {
+    if (sourceTotal + curatedCount !== videos.length) {
       violations.push(
-        `Station ${station.id} source total ${sourceTotal} does not match station total ${videos.length}`
+        `Station ${station.id} source total ${sourceTotal} plus ${curatedCount} curated videos does not match station total ${videos.length}`
       );
     }
     stationReports.push({
       id: station.id,
       name: station.name,
       selectedCount: videos.length,
+      curatedCount,
       sources,
     });
   }
@@ -192,6 +211,9 @@ export function formatCatalogHealthMarkdown(result) {
   ];
   for (const station of result.stations) {
     lines.push(`## ${station.name} (${station.selectedCount})`, '');
+    if (station.curatedCount > 0) {
+      lines.push(`- Individually curated videos: ${station.curatedCount}`, '');
+    }
     lines.push(
       '| Source | State | Baseline | Uploads | Candidates | Selected | Last successful fetch | Policy |'
     );

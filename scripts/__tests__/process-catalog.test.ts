@@ -5,6 +5,71 @@ import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
 describe('process-catalog', () => {
+  it('keeps curated ownership through live rebuilds and empty-cache fallback', () => {
+    const root = mkdtempSync(join(tmpdir(), 'looptv-process-curated-'));
+    const sources = join(root, 'sources');
+    const stationsPath = join(root, 'stations.json');
+    const outputPath = join(root, 'catalog.json');
+    mkdirSync(sources);
+    const curated = {
+      id: 'abcdefghijk',
+      title: 'A long talk',
+      duration: 7200,
+      date: '2026-10-01',
+      source: 'Known Source',
+      tags: ['Known Source', 'Databases'],
+      viewCount: 30_000,
+      provenanceUrl: 'https://hackertube.org/p/systems-and-databases',
+    };
+    writeFileSync(
+      stationsPath,
+      JSON.stringify([
+        { id: 'tech', sources: [{ name: 'Known Source', handle: '@known', topPercentile: 100 }] },
+        { id: 'hackertube', sources: [], curatedVideos: [curated] },
+      ])
+    );
+    const raw = [
+      { id: 'lmnopqrstuv', title: 'Channel title', duration: 300, view_count: 40_000 },
+      { id: 'abcdefghijk', title: 'Channel duplicate', duration: 400, view_count: 30_000 },
+    ];
+    writeFileSync(join(sources, 'known.jsonl'), raw.map((row) => JSON.stringify(row)).join('\n'));
+    const run = () => {
+      const result = spawnSync(
+        process.execPath,
+        [resolve('scripts/process-catalog.mjs'), sources, outputPath],
+        { encoding: 'utf8', env: { ...process.env, STATIONS_PATH: stationsPath } }
+      );
+      expect(result.status, result.stderr).toBe(0);
+      return JSON.parse(readFileSync(outputPath, 'utf8'));
+    };
+    const first = run();
+    const second = run();
+    expect(second.stations).toEqual(first.stations);
+    expect(second.stations.tech.videos).toHaveLength(1);
+    expect(second.stations.tech.videos[0].id).toBe('lmnopqrstuv');
+    expect(second.stations.hackertube.videos).toEqual([curated]);
+    expect(second.sourceMeta.known.selectedCount).toBe(1);
+    writeFileSync(join(sources, 'known.jsonl'), '');
+    const fallback = run();
+    expect(fallback.stations.tech.videos).toHaveLength(1);
+    expect(fallback.stations.hackertube.videos).toEqual([curated]);
+    expect(fallback.sourceMeta.known).toMatchObject({ selectedCount: 1, refreshState: 'empty' });
+    writeFileSync(
+      stationsPath,
+      JSON.stringify([
+        { id: 'tech', sources: [{ name: 'Known Source', handle: '@known', topPercentile: 100 }] },
+      ])
+    );
+    writeFileSync(join(sources, 'known.jsonl'), raw.map((row) => JSON.stringify(row)).join('\n'));
+    const returned = run().stations.tech.videos.find(
+      (entry: { id: string }) => entry.id === curated.id
+    );
+    expect(returned.tags).toEqual(curated.tags);
+    expect(returned.provenanceUrl).toBeUndefined();
+    expect(returned.description).toBeUndefined();
+    expect(returned.duration).toBe(400);
+  });
+
   it('preserves source freshness metadata for catalog fallback rows', () => {
     const root = mkdtempSync(join(tmpdir(), 'looptv-process-catalog-'));
     const sources = join(root, 'sources');

@@ -17,6 +17,7 @@ export interface CatalogHealthAuditResult {
     id: string;
     name: string;
     selectedCount: number;
+    curatedCount: number;
     sources: Array<{
       name: string;
       handle: string;
