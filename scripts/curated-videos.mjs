@@ -97,7 +97,6 @@ export function mergeCuratedVideos(catalog, stationsConfig, previousCatalog = ca
         viewCount,
         provenanceUrl,
       };
-      if (prior?.taggingEvidence) video.taggingEvidence = prior.taggingEvidence;
       stations[station.id] ??= { videos: [], categoryVideoIds: {} };
       stations[station.id].videos.push(video);
       if (prior) existing++;

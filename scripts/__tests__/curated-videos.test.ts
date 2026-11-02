@@ -26,9 +26,15 @@ describe('curated video merge', () => {
   it('applies tag corrections from the config on later rebuilds', () => {
     const catalog: Catalog = { lastUpdated: '', stations: {} };
     const first = mergeCuratedVideos(catalog, stations).catalog;
+    first.stations.tech.videos[0].taggingEvidence = {
+      origin: 'model',
+      format: 'accepted',
+      semanticGrounding: 'unknown',
+    };
     const corrected = { ...video, tags: ['Speaker', 'Algorithms'] };
     const next = mergeCuratedVideos(first, [{ ...stations[0], curatedVideos: [corrected] }]);
     expect(next.catalog.stations.tech.videos[0].tags).toEqual(corrected.tags);
+    expect(next.catalog.stations.tech.videos[0].taggingEvidence).toBeUndefined();
   });
 
   it('rejects duplicate curated ids instead of silently choosing a station', () => {
