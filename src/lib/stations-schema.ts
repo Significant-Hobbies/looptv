@@ -55,4 +55,13 @@ export const StationsConfigSchema = z
   .min(1, 'stations.json must contain at least one station')
   .refine((arr) => new Set(arr.map((s) => s.id)).size === arr.length, {
     message: 'station ids must be unique',
-  });
+  })
+  .refine(
+    (arr) => {
+      const ids = arr.flatMap((station) => (station.curatedVideos || []).map((video) => video.id));
+      return new Set(ids).size === ids.length;
+    },
+    {
+      message: 'curated video ids must be unique across stations',
+    }
+  );

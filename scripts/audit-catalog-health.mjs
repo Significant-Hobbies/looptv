@@ -98,6 +98,11 @@ export function auditCatalogHealth({
     const sourceByName = new Map(station.sources.map((source) => [source.name, source]));
     const counts = new Map(station.sources.map((source) => [source.name, 0]));
     const curatedById = new Map((station.curatedVideos || []).map((video) => [video.id, video]));
+    const presentIds = new Set(videos.map((video) => video.id));
+    for (const id of curatedById.keys()) {
+      if (!presentIds.has(id))
+        violations.push(`Station ${station.id} is missing curated video ${id}`);
+    }
     let curatedCount = 0;
 
     for (const video of videos) {

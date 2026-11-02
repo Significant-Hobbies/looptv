@@ -54,6 +54,7 @@ export function mergeCuratedVideos(catalog, stationsConfig, previousCatalog = ca
   for (const station of stationsConfig) {
     for (const video of station.curatedVideos || []) {
       validateCuratedVideo(video);
+      if (curatedIds.has(video.id)) throw new Error(`Duplicate curated video ${video.id}`);
       curatedIds.add(video.id);
     }
   }
@@ -80,12 +81,10 @@ export function mergeCuratedVideos(catalog, stationsConfig, previousCatalog = ca
     ])
   );
   const sourceMeta = updateDisplacedSourceCounts(catalog, stations, stationsConfig, curatedIds);
-  const selected = new Set();
   let added = 0;
   let existing = 0;
   for (const station of stationsConfig) {
     for (const curated of station.curatedVideos || []) {
-      if (selected.has(curated.id)) continue;
       const prior = priorVideos.get(curated.id);
       const { id, title, duration, date, tags, source, viewCount, provenanceUrl } = curated;
       const video = {
@@ -93,7 +92,7 @@ export function mergeCuratedVideos(catalog, stationsConfig, previousCatalog = ca
         title,
         duration,
         date,
-        tags: [...new Set([...(prior?.tags || []), ...tags])],
+        tags: [...new Set(tags)],
         source,
         viewCount,
         provenanceUrl,
@@ -101,7 +100,6 @@ export function mergeCuratedVideos(catalog, stationsConfig, previousCatalog = ca
       if (prior?.taggingEvidence) video.taggingEvidence = prior.taggingEvidence;
       stations[station.id] ??= { videos: [], categoryVideoIds: {} };
       stations[station.id].videos.push(video);
-      selected.add(id);
       if (prior) existing++;
       else added++;
     }

@@ -24,6 +24,9 @@ describe('stations-schema', () => {
       ],
     };
     expect(StationConfigSchema.parse(station).curatedVideos).toEqual(station.curatedVideos);
+    expect(StationsConfigSchema.safeParse([station, { ...station, id: 'other' }]).success).toBe(
+      false
+    );
     expect(StationConfigSchema.safeParse({ ...station, curatedVideos: [] }).success).toBe(false);
     expect(
       StationConfigSchema.safeParse({

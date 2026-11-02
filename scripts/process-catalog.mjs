@@ -199,8 +199,14 @@ for (const station of stationsConfig) {
     for (const raw of filtered) {
       if (selectedVideos.has(raw.id) || curatedIds.has(raw.id)) continue;
       const prev = existingVideos.get(raw.id);
-      if (prev?.tags && prev.tags.length > 1 && !prev.provenanceUrl) {
-        allVideos.push({ ...prev, source: src.name, viewCount: raw.view_count });
+      if (prev?.tags && prev.tags.length > 1) {
+        const retained = { ...prev, source: src.name, viewCount: raw.view_count };
+        if (retained.provenanceUrl) {
+          delete retained.provenanceUrl;
+          retained.duration = raw.duration;
+          retained.title = raw.title || prev.title;
+        }
+        allVideos.push(retained);
       } else {
         totalNew++;
         allVideos.push({

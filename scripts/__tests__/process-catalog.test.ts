@@ -54,6 +54,20 @@ describe('process-catalog', () => {
     expect(fallback.stations.tech.videos).toHaveLength(1);
     expect(fallback.stations.hackertube.videos).toEqual([curated]);
     expect(fallback.sourceMeta.known).toMatchObject({ selectedCount: 1, refreshState: 'empty' });
+    writeFileSync(
+      stationsPath,
+      JSON.stringify([
+        { id: 'tech', sources: [{ name: 'Known Source', handle: '@known', topPercentile: 100 }] },
+      ])
+    );
+    writeFileSync(join(sources, 'known.jsonl'), raw.map((row) => JSON.stringify(row)).join('\n'));
+    const returned = run().stations.tech.videos.find(
+      (entry: { id: string }) => entry.id === curated.id
+    );
+    expect(returned.tags).toEqual(curated.tags);
+    expect(returned.provenanceUrl).toBeUndefined();
+    expect(returned.description).toBeUndefined();
+    expect(returned.duration).toBe(400);
   });
 
   it('preserves source freshness metadata for catalog fallback rows', () => {

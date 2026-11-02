@@ -13,6 +13,22 @@ const stations = [
 ];
 
 describe('catalog health audit', () => {
+  it('rejects a missing configured curated selection', () => {
+    const result = auditCatalogHealth({
+      stations: [
+        {
+          id: 'hackertube',
+          name: 'HackerTube',
+          description: 'Selections',
+          sources: [],
+          curatedVideos: [{ id: 'abcdefghijk', source: 'Speaker' }],
+        },
+      ],
+      catalog: { lastUpdated: '', stations: { hackertube: { videos: [], categoryVideoIds: {} } } },
+      requiredFreshCoverage: 0,
+    });
+    expect(result.violations.join('\n')).toContain('missing curated video abcdefghijk');
+  });
   it('audits configured curated IDs separately without inflating channel counts or freshness', () => {
     const curated = {
       id: 'abcdefghijk',

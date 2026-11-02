@@ -23,6 +23,21 @@ const stations: StationConfig[] = [
 ];
 
 describe('curated video merge', () => {
+  it('applies tag corrections from the config on later rebuilds', () => {
+    const catalog: Catalog = { lastUpdated: '', stations: {} };
+    const first = mergeCuratedVideos(catalog, stations).catalog;
+    const corrected = { ...video, tags: ['Speaker', 'Algorithms'] };
+    const next = mergeCuratedVideos(first, [{ ...stations[0], curatedVideos: [corrected] }]);
+    expect(next.catalog.stations.tech.videos[0].tags).toEqual(corrected.tags);
+  });
+
+  it('rejects duplicate curated ids instead of silently choosing a station', () => {
+    const duplicate = [...stations, { ...stations[0], id: 'other' }];
+    expect(() => mergeCuratedVideos({ lastUpdated: '', stations: {} }, duplicate)).toThrow(
+      'Duplicate curated video'
+    );
+  });
+
   it('adds tagged videos without changing source freshness and is repeatable', () => {
     const catalog: Catalog = {
       lastUpdated: '2026-10-01T00:00:00Z',
@@ -40,7 +55,7 @@ describe('curated video merge', () => {
     expect(second.catalog).toEqual(first.catalog);
   });
 
-  it('moves existing videos to their curated station while preserving tags and truthful channel counts', () => {
+  it('moves existing videos to their curated station with configured tags and truthful channel counts', () => {
     const selected = {
       ...video,
       duration: 1200,
@@ -79,7 +94,7 @@ describe('curated video merge', () => {
       source: 'Speaker',
       duration: 7200,
       provenanceUrl: video.provenanceUrl,
-      tags: ['Original', 'Tag', 'Speaker', 'Databases'],
+      tags: video.tags,
     });
     expect(result.catalog.sourceMeta?.existing).toEqual({
       ...catalog.sourceMeta?.existing,
