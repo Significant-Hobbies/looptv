@@ -4,6 +4,41 @@ import stations from '../../../stations.json';
 import { StationConfigSchema, StationsConfigSchema } from '../stations-schema';
 
 describe('stations-schema', () => {
+  it('validates curated individual videos without requiring channel subscriptions', () => {
+    const station = {
+      id: 'tech',
+      name: 'Tech',
+      description: 'Technology',
+      sources: [],
+      curatedVideos: [
+        {
+          id: 'abcdefghijk',
+          title: 'A talk',
+          duration: 7200,
+          date: '2026-10-01',
+          tags: ['Speaker', 'Databases'],
+          source: 'Speaker',
+          viewCount: 40_000,
+          provenanceUrl: 'https://hackertube.org/p/systems-and-databases',
+        },
+      ],
+    };
+    expect(StationConfigSchema.parse(station).curatedVideos).toEqual(station.curatedVideos);
+    expect(StationConfigSchema.safeParse({ ...station, curatedVideos: [] }).success).toBe(false);
+    expect(
+      StationConfigSchema.safeParse({
+        ...station,
+        curatedVideos: [{ ...station.curatedVideos[0], viewCount: 9_999 }],
+      }).success
+    ).toBe(false);
+    expect(
+      StationConfigSchema.safeParse({
+        ...station,
+        curatedVideos: [{ ...station.curatedVideos[0], provenanceUrl: 'javascript:alert(1)' }],
+      }).success
+    ).toBe(false);
+  });
+
   it('validates the committed stations.json', () => {
     const result = StationsConfigSchema.safeParse(stations);
     if (!result.success) {

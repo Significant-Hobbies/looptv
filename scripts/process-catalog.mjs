@@ -10,6 +10,7 @@ import {
   qualifiesRawVideo,
   validateCatalog,
 } from './catalog-quality.mjs';
+import { mergeCuratedVideos } from './curated-videos.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = process.argv[2];
@@ -17,6 +18,9 @@ const OUTPUT = process.argv[3];
 
 const stationsPath = process.env.STATIONS_PATH || path.join(__dirname, '..', 'stations.json');
 const stationsConfig = JSON.parse(fs.readFileSync(stationsPath, 'utf-8'));
+const curatedIds = new Set(
+  stationsConfig.flatMap((station) => (station.curatedVideos || []).map((video) => video.id))
+);
 
 // Load existing catalog to preserve NER-enriched tags
 let existing = { stations: {} };
@@ -41,7 +45,9 @@ const generatedAt = new Date();
 
 function existingSourceRows(stationId, sourceName) {
   return (existing.stations?.[stationId]?.videos || [])
-    .filter((video) => video.source === sourceName)
+    .filter(
+      (video) => video.source === sourceName && !video.provenanceUrl && !curatedIds.has(video.id)
+    )
     .map((video) => ({
       id: video.id,
       title: video.title || '',
@@ -142,6 +148,7 @@ const catalog = {
 };
 let totalNew = 0;
 const emptyStations = [];
+const selectedVideos = new Map();
 
 for (const station of stationsConfig) {
   const allVideos = [];
@@ -178,7 +185,7 @@ for (const station of stationsConfig) {
         input.state === 'live'
           ? input.candidateCount
           : (input.prevMeta?.videoCount ?? sourceVideos.length),
-      selectedCount: filtered.length,
+      selectedCount: 0,
       liveVideoCount: input.liveVideoCount,
       fallbackVideoCount: input.fallbackVideoCount,
       refreshState: input.state,
@@ -190,10 +197,10 @@ for (const station of stationsConfig) {
     };
 
     for (const raw of filtered) {
+      if (selectedVideos.has(raw.id) || curatedIds.has(raw.id)) continue;
       const prev = existingVideos.get(raw.id);
-      if (prev?.tags && prev.tags.length > 1) {
-        prev.viewCount = raw.view_count;
-        allVideos.push(prev);
+      if (prev?.tags && prev.tags.length > 1 && !prev.provenanceUrl) {
+        allVideos.push({ ...prev, source: src.name, viewCount: raw.view_count });
       } else {
         totalNew++;
         allVideos.push({
@@ -207,17 +214,22 @@ for (const station of stationsConfig) {
           description: (raw.description || '').slice(0, 300),
         });
       }
+      selectedVideos.set(raw.id, allVideos.at(-1));
+      sourceMeta[handle].selectedCount++;
     }
   }
 
   catalog.stations[station.id] = { videos: allVideos, categoryVideoIds: {} };
-  if (allVideos.length === 0) {
-    emptyStations.push(station.id);
-  }
-
   const sourceNames = station.sources.map((s) => s.name).join(' + ');
   const newInStation = allVideos.filter((v) => v.description).length;
   console.log(`${station.id}: ${allVideos.length} videos (${sourceNames}), ${newInStation} new`);
+}
+
+const curated = mergeCuratedVideos(catalog, stationsConfig, existing);
+catalog.stations = curated.catalog.stations;
+console.log(`Curated videos: ${curated.added} added, ${curated.existing} already selected`);
+for (const [id, station] of Object.entries(catalog.stations)) {
+  if (station.videos.length === 0) emptyStations.push(id);
 }
 
 const metas = Object.values(sourceMeta);

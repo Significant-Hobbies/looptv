@@ -26,6 +26,11 @@ export default function ChannelsPage() {
               </Link>
             </h2>
             <p className="mt-1 text-xs text-zinc-500">{s.description}</p>
+            {s.curatedVideos?.length ? (
+              <p className="mt-3 text-sm text-zinc-300">
+                {s.curatedVideos.length.toLocaleString()} individually curated videos
+              </p>
+            ) : null}
             <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm md:grid-cols-3">
               {s.sources.map((src) => (
                 <li key={src.handle}>

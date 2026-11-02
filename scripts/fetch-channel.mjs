@@ -122,7 +122,7 @@ export function sourceRowsFromCatalog(catalog, source) {
     return [];
   const videos = catalog.stations?.[source.stationId]?.videos || [];
   return videos
-    .filter((video) => video.source === source.name)
+    .filter((video) => video.source === source.name && !video.provenanceUrl)
     .map((video) => ({
       id: video.id,
       title: video.title || '',

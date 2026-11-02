@@ -6,6 +6,7 @@ export interface Video {
   tags: string[];
   source?: string; // YouTube channel name for multi-source stations
   viewCount?: number;
+  provenanceUrl?: string;
   /** Missing evidence on legacy rows means their grounding is unknown. */
   taggingEvidence?: {
     origin: 'model';
@@ -29,6 +30,13 @@ export interface StationConfig {
   name: string;
   description: string;
   sources: YouTubeSource[];
+  curatedVideos?: CuratedVideo[];
+}
+
+export interface CuratedVideo extends Video {
+  source: string;
+  viewCount: number;
+  provenanceUrl: string;
 }
 
 interface StationCatalog {

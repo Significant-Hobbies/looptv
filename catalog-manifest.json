@@ -1,30 +1,31 @@
 {
   "$comment": "Catalog audit baselines. Auto-rebaselined by CI after each passing audit (validate-catalog-manifest.mjs --update). See docs/catalog-auditability.md for thresholds and overrides.",
-  "generatedAt": "2026-11-01T12:34:39.510Z",
+  "generatedAt": "2026-11-02T12:16:12.944Z",
   "thresholds": {
     "maxStationDropPct": 30,
     "minStationDropAbs": 5,
     "maxTotalDropPct": 20,
     "maxVideoChurnPct": 50
   },
-  "totalVideos": 8792,
+  "totalVideos": 9059,
   "stations": {
-    "ai": 443,
-    "comedy": 764,
+    "ai": 441,
+    "comedy": 763,
     "design": 308,
-    "explainers": 712,
+    "explainers": 711,
     "film": 141,
     "finance": 223,
     "fitness": 267,
-    "math": 356,
+    "hackertube": 295,
+    "math": 349,
     "mindset": 360,
     "philosophy": 455,
-    "science": 1010,
+    "science": 1002,
     "snl": 1000,
-    "space": 471,
+    "space": 470,
     "startups": 570,
-    "talks": 200,
-    "tech": 1512
+    "talks": 199,
+    "tech": 1505
   },
   "videos": {
     "ai": {
@@ -860,10 +861,6 @@
         "t": "OpenAI o1 and o1 pro mode in ChatGPT — 12 Days of OpenAI: Day 1",
         "d": 896
       },
-      "iDulhoQ2pro": {
-        "t": "Attention Is All You Need",
-        "d": 1627
-      },
       "iH_wV8BbS24": {
         "t": "Sandboxes Aren't Optional: 4 Ways to Isolate Coding Agents — Robert Brennan, OpenHands",
         "d": 863
@@ -951,10 +948,6 @@
       "kA-P9ood-cE": {
         "t": "GPT 4.1 in the API",
         "d": 1392
-      },
-      "kCc8FmEb1nY": {
-        "t": "Let's build GPT: from scratch, in code, spelled out.",
-        "d": 6980
       },
       "KeepnvtICWo": {
         "t": "NVIDIA's Magical AI Speaks Using Your Voice! 🙊",
@@ -2381,10 +2374,6 @@
       "93JV8VkGnJg": {
         "t": "Anne Frank: The Musical - IMBM",
         "d": 578
-      },
-      "9BnLbv6QYcA": {
-        "t": "Apple Introduces Revolutionary New Laptop With No Keyboard",
-        "d": 166
       },
       "9E3nxoFjt4o": {
         "t": "Scott Sterling Breaking News Update - Studio C",
@@ -8842,10 +8831,6 @@
         "t": "How to Stop a Riot",
         "d": 618
       },
-      "yY96hTb8WgI": {
-        "t": "It's not you. Bad doors are everywhere.",
-        "d": 332
-      },
       "YYvLEbC3kn8": {
         "t": "The Tragic Reality of Brain Drain on Poor Countries | Economics Explained",
         "d": 806
@@ -11473,6 +11458,1188 @@
         "d": 192
       }
     },
+    "hackertube": {
+      "_ahvzDzKdB0": {
+        "t": "Growing a Language, by Guy Steele",
+        "d": 3211
+      },
+      "_Cp-BGQfpHQ": {
+        "t": "BOLTR: Juicero, Cold Press Juicer for Rich Weirdos",
+        "d": 2499
+      },
+      "_gZK0tW8EhQ": {
+        "t": "The Remote Agent Experiment: Debugging Code from 60 Million Miles Away",
+        "d": 4243
+      },
+      "_rBO8neWw04": {
+        "t": "Detergent packs are kinda wishy-washy (Dishwashers Explained)",
+        "d": 1954
+      },
+      "-4FXLQoLDBA": {
+        "t": "Animated Voting Methods",
+        "d": 378
+      },
+      "03p2CADwGF8": {
+        "t": "The Lighthill debate on Artificial Intelligence: \"The general purpose robot is a mirage\"",
+        "d": 4992
+      },
+      "0CDXJ6bMkMY": {
+        "t": "David Heinemeier Hansson at Startup School 08",
+        "d": 1916
+      },
+      "0SARbwvhupQ": {
+        "t": "Google I/O 2009 - The Myth of the Genius Programmer",
+        "d": 3317
+      },
+      "0Z4aF-qiziM": {
+        "t": "Defcon 21 - Decapping Chips The Strike Easy Hard Way",
+        "d": 6087
+      },
+      "14wqBA5Q1yc": {
+        "t": "Super Mario World -- Credits Warp in 5:59.6 (First Time Ever on Console)",
+        "d": 541
+      },
+      "1GhNXHCQGsM": {
+        "t": "PREDATOR - Tracker that learns and improves",
+        "d": 252
+      },
+      "1hs451PfFzQ": {
+        "t": "How We Solved the Worst Minigame in Zelda's History",
+        "d": 1472
+      },
+      "1kQUXpZpLXI": {
+        "t": "14nm and 7nm are NOT what you think it is - Visiting Tescan Part 3/3",
+        "d": 1208
+      },
+      "1rCrfQUcXDI": {
+        "t": "Pinging The Voyager 2 Probe (PART 2)",
+        "d": 781
+      },
+      "1xQeXOz0Ncs": {
+        "t": "Who Destroyed Three Mile Island? - Nickolas Means | The Lead Developer Austin 2018",
+        "d": 2227
+      },
+      "2IT2oAzTcvU": {
+        "t": "Nina Kollars - Confessions of an Nespresso Money Mule - DEF CON 27 Conference",
+        "d": 1195
+      },
+      "2KSahAoOLdU": {
+        "t": "Apollo Guidance Computer Part 1: Restoring the computer that put man on the Moon",
+        "d": 1264
+      },
+      "2Op3QLzMgSY": {
+        "t": "Lecture 1A | MIT 6.001 Structure and Interpretation, 1986",
+        "d": 4376
+      },
+      "2pWv7GOvuf0": {
+        "t": "RL Course by David Silver - Lecture 1: Introduction to Reinforcement Learning",
+        "d": 5293
+      },
+      "2S0k12uZR14": {
+        "t": "Velocity 2012:  Richard Cook, \"How Complex Systems Fail\"",
+        "d": 1701
+      },
+      "30jNsCVLpAE": {
+        "t": "Debugging Under Fire: Keep your Head when Systems have Lost their Mind • Bryan Cantrill • GOTO 2017",
+        "d": 3155
+      },
+      "36myc8wQhLo": {
+        "t": "USENIX ATC '21/OSDI '21 Joint Keynote Address-It's Time for Operating Systems to Rediscover Hardware",
+        "d": 3980
+      },
+      "3kEfedtQVOY": {
+        "t": "28c3: The Science of Insecurity",
+        "d": 3563
+      },
+      "4F72VULWFvc": {
+        "t": "\"The Clean Code Talks  -- Inheritance, Polymorphism, & Testing\"",
+        "d": 2305
+      },
+      "4fFDFbi3toc": {
+        "t": "\"Testing Distributed Systems w/ Deterministic Simulation\" by Will Wilson",
+        "d": 2420
+      },
+      "4Q7FTjhvZ7Y": {
+        "t": "Project Code Rush - The Beginnings of Netscape / Mozilla Documentary",
+        "d": 3369
+      },
+      "5eqRuVp65eY": {
+        "t": "AI can't cross this line and we don't know why.",
+        "d": 1447
+      },
+      "5Ge2RcvDlgw": {
+        "t": "The Extreme Engineering of ASML’s EUV Light Source",
+        "d": 1040
+      },
+      "5ODzO7Lz_pw": {
+        "t": "Thomas Thwaites: How I built a toaster -- from scratch",
+        "d": 682
+      },
+      "5Vt8zqhHe_c": {
+        "t": "Maciej Ceglowski - Barely succeed! It's easier!",
+        "d": 2363
+      },
+      "6reLWfFNer0": {
+        "t": "How to Build a Startup Without Funding by Pieter Levels @ Dojo Bali",
+        "d": 3600
+      },
+      "7CgXvIuZR40": {
+        "t": "TasBlock at AGDQ 2017: TASBot",
+        "d": 3524
+      },
+      "7EmboKQH8lM": {
+        "t": "Clean Code - Uncle Bob / Lesson 1",
+        "d": 6522
+      },
+      "7Hk9jct2ozY": {
+        "t": "DNA animation (2002-2014) by Drew Berry and Etsuko Uno wehi.tv #ScienceArt",
+        "d": 440
+      },
+      "7J7X7aZvMXQ": {
+        "t": "How does Computer Memory Work? 💻🛠",
+        "d": 2133
+      },
+      "8bZh5LMaSmE": {
+        "t": "RailsConf 2014 - All the Little Things by Sandi Metz",
+        "d": 2327
+      },
+      "8dhp_20j0Ys": {
+        "t": "How Toy Story 2 Almost Got Deleted: Stories From Pixar Animation: ENTV",
+        "d": 146
+      },
+      "8fi7uSYlOdc": {
+        "t": "Containers From Scratch • Liz Rice • GOTO 2018",
+        "d": 2574
+      },
+      "8Ko3TdPy0TU": {
+        "t": "How lucky is too lucky?: The Minecraft Speedrunning Dream Controversy Explained",
+        "d": 2387
+      },
+      "8pTEmbeENF4": {
+        "t": "Bret Victor   The Future of Programming",
+        "d": 1976
+      },
+      "8S0FDjFBj8o": {
+        "t": "How to sound smart in your TEDx Talk | Will Stephen | TEDxNewYork",
+        "d": 356
+      },
+      "8X69_42Mj-g": {
+        "t": "Clasp: Common Lisp using LLVM and C++ for Molecular Metaprogramming",
+        "d": 3458
+      },
+      "9BnLbv6QYcA": {
+        "t": "Apple Introduces Revolutionary New Laptop With No Keyboard",
+        "d": 166
+      },
+      "9eyFDBPk4Yw": {
+        "t": "Admiral Grace Hopper Explains the Nanosecond",
+        "d": 124
+      },
+      "9vz06QO3UkQ": {
+        "t": "The Internet's Own Boy: The Story of Aaron Swartz | full movie (2014)",
+        "d": 6300
+      },
+      "9XaYdCdwiWU": {
+        "t": "#HITB2012KUL D1T3 - The Grugq - OPSEC: Because Jail is for wuftpd",
+        "d": 3865
+      },
+      "a1zDuOPkMSw": {
+        "t": "Hamming, \"You and Your Research\" (June 6, 1995)",
+        "d": 2659
+      },
+      "aAb7hSCtvGw": {
+        "t": "How To Design A Good API and Why it Matters",
+        "d": 3619
+      },
+      "Ac7G7xOG2Ag": {
+        "t": "\"Turbo Encabulator\" the Original",
+        "d": 110
+      },
+      "AF8d72mA41M": {
+        "t": "Why It Was Almost Impossible to Make the Blue LED",
+        "d": 2025
+      },
+      "AgkfIQ4IGaM": {
+        "t": "Deep Visualization Toolbox",
+        "d": 234
+      },
+      "aircAruvnKk": {
+        "t": "But what is a neural network? | Deep learning chapter 1",
+        "d": 1120
+      },
+      "ajGX7odA87k": {
+        "t": "USENIX Security '18-Q: Why Do Keynote Speakers Keep Suggesting That Improving Security Is Possible?",
+        "d": 3082
+      },
+      "aMcJ1Jvtef0": {
+        "t": "8 Bit & '8 Bitish' Graphics-Outside the Box",
+        "d": 5134
+      },
+      "AnrlSqtpOkw": {
+        "t": "Alan Kay's tribute to Ted Nelson at \"Intertwingled\" Festival",
+        "d": 1053
+      },
+      "aoag03mSuXQ": {
+        "t": "The Internet Was Weeks Away From Disaster and No One Knew",
+        "d": 3180
+      },
+      "AyOAjFNPAbA": {
+        "t": "AWS re:Invent 2016: Tuesday Night Live with James Hamilton",
+        "d": 5607
+      },
+      "B1J2RMorJXM": {
+        "t": "Light Years Ahead | The 1969 Apollo Guidance Computer",
+        "d": 4882
+      },
+      "b2F-DItXtZs": {
+        "t": "Episode 1 - Mongo DB Is Web Scale",
+        "d": 336
+      },
+      "B965f8AcNbw": {
+        "t": "2. The Bronze Age Collapse - Mediterranean Apocalypse",
+        "d": 3825
+      },
+      "bB340S0tGf8": {
+        "t": "Interview with an Agile Coach - Sprint1",
+        "d": 262
+      },
+      "BKorP55Aqvg": {
+        "t": "The Expert (Short Comedy Sketch)",
+        "d": 455
+      },
+      "bLk1cjZ4ll0": {
+        "t": "How to design an actually good toaster with lessons from the 1940's",
+        "d": 662
+      },
+      "bmSAYlu0NcY": {
+        "t": "A Philosophy of Software Design | John Ousterhout | Talks at Google",
+        "d": 3700
+      },
+      "bRCNenhcvpw": {
+        "t": "IBM Selectric Typewriter & its digital to analogue converter",
+        "d": 185
+      },
+      "bSkpMdDe4g4": {
+        "t": "CppCon 2017: Matt Godbolt “What Has My Compiler Done for Me Lately? Unbolting the Compiler's Lid”",
+        "d": 4546
+      },
+      "bxe2T-V8XRs": {
+        "t": "Neural Networks Demystified [Part 1: Data and Architecture]",
+        "d": 187
+      },
+      "BYRTvoZ3Rho": {
+        "t": "Was YOUR vote counted? (feat. homomorphic encryption) - Numberphile",
+        "d": 514
+      },
+      "c12cYAUTXXs": {
+        "t": "Erlang Factory 2014 - That's 'Billion' with a 'B': Scaling to the Next Level at WhatsApp",
+        "d": 2955
+      },
+      "CGRtyxEpoGg": {
+        "t": "Why Western Designs Fail in Developing Countries",
+        "d": 1656
+      },
+      "cIQ9IXSUzuM": {
+        "t": "D/A and A/D | Digital Show and Tell (Monty Montgomery @ xiph.org)",
+        "d": 1433
+      },
+      "CS01Hmjv1pQ": {
+        "t": "Ralph Langner: Cracking Stuxnet, a 21st-century cyber weapon",
+        "d": 641
+      },
+      "D1R-jKKp3NA": {
+        "t": "Steve Jobs Stanford Commencement Speech 2005",
+        "d": 874
+      },
+      "DFFVSvAr7Wc": {
+        "t": "Geoffrey West on COMPLEXITY",
+        "d": 2451
+      },
+      "dKJEpOtVgXc": {
+        "t": "Do we need Attention? - Linear RNNs and State Space Models (SSMs) for NLP",
+        "d": 2383
+      },
+      "DleXA5ADG78": {
+        "t": "Brains, Sex, and Machine Learning",
+        "d": 3619
+      },
+      "DovunOxlY1k": {
+        "t": "AT&T Archives: Similiarities of Wave Behavior (Bonus Edition)",
+        "d": 1683
+      },
+      "dT9y-KQbqi4": {
+        "t": "How I hacked a hardware crypto wallet and recovered $2 million",
+        "d": 1938
+      },
+      "dX9CGRZwD-w": {
+        "t": "How are Microchips Made? 🖥️🛠️ CPU Manufacturing Process Steps",
+        "d": 1668
+      },
+      "DXvAlwMAxiA": {
+        "t": "How a transistor works",
+        "d": 683
+      },
+      "DYvhC_RdIwQ": {
+        "t": "I Have Delivered Value... But At What Cost?",
+        "d": 169
+      },
+      "e08kOj2kISU": {
+        "t": "How to Speed up a Python Program 114,000 times.",
+        "d": 3551
+      },
+      "e3GFG0sXIig": {
+        "t": "How We Should Vote (Range Voting)",
+        "d": 383
+      },
+      "ecIWPzGEbFc": {
+        "t": "\"Uncle\" Bob Martin - \"The Future of Programming\"",
+        "d": 4701
+      },
+      "eJ3RzGoQC4s": {
+        "t": "The Century of the Self (Full Adam Curtis Documentary)",
+        "d": 14084
+      },
+      "EKWGGDXe5MA": {
+        "t": "Richard Feynman Computer Science Lecture - Hardware, Software and Heuristics",
+        "d": 4547
+      },
+      "eQ2OZKitRwc": {
+        "t": "DEF CON 22 - Adrian Crenshaw- Dropping Docs on Darknets: How People Got Caught",
+        "d": 3059
+      },
+      "etx0k1nLn78": {
+        "t": "Why do Biden's votes not follow Benford's Law?",
+        "d": 1066
+      },
+      "EY6q5dv_B-o": {
+        "t": "VCF East: Ken Thompson interviewed by Brian Kernighan",
+        "d": 3831
+      },
+      "EZ05e7EMOLM": {
+        "t": "🚀  TDD, Where Did It All Go Wrong (Ian Cooper)",
+        "d": 3835
+      },
+      "f84n5oFoZBc": {
+        "t": "Hammock Driven Development - Rich Hickey",
+        "d": 2389
+      },
+      "fa28lIGuxq8": {
+        "t": "Why Do Reversing Trucks Not Beep Any More?",
+        "d": 105
+      },
+      "fE2KDzZaxvE": {
+        "t": "Zebras All the Way Down - Bryan Cantrill, Uptime 2017",
+        "d": 2797
+      },
+      "fg0_Vhldz-8": {
+        "t": "Liquid Democracy In Simple Terms",
+        "d": 304
+      },
+      "fhOHn9TClXY": {
+        "t": "Joe Armstrong & Alan Kay - Joe Armstrong interviews Alan Kay",
+        "d": 4615
+      },
+      "FihU5JxmnBg": {
+        "t": "Debugging with the Scientific Method - Stuart Halloway",
+        "d": 2949
+      },
+      "FITJMJjASUs": {
+        "t": "Ruby Conf 12 - Y Not- Adventures in Functional Programming by Jim Weirich",
+        "d": 3202
+      },
+      "FnEWBtCnFs8": {
+        "t": "2 1 1 Jason Scott   Rescuing The Prince of Persia from the sands of time",
+        "d": 3167
+      },
+      "fNk_zzaMoSs": {
+        "t": "Vectors | Chapter 1, Essence of linear algebra",
+        "d": 591
+      },
+      "fU9hR3kiOK0": {
+        "t": "\"Turning the database inside out with Apache Samza\" by Martin Kleppmann",
+        "d": 2863
+      },
+      "fWqBmmPQP40": {
+        "t": "27c3: Reverse Engineering the MOS 6502 CPU (en)",
+        "d": 3117
+      },
+      "FzRP1qdwPKw": {
+        "t": "How To Contact The Voyager 2 Probe (PART 1)",
+        "d": 1216
+      },
+      "G1r55efei5c": {
+        "t": "!!Con 2016 - How I Code and Use a Computer at 1,000 WPM!! By Sina Bahram",
+        "d": 809
+      },
+      "g2tMcMQqSbA": {
+        "t": "Colossus - The Greatest Secret in the History of Computing",
+        "d": 3626
+      },
+      "GaRurhiK-Lk": {
+        "t": "How the Minecraft Title Screen Seed was Found",
+        "d": 504
+      },
+      "GcDshWmhF4A": {
+        "t": "Marble adding machine",
+        "d": 214
+      },
+      "GDzBE6vz5r0": {
+        "t": "The Mind-Blowing Machines that Stamp Millions of Metal Parts - Smarter Every Day 288",
+        "d": 3552
+      },
+      "gkj_91IJVBk": {
+        "t": "Václav Smil at Driva Climate Investment Meeting 2019",
+        "d": 3131
+      },
+      "GLQyj-kBRdo": {
+        "t": "dotScale 2014 - Robert Kennedy - Life in the Trenches of healthcare.gov",
+        "d": 1641
+      },
+      "GNKFSpJIBO0": {
+        "t": "Math Encounters -- Five Balls, Two Hands: The Patterns of Juggling -- Colin Wright (Presentation)",
+        "d": 4308
+      },
+      "gNRnrn5DE58": {
+        "t": "Origins of Precision",
+        "d": 1833
+      },
+      "GsyhGHUEt-k": {
+        "t": "Emojli: Behind the Scenes and Why You Should Never Build An App",
+        "d": 1858
+      },
+      "GVsUOuSjvcg": {
+        "t": "Future Computers Will Be Radically Different (Analog Computing)",
+        "d": 1302
+      },
+      "H62hZJVqs2o": {
+        "t": "\"Uptime 15,364 days - The Computers of Voyager\" by Aaron Cummings",
+        "d": 2405
+      },
+      "h7apO7q16V0": {
+        "t": "The Fast Fourier Transform (FFT): Most Ingenious Algorithm Ever?",
+        "d": 1703
+      },
+      "HaEPXoXVf2k": {
+        "t": "AWS re:Invent 2018: Amazon DynamoDB Deep Dive: Advanced Design Patterns for DynamoDB (DAT401)",
+        "d": 3596
+      },
+      "HB5TrK7A4pI": {
+        "t": "\"We Really Don't Know How to Compute!\" - Gerald Sussman (2011)",
+        "d": 3859
+      },
+      "hB6eY73sLV0": {
+        "t": "SNES Code Injection -- Flappy Bird in SMW",
+        "d": 391
+      },
+      "hckwxq8rnr0": {
+        "t": "Apollo Core Rope Memory (Apollo Guidance Computer Part 30)",
+        "d": 2943
+      },
+      "HKQDSgBHPfY": {
+        "t": "DEF CON 25 - John Sotos - Genetic Diseases to Guide Digital Hacks of the Human Genome",
+        "d": 2987
+      },
+      "hpgK51w6uhk": {
+        "t": "America's Iron Giants - The World's Most Powerful Metalworkers",
+        "d": 768
+      },
+      "hUhisi2FBuw": {
+        "t": "The Ingenious Design of the Aluminum Beverage Can",
+        "d": 699
+      },
+      "HxaD_trXwRE": {
+        "t": "Lexical Scanning in Go - Rob Pike",
+        "d": 3078
+      },
+      "HyzD8pNlpwI": {
+        "t": "The Ultimate Game Boy Talk (33c3)",
+        "d": 3667
+      },
+      "hz_mMLhUinw": {
+        "t": "The Superheterodyne Radio: No really, that's its name",
+        "d": 751
+      },
+      "Hzb37RyagCQ": {
+        "t": "36C3 -  Open Source is Insufficient to Solve Trust Problems in Hardware",
+        "d": 3646
+      },
+      "hzGaO4Kdz2Y": {
+        "t": "EEVblog #854 - B52 Bomber Automatic Astro Compass Teardown",
+        "d": 1732
+      },
+      "IcgmSRJHu_8": {
+        "t": "\"Making Impossible States Impossible\" by Richard Feldman",
+        "d": 1506
+      },
+      "iDulhoQ2pro": {
+        "t": "Attention Is All You Need",
+        "d": 1627
+      },
+      "iffTJ1vPCSo": {
+        "t": "Replace Your Exploit-Ridden Firmware with Linux - Ronald Minnich, Google",
+        "d": 2283
+      },
+      "IgF3OX8nT0w": {
+        "t": "The Most Powerful Computers You've Never Heard Of",
+        "d": 1212
+      },
+      "ipRvjS7q1DI": {
+        "t": "Richard Feynman: Can Machines Think?",
+        "d": 1107
+      },
+      "IroPQ150F6c": {
+        "t": "Andrew Kelley: A Practical Guide to Applying Data Oriented Design (DoD)",
+        "d": 2800
+      },
+      "IRTfhkiAqPw": {
+        "t": "Object-Oriented Programming is Embarrassing: 4 Short Examples",
+        "d": 1683
+      },
+      "IS5ycm7VfXg": {
+        "t": "\"Z2\" - Upgraded Homemade Silicon Chips",
+        "d": 346
+      },
+      "izxXGuVL21o": {
+        "t": "How Crash Bandicoot Hacked The Original Playstation | War Stories | Ars Technica",
+        "d": 1897
+      },
+      "J3FcbFqSoQY": {
+        "t": "I Genetically Engineered *MYSELF* to Fix Lactose Intolerance",
+        "d": 1113
+      },
+      "j3mhkYbznBk": {
+        "t": "Richard Feynman  - The.Character of Physical Law - Part 1 The Law of Gravitation (full version)",
+        "d": 3364
+      },
+      "j9uRckJLqLk": {
+        "t": "The 3D-Printed Curta Calculator",
+        "d": 516
+      },
+      "JBgG_VSP7f8": {
+        "t": "Karl Sims - Evolved Virtual Creatures, Evolution Simulation, 1994",
+        "d": 250
+      },
+      "jbkSRLYSojo": {
+        "t": "Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats - BBC",
+        "d": 288
+      },
+      "JDaicPIgn9U": {
+        "t": "Lest We Remember: Cold Boot Attacks on Encryption Keys",
+        "d": 322
+      },
+      "JEpsBg0AO6o": {
+        "t": "Paxos lecture (Raft user study)",
+        "d": 3994
+      },
+      "ji5_MqicxSo": {
+        "t": "Randy Pausch's Last Lecture: Achieving Your Childhood Dreams",
+        "d": 4587
+      },
+      "Jib2AmRb_rk": {
+        "t": "SQLite: The Database at the Edge of the Network with Dr. Richard Hipp",
+        "d": 3598
+      },
+      "jkrNMKz9pWU": {
+        "t": "A Hackers' Guide to Language Models",
+        "d": 5473
+      },
+      "jmTwlEh8L7g": {
+        "t": "DEF CON 26  - Christopher Domas - GOD MODE UNLOCKED Hardware Backdoors in redacted x86",
+        "d": 2764
+      },
+      "JTfhYyTuT44": {
+        "t": "In Search Of A Flat Earth",
+        "d": 4577
+      },
+      "JtKAScORevQ": {
+        "t": "How our voting system (and IRV) betrays your favourite candidate",
+        "d": 215
+      },
+      "jVkLVRt6c1U": {
+        "t": "Mike Monteiro: F*ck You, Pay Me",
+        "d": 2274
+      },
+      "jw8K460vx1c": {
+        "t": "Revolution OS",
+        "d": 5110
+      },
+      "kBdfcR-8hEY": {
+        "t": "Justice: What's The Right Thing To Do? Episode 01 \"THE MORAL SIDE OF MURDER\"",
+        "d": 3296
+      },
+      "kCc8FmEb1nY": {
+        "t": "Let's build GPT: from scratch, in code, spelled out.",
+        "d": 6980
+      },
+      "kpk2tdsPh0A": {
+        "t": "SM64 - Watch for Rolling Rocks - 0.5x A Presses (Commentated) [OUTDATED]",
+        "d": 1479
+      },
+      "KrksBdWcZgQ": {
+        "t": "Breaking the x86 Instruction Set",
+        "d": 2669
+      },
+      "l_F9jxsfGCw": {
+        "t": "Darius Kazemi, Tiny Subversions - XOXO Festival (2014)",
+        "d": 1300
+      },
+      "l70iRcSxqzo": {
+        "t": "Kim Nilsson - Cracking MtGox",
+        "d": 2302
+      },
+      "l8XOZJkozfI": {
+        "t": "The Voting System That's Actually Too Good for Politicians to Allow",
+        "d": 407
+      },
+      "le71yVPh4uk": {
+        "t": "Spying on the Scammers [Part 1/5]",
+        "d": 978
+      },
+      "lJ8ydIuPFeU": {
+        "t": "\"How NOT to Measure Latency\" by Gil Tene",
+        "d": 2579
+      },
+      "ljOoGyCso8s": {
+        "t": "Inside a Huge PCB Factory",
+        "d": 1609
+      },
+      "LkH2r-sNjQs": {
+        "t": "Why Electronic Voting Is Still A Bad Idea",
+        "d": 721
+      },
+      "lKXe3HUG2l4": {
+        "t": "\"The Mess We're In\" by Joe Armstrong",
+        "d": 2750
+      },
+      "LnzuMJLZRdU": {
+        "t": "“Hello, world” from scratch on a 6502 — Part 1",
+        "d": 1644
+      },
+      "Lq-Y7crQo44": {
+        "t": "Algorithmic Redistricting: Elections made-to-order",
+        "d": 1608
+      },
+      "LQmTKxI4Wn4": {
+        "t": "Electron transport chain",
+        "d": 465
+      },
+      "m7PVZixO35c": {
+        "t": "New computers don't speed up old code",
+        "d": 1165
+      },
+      "MBnnXbOM5S4": {
+        "t": "The more general uncertainty principle, regarding Fourier transforms",
+        "d": 1087
+      },
+      "Mfsnlbd-4xQ": {
+        "t": "Functional Composition - Chris Ford",
+        "d": 2361
+      },
+      "MiUHjLxm3V0": {
+        "t": "The World's Most Important Machine",
+        "d": 3300
+      },
+      "ML4tw_UzqZE": {
+        "t": "Building The World's First Computer - Greeks, Clocks and Rockets - Antikythera Mechanism Episode 1",
+        "d": 413
+      },
+      "MlhAkNWC1qo": {
+        "t": "David Heinemeier Hansson-Unlearn Your MBA (Entire talk)",
+        "d": 3530
+      },
+      "NAsM30MAHLg": {
+        "t": "(1/4) Intro/History: Introducing a 100-year-old mechanical computer",
+        "d": 219
+      },
+      "ncHmEUmJZf4": {
+        "t": "CppCon 2017: Matt Kulukundis “Designing a Fast, Efficient, Cache-friendly Hash Table, Step by Step”",
+        "d": 3574
+      },
+      "NdppYYfQJgg": {
+        "t": "38C3 - From Silicon to Sovereignty: How Advanced Chips are Redefining Global Dominance",
+        "d": 2402
+      },
+      "nfDoml-Db64": {
+        "t": "The man who almost faked his way to a Nobel Prize",
+        "d": 2550
+      },
+      "NGFhc8R_uO4": {
+        "t": "Indistinguishable From Magic: Manufacturing Modern Computer Chips",
+        "d": 3680
+      },
+      "niKblgZupOc": {
+        "t": "CGA Graphics - Not as bad as you thought!",
+        "d": 687
+      },
+      "nmgFG7PUHfo": {
+        "t": "The Most Underrated Algorithm",
+        "d": 1593
+      },
+      "NNnIGh9g6fA": {
+        "t": "1. Introduction to Human Behavioral Biology",
+        "d": 3435
+      },
+      "nsaUX48t0w8": {
+        "t": "Single particle creates interference after double slit - Wave particle duality at the workshop",
+        "d": 62
+      },
+      "Nu-nlQqFCKg": {
+        "t": "Speech Recognition Breakthrough for the Spoken, Translated Word",
+        "d": 545
+      },
+      "nU8DcBF-qo4": {
+        "t": "Google Developers Day US - Theorizing from Data",
+        "d": 3172
+      },
+      "nuruzFqMgIw": {
+        "t": "BadUSB - On Accessories that Turn Evil by Karsten Nohl + Jakob Lell",
+        "d": 2671
+      },
+      "o0fG_lnVhHw": {
+        "t": "HOW ROCKETS ARE MADE (Rocket Factory Tour - United Launch Alliance) - Smarter Every Day 231",
+        "d": 3256
+      },
+      "o4-YnLpLgtk": {
+        "t": "Symbolics Lisp Machine demo Jan 2013",
+        "d": 823
+      },
+      "o9pEzgHorH0": {
+        "t": "Stop Writing Classes",
+        "d": 1649
+      },
+      "oIG9ztQw2Gc": {
+        "t": "Jim Keller: Moore’s Law is Not Dead",
+        "d": 3893
+      },
+      "otbnC2zE2rw": {
+        "t": "Designing the Ideal Bootstrapped Business with Jason Cohen",
+        "d": 3937
+      },
+      "OyfBQmvr2Hc": {
+        "t": "William Byrd on \"The Most Beautiful Program Ever Written\" [PWL NYC]",
+        "d": 5466
+      },
+      "p8u_k2LIZyo": {
+        "t": "Fast Inverse Square Root — A Quake III Algorithm",
+        "d": 1208
+      },
+      "pa5_tudyAF8": {
+        "t": "BMW i3 Factory Production Tour",
+        "d": 2433
+      },
+      "PE4gwstWhmc": {
+        "t": "How We've Scaled Dropbox",
+        "d": 4097
+      },
+      "PGLYEDpNu60": {
+        "t": "Velocity NY 2013:   Richard Cook, \"Resilience In Complex Adaptive Systems\"",
+        "d": 1150
+      },
+      "pgoetgxecw8": {
+        "t": "Refterm Lecture Part 1 - Philosophies of Optimization",
+        "d": 1121
+      },
+      "PGv5BqNL164": {
+        "t": "The KGB, the Computer, and Me.",
+        "d": 3418
+      },
+      "PHe0bXAIuk0": {
+        "t": "How The Economic Machine Works by Ray Dalio",
+        "d": 1860
+      },
+      "plVk4NVIUh8": {
+        "t": "The Evolution of Bacteria on a “Mega-Plate” Petri Dish (Kishony Lab)",
+        "d": 115
+      },
+      "pnv5iKB2hl4": {
+        "t": "Why city flags may be the worst-designed thing you've never noticed | Roman Mars",
+        "d": 1099
+      },
+      "PUv66718DII": {
+        "t": "Bret Victor - Inventing on Principle",
+        "d": 3260
+      },
+      "Q2aEzeMDHMA": {
+        "t": "JPEG DCT, Discrete Cosine Transform (JPEG Pt2)- Computerphile",
+        "d": 912
+      },
+      "qCGofLIzX6g": {
+        "t": "How Python was Shaped by leaky Internals, Armin Ronacher, Flask framework",
+        "d": 2995
+      },
+      "qf7ws2DF-zk": {
+        "t": "Why Democracy Is Mathematically Impossible",
+        "d": 1414
+      },
+      "Qi1Yry33TQE": {
+        "t": "Ali Rahimi's talk at NIPS(NIPS 2017 Test-of-time award presentation)",
+        "d": 1400
+      },
+      "qJEWOTZnFeg": {
+        "t": "\"Money doesn't interest me\" - Ton Roosendaal 2017 Interview",
+        "d": 6411
+      },
+      "QM1iUe6IofM": {
+        "t": "Object-Oriented Programming is Bad",
+        "d": 2675
+      },
+      "QrkiJZKJfpY": {
+        "t": "Mechanical circuits: electronics without electricity",
+        "d": 1162
+      },
+      "QVuU2YCwHjw": {
+        "t": "Ptolemy and Homer (Simpson)",
+        "d": 230
+      },
+      "r-TLSBdHe1A": {
+        "t": "\"Performance Matters\" by Emery Berger",
+        "d": 2535
+      },
+      "rAZavOcEnLg": {
+        "t": "Making Money Flow: The MONIAC",
+        "d": 277
+      },
+      "rcwngbUrZNg": {
+        "t": "Joanna Rutkowska: Towards (reasonably) trustworthy x86 laptops",
+        "d": 3772
+      },
+      "RjD1aLm4Thg": {
+        "t": "What Bodies Think About: Bioelectric Computation Outside the Nervous System - NeurIPS 2018",
+        "d": 3127
+      },
+      "rnmcRTnTNC8": {
+        "t": "I'll Let Myself In: Tactics of Physical Pen Testers",
+        "d": 2696
+      },
+      "rOwMW6agpTI": {
+        "t": "27C3: Adventures in analyzing Stuxnet (Bruce Dang from Microsoft)",
+        "d": 4496
+      },
+      "RqQhWitJ1As": {
+        "t": "BlueHat IL 2019 - Andrew \"bunnie\" Huang - Supply Chain Security: \"If I were a Nation State...”",
+        "d": 2738
+      },
+      "rRbY3TMUcgQ": {
+        "t": "Erlang The Movie II: The Sequel",
+        "d": 595
+      },
+      "rTawFwUvnLE": {
+        "t": "Geoffrey Hinton talk \"What is wrong with convolutional neural nets ?\"",
+        "d": 4296
+      },
+      "RTB5XhjbgZA": {
+        "t": "Segmented Displays",
+        "d": 835
+      },
+      "rX0ItVEVjHc": {
+        "t": "CppCon 2014: Mike Acton \"Data-Oriented Design and C++\"",
+        "d": 5266
+      },
+      "s1i-dnAH9Y4": {
+        "t": "Mechanical Computer (All Parts) - Basic Mechanisms In Fire Control Computers",
+        "d": 2513
+      },
+      "S27pHKBEp30": {
+        "t": "LSTM is dead. Long Live Transformers!",
+        "d": 1728
+      },
+      "s7tWHJfhiyo": {
+        "t": "Why Your Vote Doesn't Count",
+        "d": 391
+      },
+      "sfGtw2C95Ms": {
+        "t": "Understanding the Job",
+        "d": 296
+      },
+      "SGJ5cZnoodY": {
+        "t": "Shenzhen: The Silicon Valley of Hardware (Full Documentary) | Future Cities | WIRED",
+        "d": 4071
+      },
+      "smStEPSRKBs": {
+        "t": "Atari's Quadrascan Explained",
+        "d": 1257
+      },
+      "spUNpyF58BY": {
+        "t": "But what is the Fourier Transform?  A visual introduction.",
+        "d": 1181
+      },
+      "sTu3LwpF6XI": {
+        "t": "Making logic gates from transistors",
+        "d": 781
+      },
+      "stxVBJem3Rs": {
+        "t": "Failing to Fail: The Spiderweb Software Way",
+        "d": 3587
+      },
+      "sw0VfmXKq54": {
+        "t": "How Prince of Persia Defeated Apple II's Memory Limitations | War Stories | Ars Technica",
+        "d": 1249
+      },
+      "swQbA4zub20": {
+        "t": "AWS re:Invent 2018: How AWS Minimizes the Blast Radius of Failures (ARC338)",
+        "d": 3344
+      },
+      "SxdOUGdseq4": {
+        "t": "\"Simple Made Easy\" - Rich Hickey (2011)",
+        "d": 3699
+      },
+      "t_rzYnXEQlE": {
+        "t": "FIXING the ENTIRE SM64 Source Code (INSANE N64 performance)",
+        "d": 1100
+      },
+      "t705r8ICkRw": {
+        "t": "Starbase Tour with Elon Musk [PART 1 // Summer 2021]",
+        "d": 3197
+      },
+      "tc4ROCJYbm0": {
+        "t": "AT&T Archives: The UNIX Operating System",
+        "d": 1647
+      },
+      "tD5NrevFtbU": {
+        "t": "\"Clean\" Code, Horrible Performance",
+        "d": 1361
+      },
+      "Tfh0ytz8S0k": {
+        "t": "How \"oldschool\" graphics worked Part 1 - Commodore and Nintendo",
+        "d": 428
+      },
+      "TfYf_rPWUdY": {
+        "t": "mRNA Translation (Advanced)",
+        "d": 184
+      },
+      "tLdRBsuvVKc": {
+        "t": "Dev Deletes Entire Production Database, Chaos Ensues",
+        "d": 620
+      },
+      "TTM_b7EJg5E": {
+        "t": "The Do's and Don'ts of Error Handling • Joe Armstrong • GOTO 2018",
+        "d": 2731
+      },
+      "u-x7PdnvCyI": {
+        "t": "Morris Chang, in conversation with Jen-Hsun Huang",
+        "d": 5501
+      },
+      "U7VwtOrwceo": {
+        "t": "Guarding Against Physical Attacks: The Xbox One Story — Tony Chen, Microsoft",
+        "d": 3485
+      },
+      "UCgoxQCf5Jg": {
+        "t": "TempleOS | Down the Rabbit Hole",
+        "d": 5152
+      },
+      "UEfP1OKKz_Q": {
+        "t": "British Plugs Are Better Than All Other Plugs, And Here's Why",
+        "d": 266
+      },
+      "UiS27feX8o0": {
+        "t": "The Antique Microwave Oven that's Better than Yours",
+        "d": 860
+      },
+      "uknEhXyZgsg": {
+        "t": "Alto System Project: Dan Ingalls demonstrates Smalltalk",
+        "d": 7682
+      },
+      "uNjxe8ShM-8": {
+        "t": "On The Turing Completeness of PowerPoint (SIGBOVIK)",
+        "d": 334
+      },
+      "UnU7DJXiMAQ": {
+        "t": "Walls, Floors, & Ceilings",
+        "d": 2243
+      },
+      "Unzc731iCUY": {
+        "t": "How to Speak",
+        "d": 3823
+      },
+      "uRGljemfwUE": {
+        "t": "The Website is Down #1: Sales Guy vs. Web Dude",
+        "d": 624
+      },
+      "US8QG9I1XW0": {
+        "t": "Functional architecture - The pits of success - Mark Seemann",
+        "d": 3610
+      },
+      "UzxYlbK2c7E": {
+        "t": "Lecture 1 | Machine Learning (Stanford)",
+        "d": 4120
+      },
+      "vAHXK2wut_I": {
+        "t": "Super Mario World Credits Warp Explained",
+        "d": 715
+      },
+      "Vjm8P8utT5g": {
+        "t": "[TAS] Pokémon Yellow - Arbitrary Code Execution",
+        "d": 465
+      },
+      "VMj-3S1tku0": {
+        "t": "The spelled-out intro to neural networks and backpropagation: building micrograd",
+        "d": 8752
+      },
+      "vq2nnJ4g6N0": {
+        "t": "Tensorflow and deep learning - without a PhD by Martin Görner",
+        "d": 9353
+      },
+      "vsMydMDi3rI": {
+        "t": "Frank Abagnale | Catch Me If You Can | Talks at Google",
+        "d": 3800
+      },
+      "vtIzMaLkCaM": {
+        "t": "LEADERSHIP LAB: The Craft of Writing Effectively",
+        "d": 4912
+      },
+      "w_znRopGtbE": {
+        "t": "Homebrew NMOS Transistor Step by Step - So Easy Even Jeri Can Do It",
+        "d": 485
+      },
+      "w3WYdYyjek4": {
+        "t": "TigerStyle! (Or How To Design Safer Systems in Less Time) by Joran Dirk Greef",
+        "d": 3719
+      },
+      "WDIkqP4JbkE": {
+        "t": "code::dive conference 2014 - Scott Meyers: Cpu Caches and Why You Care",
+        "d": 4618
+      },
+      "WFCvkkDSfIU": {
+        "t": "Animations of unseeable biology | Drew Berry | TED",
+        "d": 549
+      },
+      "wjZofJX0v4M": {
+        "t": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
+        "d": 1634
+      },
+      "Wm2h0cbvsw8": {
+        "t": "We're Gonna Build a Framework",
+        "d": 248
+      },
+      "wo84LFzx5nI": {
+        "t": "Casey Muratori – The Big OOPs: Anatomy of a Thirty-five-year Mistake – BSC 2025",
+        "d": 8854
+      },
+      "wupToqz1e2g": {
+        "t": "Carl Sagan - Pale Blue Dot",
+        "d": 211
+      },
+      "wxL4ElboiuA": {
+        "t": "The Art of Making a Nixie Tube",
+        "d": 2270
+      },
+      "WXuK6gekU1Y": {
+        "t": "AlphaGo - The Movie | Full award-winning documentary",
+        "d": 5428
+      },
+      "WYPNjSoDrqw": {
+        "t": "Birth of BASIC",
+        "d": 2293
+      },
+      "XetplHcM7aQ": {
+        "t": "James Burke Connections, Ep. 1 \"The Trigger Effect\"",
+        "d": 2962
+      },
+      "XheAMrS8Q1c": {
+        "t": "Michael Levin: The electrical blueprints that orchestrate life | TED",
+        "d": 1181
+      },
+      "xKu2de0yCJI": {
+        "t": "AT&T Archives: Saul Bass Pitch Video for Bell System Logo Redesign",
+        "d": 1620
+      },
+      "xn76r0JxqNM": {
+        "t": "HandmadeCon 2016 - History of Software Texture Mapping in Games",
+        "d": 4933
+      },
+      "xrIjfIjssLE": {
+        "t": "Erlang: The Movie",
+        "d": 692
+      },
+      "xx7Lfh5SKUQ": {
+        "t": "34C3 -  The Ultimate Apollo Guidance Computer Talk",
+        "d": 3702
+      },
+      "XXBxV6-zamM": {
+        "t": "Micro Men - 720p (2009)",
+        "d": 5053
+      },
+      "y8OnoxKotPQ": {
+        "t": "Microservices",
+        "d": 189
+      },
+      "Y99Wj-NStok": {
+        "t": "[Epilepsy Warning] Choco Mountain: The History of Mario Kart 64's Most Infamous Track",
+        "d": 1794
+      },
+      "Y9FZ4igNxNA": {
+        "t": "Fourier Optics used for Optical Pattern Recognition",
+        "d": 1111
+      },
+      "yCcWpzY8dIA": {
+        "t": "Conflict Resolution for Eventual Consistency • Martin Kleppmann • GOTO 2016",
+        "d": 3096
+      },
+      "YcUycQoz0zg": {
+        "t": "How We Diagnosed and Fixed the 2023 Voyager 1 Anomaly from 15 Billion Miles Away",
+        "d": 3825
+      },
+      "yhO6jfHPFQU": {
+        "t": "Simulating alternate voting systems",
+        "d": 843
+      },
+      "yJDv-zdhzMY": {
+        "t": "The Mother of All Demos, presented by Douglas Engelbart (1968)",
+        "d": 6053
+      },
+      "YpuX-5E7xoU": {
+        "t": "The Grille Trend that Kills 509 People per Year",
+        "d": 501
+      },
+      "yTkzNHF6rMs": {
+        "t": "Ruby Conf 12 - Boundaries by Gary Bernhardt",
+        "d": 2755
+      },
+      "yXbJe-rUNP8": {
+        "t": "The Complete History of the A Button Challenge",
+        "d": 19334
+      },
+      "yY96hTb8WgI": {
+        "t": "It's not you. Bad doors are everywhere.",
+        "d": 332
+      },
+      "yYAw79386WI": {
+        "t": "Around The Corner - How Differential Steering Works (1937)",
+        "d": 571
+      },
+      "YyIQKBzIuBY": {
+        "t": "Alan Kay - Programming and Scaling",
+        "d": 3399
+      },
+      "Z2o_Sp2-aBo": {
+        "t": "Build an electroluminescent glass panel display -- an Apollo DSKY",
+        "d": 1678
+      },
+      "ZK3O402wf1c": {
+        "t": "Lec 1 | MIT 18.06 Linear Algebra, Spring 2005",
+        "d": 2389
+      },
+      "ZmNOAtZIgIk": {
+        "t": "Bay Area Vision Meeting: Unsupervised Feature Learning and Deep Learning",
+        "d": 2890
+      },
+      "ZSRHeXYDLko": {
+        "t": "Preventing the Collapse of Civilization / Jonathan Blow (Thekla, Inc)",
+        "d": 3762
+      },
+      "ZUvGfuLlZus": {
+        "t": "Elevator Hacking: From the Pit to the Penthouse",
+        "d": 6954
+      },
+      "ZWQ0591PAxM": {
+        "t": "How we fit an NES game into 40 Kilobytes",
+        "d": 724
+      },
+      "ZZs2HUW9tDA": {
+        "t": "Why does PUNCHING Sonic 3D trigger a Secret Level Select?",
+        "d": 185
+      }
+    },
     "math": {
       "_qvp9a1x2UM": {
         "t": "The Useless Number - Numberphile",
@@ -11710,10 +12877,6 @@
         "t": "Arrow's Impossibility Theorem | Infinite Series",
         "d": 911
       },
-      "aircAruvnKk": {
-        "t": "But what is a neural network? | Deep learning chapter 1",
-        "d": 1120
-      },
       "akgU8nRNIp0": {
         "t": "Your Mind Is Eight-Dimensional - Your Brain as Math Part 3 | Infinite Series",
         "d": 478
@@ -11938,10 +13101,6 @@
         "t": "The Feigenbaum Constant (4.669)  - Numberphile",
         "d": 1135
       },
-      "etx0k1nLn78": {
-        "t": "Why do Biden's votes not follow Benford's Law?",
-        "d": 1066
-      },
       "EYkBctqyKic": {
         "t": "The Brick Double-Domino Effect Explained",
         "d": 240
@@ -11957,10 +13116,6 @@
       "FFftmWSzgmk": {
         "t": "What's so special about the Mandelbrot Set? - Numberphile",
         "d": 1013
-      },
-      "fNk_zzaMoSs": {
-        "t": "Vectors | Chapter 1, Essence of linear algebra",
-        "d": 591
       },
       "fqq8enTDzMY": {
         "t": "Is pool actually just mathematics?",
@@ -12205,10 +13360,6 @@
       "l7lP9y7Bb5g": {
         "t": "Beautiful Card Trick - Numberphile",
         "d": 795
-      },
-      "l8XOZJkozfI": {
-        "t": "The Voting System That's Actually Too Good for Politicians to Allow",
-        "d": 407
       },
       "LavXSS5Xtbg": {
         "t": "༄ GRAVITY BASINS ࿐",
@@ -12558,10 +13709,6 @@
         "t": "The A4 Paper Puzzle",
         "d": 481
       },
-      "spUNpyF58BY": {
-        "t": "But what is the Fourier Transform?  A visual introduction.",
-        "d": 1181
-      },
       "SsGEcLwjgEg": {
         "t": "A needlessly complicated but awesome bridge.",
         "d": 804
@@ -12754,10 +13901,6 @@
         "t": "What's special about 277777788888899? - Numberphile",
         "d": 864
       },
-      "wjZofJX0v4M": {
-        "t": "Transformers, the tech behind LLMs | Deep Learning Chapter 5",
-        "d": 1634
-      },
       "WKU0qDpu3AM": {
         "t": "Nobody Knows What The One Ring Does",
         "d": 289
@@ -12869,10 +14012,6 @@
       "YGLNyHd2w10": {
         "t": "I Solved Klotski",
         "d": 740
-      },
-      "yhO6jfHPFQU": {
-        "t": "Simulating alternate voting systems",
-        "d": 843
       },
       "YNMkADpvO4w": {
         "t": "Simulating the Evolution of Aggression",
@@ -17008,10 +18147,6 @@
         "t": "Minute Physics: What is Dark Matter?",
         "d": 69
       },
-      "AF8d72mA41M": {
-        "t": "Why It Was Almost Impossible to Make the Blue LED",
-        "d": 2025
-      },
       "aFPJf-wKTd0": {
         "t": "How Hidden Technology Transformed Bowling",
         "d": 1680
@@ -17039,10 +18174,6 @@
       "ani9dWmdW_w": {
         "t": "How It's Made: Stretch Limousines",
         "d": 324
-      },
-      "aoag03mSuXQ": {
-        "t": "The Internet Was Weeks Away From Disaster and No One Knew",
-        "d": 3180
       },
       "aOfWTscU8YM": {
         "t": "How do pregnancy tests work? - Tien Nguyen",
@@ -17171,10 +18302,6 @@
       "bQF51mqzrY4": {
         "t": "I Accidentally Photographed Something Unknown During the Eclipse - Smarter Every Day 298",
         "d": 1421
-      },
-      "bRCNenhcvpw": {
-        "t": "IBM Selectric Typewriter & its digital to analogue converter",
-        "d": 185
       },
       "BRxvK9m6d6I": {
         "t": "The Universe Is Speeding Up...",
@@ -17844,10 +18971,6 @@
         "t": "Every Animal In Your DNA",
         "d": 236
       },
-      "GVsUOuSjvcg": {
-        "t": "Future Computers Will Be Radically Different (Analog Computing)",
-        "d": 1302
-      },
       "gVZwdYZqCUI": {
         "t": "Why Some of the Rainbow is Missing",
         "d": 732
@@ -17944,10 +19067,6 @@
         "t": "Map, Filter, and Reduce Functions  ||  Python Tutorial  ||  Learn Python Programming",
         "d": 464
       },
-      "hUhisi2FBuw": {
-        "t": "The Ingenious Design of the Aluminum Beverage Can",
-        "d": 699
-      },
       "hW7DW9NIO9M": {
         "t": "Einstein's Proof of E=mc²",
         "d": 131
@@ -17995,10 +19114,6 @@
       "ieDIpgso4no": {
         "t": "BREAKING: New Phase of Matter",
         "d": 935
-      },
-      "IgF3OX8nT0w": {
-        "t": "The Most Powerful Computers You've Never Heard Of",
-        "d": 1212
       },
       "ihZXl33t8So": {
         "t": "Microsoft's Topological Quantum Computer Explained",
@@ -18527,10 +19642,6 @@
       "MhVw-MHGv4s": {
         "t": "How a Retractable Ballpoint Pen Works",
         "d": 283
-      },
-      "MiUHjLxm3V0": {
-        "t": "The World's Most Important Machine",
-        "d": 3300
       },
       "mmkCS5eA4f8": {
         "t": "Can you solve the wizard standoff riddle? - Dan Finkel",
@@ -19123,10 +20234,6 @@
       "Qr28zMXQ3bU": {
         "t": "Apollo’s Most Important Discovery (Inside NASA’s Moon Rock Vault!)",
         "d": 655
-      },
-      "QrkiJZKJfpY": {
-        "t": "Mechanical circuits: electronics without electricity",
-        "d": 1162
       },
       "qt6BO-DV0pY": {
         "t": "Biggest Breakthroughs in Biology and Neuroscience: 2023",
@@ -25684,10 +26791,6 @@
         "t": "What’s On The Other Side Of A Black Hole?",
         "d": 915
       },
-      "t705r8ICkRw": {
-        "t": "Starbase Tour with Elon Musk [PART 1 // Summer 2021]",
-        "d": 3197
-      },
       "tafGL02EUOA": {
         "t": "Quantum Entanglement and the Great Bohr-Einstein Debate | Space Time | PBS Digital Studios",
         "d": 842
@@ -28880,10 +29983,6 @@
         "t": "How the blockchain is changing money and business | Don Tapscott",
         "d": 1130
       },
-      "pnv5iKB2hl4": {
-        "t": "Why city flags may be the worst-designed thing you've never noticed | Roman Mars",
-        "d": 1099
-      },
       "psN1DORYYV0": {
         "t": "Listening to shame | Brené Brown | TED",
         "d": 1239
@@ -29261,10 +30360,6 @@
       "_Q-e_nczWqM": {
         "t": "The AI Economy is about to change",
         "d": 579
-      },
-      "_rBO8neWw04": {
-        "t": "Detergent packs are kinda wishy-washy (Dishwashers Explained)",
-        "d": 1954
       },
       "_RlxCc0M6Ko": {
         "t": "How to Set Up a Home Media Server",
@@ -31142,10 +32237,6 @@
         "t": "How strong is Steve? (Reuploaded again)",
         "d": 132
       },
-      "DXvAlwMAxiA": {
-        "t": "How a transistor works",
-        "d": 683
-      },
       "dY6jR52fFWo": {
         "t": "Coding Adventure: Coding a Coding Game",
         "d": 278
@@ -31153,10 +32244,6 @@
       "DYhC7nFRL5I": {
         "t": "Set up a Local AI like ChatGPT on your own machine!",
         "d": 802
-      },
-      "DYvhC_RdIwQ": {
-        "t": "I Have Delivered Value... But At What Cost?",
-        "d": 169
       },
       "DZkbDCSdC1Q": {
         "t": "Why You Should Learn To Program the HARD WAY",
@@ -32525,10 +33612,6 @@
       "LNLVOjbrQj4": {
         "t": "TOP DOWN SHOOTING in Unity",
         "d": 1192
-      },
-      "LnzuMJLZRdU": {
-        "t": "“Hello, world” from scratch on a 6502 — Part 1",
-        "d": 1644
       },
       "LoLYw--s-5w": {
         "t": "Did Google just kickstart the intelligence explosion?",
@@ -33930,10 +35013,6 @@
         "t": "All New Windows XP 20th Anniversary Build",
         "d": 817
       },
-      "sTu3LwpF6XI": {
-        "t": "Making logic gates from transistors",
-        "d": 781
-      },
       "stZr6U_7S90": {
         "t": "Claude Code is unusable now",
         "d": 1462
@@ -34253,10 +35332,6 @@
       "UIQMq9MeBMY": {
         "t": "Best Portable Projectors of 2016!",
         "d": 421
-      },
-      "UiS27feX8o0": {
-        "t": "The Antique Microwave Oven that's Better than Yours",
-        "d": 860
       },
       "UJqyxmhDWTM": {
         "t": "Why Piracy Will NEVER DIE",
@@ -34913,10 +35988,6 @@
       "y61EegqNvOI": {
         "t": "TRS-80 DT-1 Refurb Pt1: Analysis and Electronics | #SepTandy",
         "d": 1986
-      },
-      "y8OnoxKotPQ": {
-        "t": "Microservices",
-        "d": 189
       },
       "Y8Ym7hMR100": {
         "t": "AI isn't gonna keep improving",
