@@ -1,13 +1,13 @@
 {
   "$comment": "Catalog audit baselines. Auto-rebaselined by CI after each passing audit (validate-catalog-manifest.mjs --update). See docs/catalog-auditability.md for thresholds and overrides.",
-  "generatedAt": "2026-11-02T12:16:12.944Z",
+  "generatedAt": "2026-11-07T21:08:35.758Z",
   "thresholds": {
     "maxStationDropPct": 30,
     "minStationDropAbs": 5,
     "maxTotalDropPct": 20,
     "maxVideoChurnPct": 50
   },
-  "totalVideos": 9059,
+  "totalVideos": 9190,
   "stations": {
     "ai": 441,
     "comedy": 763,
@@ -17,15 +17,16 @@
     "finance": 223,
     "fitness": 267,
     "hackertube": 295,
-    "math": 349,
+    "math": 348,
     "mindset": 360,
     "philosophy": 455,
-    "science": 1002,
+    "science": 1001,
     "snl": 1000,
     "space": 470,
     "startups": 570,
     "talks": 199,
-    "tech": 1505
+    "tech": 1505,
+    "youtube-tier-list-2026": 133
   },
   "videos": {
     "ai": {
@@ -13313,10 +13314,6 @@
         "t": "You Can Never Become Pope",
         "d": 309
       },
-      "kL9BTbIGxLg": {
-        "t": "i’m so bad at billiards that i ended up in the hyperbolic plane",
-        "d": 683
-      },
       "Km024eldY1A": {
         "t": "How many chess games are possible? - Numberphile",
         "d": 731
@@ -18150,10 +18147,6 @@
       "aFPJf-wKTd0": {
         "t": "How Hidden Technology Transformed Bowling",
         "d": 1680
-      },
-      "AGglJehON5g": {
-        "t": "The Perfect Battery Material Is Dangerous",
-        "d": 2082
       },
       "AgKaHTh-_Gs": {
         "t": "Why Does February Only Have 28 Days?",
@@ -36296,6 +36289,540 @@
       "Zy9N48udcdc": {
         "t": "Mass Extinction Simulator",
         "d": 1464
+      }
+    },
+    "youtube-tier-list-2026": {
+      "-Ft5BrmUg1I": {
+        "t": "I made a fully automatic hammer",
+        "d": 1111
+      },
+      "-qUu8kIliy8": {
+        "t": "Making the most pickproof lock yet",
+        "d": 1616
+      },
+      "-zFgunAseb0": {
+        "t": "A look at the winning drones from the DARPA Lift Challenge",
+        "d": 1841
+      },
+      "0Gi5Z51KdUE": {
+        "t": "Reinventing the Pencil Sharpener",
+        "d": 920
+      },
+      "0mU7p4_CbBA": {
+        "t": "Ducati V4 Engines Are Different From Everything Else – Here’s Why",
+        "d": 1060
+      },
+      "0rXpncpkLcw": {
+        "t": "This plant will die if I'm on my phone too much",
+        "d": 942
+      },
+      "1F2MkVSviB8": {
+        "t": "4 Days in the World's Tiniest Airplane* (Flying from Los Angeles to OSHKOSH!)",
+        "d": 981
+      },
+      "1JqUHO4qpl0": {
+        "t": "How to cheaply solder to graphite by freezing metal, open sourced",
+        "d": 1206
+      },
+      "1sgsb-F8dCw": {
+        "t": "Building a CT Scanner to prove a Furby has no soul",
+        "d": 1651
+      },
+      "2yCjO-wRxyM": {
+        "t": "SNL VFX Mystery | Quick D",
+        "d": 587
+      },
+      "3AScojcf2Yw": {
+        "t": "I Built the Drill Press I've Always Wanted",
+        "d": 3102
+      },
+      "3wT9uNRk3AM": {
+        "t": "Liquid Marbles are the Coolest Scientific Breakthrough I've Made (So Far)",
+        "d": 676
+      },
+      "3ZAgiviVee0": {
+        "t": "Real Omnitrix Turns Me Into a Superhero! (Ben 10)",
+        "d": 997
+      },
+      "4u-u11n9img": {
+        "t": "Factorio \"Expert\" plays Sandustry",
+        "d": 1179
+      },
+      "4YvnVJRlQQs": {
+        "t": "The Wavy Window Paradox",
+        "d": 205
+      },
+      "5RtwFbSeV5Y": {
+        "t": "When a MiG-25 fought an F-15",
+        "d": 865
+      },
+      "6gsZY_-kT3U": {
+        "t": "This Device Turns Anything into a Suction Cup",
+        "d": 829
+      },
+      "7OxNZ-N_3vE": {
+        "t": "The Underdogs Taking On SpaceX [Stoke Space 2025]",
+        "d": 5239
+      },
+      "7wnR5tIPyHs": {
+        "t": "Crispy Hashbrowns - You Suck at Cooking (episode 161)",
+        "d": 230
+      },
+      "8wmpQ9hiQ1g": {
+        "t": "Resin Printing a Supersonic Rocket Control System -- Form 4",
+        "d": 834
+      },
+      "A2Djq-90hzw": {
+        "t": "Why Is SpaceX's Starship Losing Heat Tiles?",
+        "d": 38
+      },
+      "AazmxNs5kmE": {
+        "t": "AIRS: The MX Peacekeeper's Perfect Blind Navigator",
+        "d": 3473
+      },
+      "AGglJehON5g": {
+        "t": "The Perfect Battery Material Is Dangerous",
+        "d": 2082
+      },
+      "alkJ7xScBiw": {
+        "t": "What if you set off a nuke in the Mariana Trench?",
+        "d": 210
+      },
+      "aOBztZqGC5A": {
+        "t": "I Tried to Make a Flywheel Flipper - Here's What Went Wrong",
+        "d": 1278
+      },
+      "bGwnChxO6II": {
+        "t": "[1629] Coolest Lock Tool Ever?",
+        "d": 507
+      },
+      "bp2IAlU53uw": {
+        "t": "Why Centrifugal Fans SPEED UP When Blocked (Regular Fans Slow Down)",
+        "d": 860
+      },
+      "BUYSikP8Dyw": {
+        "t": "How Hard is it to Beat NULLIUS — The Eternal Starter Base",
+        "d": 5066
+      },
+      "bvFIUGuEIk4": {
+        "t": "Piano tech traumatized from opening my piano",
+        "d": 428
+      },
+      "CePYyjvjcd4": {
+        "t": "My Dream Power Hammer Restoration! Part 11",
+        "d": 2280
+      },
+      "Co57SfcT-h0": {
+        "t": "Supersonic Trebuchet",
+        "d": 1316
+      },
+      "CSJydnLzBAo": {
+        "t": "Unitree G1 Actuator Teardown: How This Humanoid Robot Moves",
+        "d": 1589
+      },
+      "Cu16K_AMuaY": {
+        "t": "What Makes Starship's Water Deluge System So Unique??",
+        "d": 4308
+      },
+      "cxh4II6zN4s": {
+        "t": "The Battle of Midway (1/2) - The Turning Point of the Pacific War - Animated",
+        "d": 2707
+      },
+      "d_qvLDhkg00": {
+        "t": "A pretty reason why Gaussian + Gaussian = Gaussian",
+        "d": 795
+      },
+      "d9o09BHEOh8": {
+        "t": "How To Lose a 1,000,000 dollar competition (DARPA lift Challenge)",
+        "d": 2640
+      },
+      "df1mDyIoQnI": {
+        "t": "Testing the DarkAero 1 Engine Mount",
+        "d": 1562
+      },
+      "Dtl9vZOoQfE": {
+        "t": "Monster Chopper First Drive!",
+        "d": 1660
+      },
+      "EG9ISMjM-uQ": {
+        "t": "LEGO Omnidirectional vehicle",
+        "d": 685
+      },
+      "eIcr2moY92I": {
+        "t": "ATFC: Statue Of Liberty In TFC (Episode 50)",
+        "d": 1839
+      },
+      "eIdHBDSQHyw": {
+        "t": "How far can I broadcast LoRa packets WITHOUT a radio? - LoLRa",
+        "d": 2278
+      },
+      "eVI9Ig3lq_o": {
+        "t": "The Weirdest Robots to Ever Fight at NHRL",
+        "d": 733
+      },
+      "FJVQ1dvbWBs": {
+        "t": "I’m Not Happy…What Should I Do To The Morrvair?",
+        "d": 663
+      },
+      "G1Syjh319VU": {
+        "t": "We turned a household freezer into a high-speed blast chiller!",
+        "d": 1941
+      },
+      "G61T-5d9jiA": {
+        "t": "Designing a Selfie Camera to Eject at Apogee",
+        "d": 1316
+      },
+      "G6pTelud5-E": {
+        "t": "I Broke The Angle of Repose",
+        "d": 482
+      },
+      "GbcN0bPs-Ig": {
+        "t": "I made tiny robot eyes",
+        "d": 1590
+      },
+      "GNmL6tFsrvc": {
+        "t": "A new way to switch songs on the Marble Machine",
+        "d": 548
+      },
+      "gqVJDHK5EjM": {
+        "t": "Firelaser V2 part 1: Designing a New Pump",
+        "d": 1330
+      },
+      "h0EGCnBjTVk": {
+        "t": "I Outsmarted Pro Car Thieves",
+        "d": 1519
+      },
+      "HmiQFYGc6C4": {
+        "t": "Alarming Mistakes, Deadly Decisions: Fatal Fire at BP-Husky",
+        "d": 1091
+      },
+      "huZRMhoT-YE": {
+        "t": "Cut just about anything in your shop - The Mini Monster",
+        "d": 786
+      },
+      "hX21ctsGhNc": {
+        "t": "Why a Language Map of the World is Impossible",
+        "d": 960
+      },
+      "Ia3Iieejyg8": {
+        "t": "Over Center Mechanisms But Were Afraid To Ask!",
+        "d": 1600
+      },
+      "ID-K64Jk6JM": {
+        "t": "Turning air into alcohol",
+        "d": 5411
+      },
+      "ID062k6AqMw": {
+        "t": "Testing my Tesla Powered Jetboat at 50% Power",
+        "d": 1140
+      },
+      "IGyUNd7Ax0Y": {
+        "t": "This Project Took Me Seven Years",
+        "d": 757
+      },
+      "iGZsPFJuxc0": {
+        "t": "How We Could Reach Proxima Centauri B in 20 Years",
+        "d": 1074
+      },
+      "IH_uv4h2xYM": {
+        "t": "This Slug Should Be Impossible",
+        "d": 984
+      },
+      "Jjg6-xT6rJg": {
+        "t": "Building a Mini Vegas-Sphere",
+        "d": 436
+      },
+      "JSm7Tp8iv3o": {
+        "t": "Could you Survive a Blast from the Worlds Biggest Vortex Cannon?",
+        "d": 528
+      },
+      "JzClLWL-Eys": {
+        "t": "Desiccant dehumidifiers are fascinating... but not for everyone",
+        "d": 1760
+      },
+      "K3FMVmAte3g": {
+        "t": "Marble Clock Seconds Teleporter",
+        "d": 988
+      },
+      "kk4AV3d4v3E": {
+        "t": "What if sailing had no rules?",
+        "d": 834
+      },
+      "kL9BTbIGxLg": {
+        "t": "i’m so bad at billiards that i ended up in the hyperbolic plane",
+        "d": 683
+      },
+      "KNnA05QYKB0": {
+        "t": "This Resin 3D Printer Changed My Mind!",
+        "d": 1731
+      },
+      "Ku_ockR2t44": {
+        "t": "The Mind-Blowing Flaw That Flooded New Orleans",
+        "d": 1474
+      },
+      "kXqXWcw-hSI": {
+        "t": "How I Won $750,000 With this Drone",
+        "d": 1436
+      },
+      "kxs3yNjlzkg": {
+        "t": "The Magnet Suspension Bike",
+        "d": 1574
+      },
+      "L1Yy-nsgBCM": {
+        "t": "Unveiling Our Undisclosed Truck!",
+        "d": 1127
+      },
+      "LddjTiXl6hQ": {
+        "t": "Putting Ancient Drills to the Test! #shorts",
+        "d": 60
+      },
+      "LDr5hlG1GBU": {
+        "t": "I regret inventing Tank Boots",
+        "d": 645
+      },
+      "LPdMNsL5MgI": {
+        "t": "Compiler Q&A, September 2024",
+        "d": 7749
+      },
+      "M1si1y5lvkk": {
+        "t": "No one can force me to have a secure website!!!",
+        "d": 2109
+      },
+      "m7Icley8A_A": {
+        "t": "Introducing the Orbital Gatling Cannon",
+        "d": 1702
+      },
+      "M88jllt4klM": {
+        "t": "My most complex fixture yet, but does it work? Baliscissors: Ep 33",
+        "d": 841
+      },
+      "MIUZRcEWng0": {
+        "t": "Using a Battleship As An Icebreaker",
+        "d": 495
+      },
+      "mq7T5_xH24M": {
+        "t": "1fps Atari 2600 Emulator in Vanilla Minecraft 1.13",
+        "d": 237
+      },
+      "mvZ1dJuvenw": {
+        "t": "Wire Bonding Basics - Manual Wedge Bonding ICs",
+        "d": 800
+      },
+      "Ndftcft6XhU": {
+        "t": "I Built a Drone With Only One Motor",
+        "d": 564
+      },
+      "nfna15r4EXM": {
+        "t": "World's First SCREW-BIKE",
+        "d": 1384
+      },
+      "nqTtKK7YXZw": {
+        "t": "The Keyboard Is Dead. Now What?",
+        "d": 1016
+      },
+      "NwhVJ7cv9B4": {
+        "t": "See inside insects with an electron microscope and a femtosecond laser",
+        "d": 1295
+      },
+      "o4TdHrMi6do": {
+        "t": "A laser pointer at 2 billion fps makes the speed of light look... kinda weird",
+        "d": 1761
+      },
+      "orrhkeQf0uo": {
+        "t": "Pro's wanted $20,000 so I did it myself",
+        "d": 2367
+      },
+      "OuZjjActWmQ": {
+        "t": "Unusual Shop Tips",
+        "d": 1297
+      },
+      "pcupjiD2xVk": {
+        "t": "Building 10 Motorized Lego Doors",
+        "d": 629
+      },
+      "pFG-nXUw6Ts": {
+        "t": "これは海水からセメントを取り出し包丁が作れるレシピ",
+        "d": 1054
+      },
+      "pG9VjHY6I84": {
+        "t": "Two Overpowered Robots Fight in South Australia - Loft Part 10, Derive S Part 7",
+        "d": 2787
+      },
+      "PXuV_YCt8g4": {
+        "t": "Primitive Technology: 3 Iron Consolidation Experiments",
+        "d": 858
+      },
+      "Py1I96F_R4Q": {
+        "t": "Blender 5.0 Is Here - A Revolution…For Free!",
+        "d": 384
+      },
+      "q6hSUH9FKdY": {
+        "t": "Blindfolded and Stranded! Can I find my way home using no map, compass or main roads?",
+        "d": 2125
+      },
+      "qgTfVQaHW5A": {
+        "t": "We Went PRO in BATTLEBOTS…Were We Ready?",
+        "d": 2449
+      },
+      "QKdkqLVq04k": {
+        "t": "Why Mercury Cant Be Absorbed With A Cloth",
+        "d": 569
+      },
+      "qMR3IXF2sWw": {
+        "t": "Home made GPU escalated quickly",
+        "d": 1363
+      },
+      "qNBEqnFt1aU": {
+        "t": "No Nuclear Startup Has Ever Done This, Until Now | Valar Atomics",
+        "d": 1013
+      },
+      "qT5XLkATzSI": {
+        "t": "How Do You Purify the Most Reactive Metal on Earth?",
+        "d": 3803
+      },
+      "R0wwuj0sTyY": {
+        "t": "The Year Without a Summer (1816 to 1824)",
+        "d": 2564
+      },
+      "RpslsMqPFWA": {
+        "t": "I made an apple peel itself",
+        "d": 1766
+      },
+      "rqCt61ZbU10": {
+        "t": "Building an LED SUPERNOVA!",
+        "d": 1507
+      },
+      "stc_mAbYoZw": {
+        "t": "This 3D Printer Has No Motors! The Engineering Behind the LightMake L4",
+        "d": 770
+      },
+      "sUdnJTC2w9I": {
+        "t": "Improving My Engine Sound Simulator With Real Data",
+        "d": 1627
+      },
+      "SwYDxh3PQJ0": {
+        "t": "The Little Ceiling Robots Inside a Semiconductor Fab",
+        "d": 1213
+      },
+      "t14ENrqlmuY": {
+        "t": "SM64 1 Key TAS But You Can See Lakitu Filming It",
+        "d": 552
+      },
+      "tBN2o4rAt5A": {
+        "t": "How a Trans-Atlantic Steam Ship Worked",
+        "d": 4950
+      },
+      "tCHk2ZteXEo": {
+        "t": "Medieval Siege Weapons Were More Than Just Catapults",
+        "d": 1370
+      },
+      "tkO7tsHPu10": {
+        "t": "My robot is better than you at knife throwing",
+        "d": 967
+      },
+      "tlsU_YT9n_g": {
+        "t": "We Could've Had the Industrial Revolution 2,000 Years Early",
+        "d": 525
+      },
+      "TPyQI7bJo6Q": {
+        "t": "Making a Deformable Mirror",
+        "d": 1881
+      },
+      "TTP4UgaNOGw": {
+        "t": "I Accidentally Built a Semi-Autonomous Electric Airboat",
+        "d": 1083
+      },
+      "TumxO2glmPQ": {
+        "t": "Why robots still can't pick strawberries",
+        "d": 1870
+      },
+      "u0KPa34PoZA": {
+        "t": "good boyfriend",
+        "d": 70
+      },
+      "udI2dWmwMUE": {
+        "t": "I built a FLAP ENGINE (New Rotary Design)",
+        "d": 1138
+      },
+      "Ui7DCKI_upA": {
+        "t": "No Way He Walked Away From This!!!",
+        "d": 626
+      },
+      "UvV2CH5il3Q": {
+        "t": "Micro-Fabrication with a Fiber Tip – A Low-Cost 3D Micro Printing Method",
+        "d": 961
+      },
+      "uvxDJ61e9xE": {
+        "t": "Atomic resolution interferometric surface roughness metrology in the dining room",
+        "d": 2628
+      },
+      "UXNcivV8JNw": {
+        "t": "DIY Synthetic Fuel Part I - Making Syngas And A High Pressure Compressor",
+        "d": 903
+      },
+      "vPOUfcpOSDg": {
+        "t": "Boom Supersonic's SuperPower Jet Engine Is Real!",
+        "d": 3392
+      },
+      "vS6HEes8daw": {
+        "t": "The PROBLEM with Capitalism - Smarter Every Day 316",
+        "d": 3331
+      },
+      "vw63IoVD9mk": {
+        "t": "How The US Navy Became The Best In The World At Damage Control In WW2 (No AI)",
+        "d": 1188
+      },
+      "W6y97zggg24": {
+        "t": "What If A 3D Printer Printed Tubes Instead?",
+        "d": 2788
+      },
+      "WFxnsU1hu9k": {
+        "t": "Why Does the World’s Biggest Ship Exist?",
+        "d": 507
+      },
+      "woiTedSKPrk": {
+        "t": "Green Lasers: What Can Certain mW Do?",
+        "d": 95
+      },
+      "XFHMhNjtPmQ": {
+        "t": "The Super Mario 64 120 star TAS Explained - Star 1",
+        "d": 1098
+      },
+      "XGQdIdzxBf0": {
+        "t": "Drone Motors on a Hydrofoil Surfboard",
+        "d": 967
+      },
+      "xIMePuuFC7I": {
+        "t": "I Built a Shockwave Cannon",
+        "d": 1386
+      },
+      "xQjeGxWyaUY": {
+        "t": "Making SuperBeer™",
+        "d": 2135
+      },
+      "XsmGHMic8vs": {
+        "t": "A Guilloche Dial In Sterling Silver - Cutting Traditional Guilloché On The Straight-Line Engine #3",
+        "d": 1208
+      },
+      "xtnfcm-fxm4": {
+        "t": "The Reptile Tier List",
+        "d": 2458
+      },
+      "XzB5E36xczM": {
+        "t": "Everything you know about Lightning is wrong",
+        "d": 823
+      },
+      "YNoZGpc607c": {
+        "t": "How Ships Remove OIL From Dirty Water",
+        "d": 174
+      },
+      "ywB-KBzHqtI": {
+        "t": "How Copper Is Made — From Rock to 99.9% Pure Metal",
+        "d": 1107
+      },
+      "z4_GxPHwqkA": {
+        "t": "Perfect Aircrete, Kitchen Ingredients.",
+        "d": 1297
       }
     }
   }
